@@ -294,7 +294,7 @@ void Tf_Memory::CreateLine(void)
 	case 7: //SKIPEQUAL
     {
 	  this->cds_MemHumData->AsString   = "SKIPEQUAL( $" + this->cb_B->Text + " , $" + this->cb_C->Text + " )";
-	  this->cds_MemCode->AsString      = "0101" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text);
+	  this->cds_MemCode->AsString      = "0101" + HexToBin(this->cb_B->Text) + "0000"; //HexToBin(this->cb_C->Text);
 	  break;
 	}
 	case 8: //SKIPGREATER
@@ -329,19 +329,19 @@ void Tf_Memory::CreateLine(void)
     }
     case 13: //AND
 	{
-      this->cds_MemHumData->AsString   = "AND( $" + this->cb_B->Text + " & " + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
+      this->cds_MemHumData->AsString   = "AND( $" + this->cb_B->Text + " & $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1000" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
     case 14: //OR
 	{
-      this->cds_MemHumData->AsString   = "OR( $" + this->cb_B->Text + " | " + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
+      this->cds_MemHumData->AsString   = "OR( $" + this->cb_B->Text + " | $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1001" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
     case 15: //XOR
 	{
-      this->cds_MemHumData->AsString   = "XOR( $" + this->cb_B->Text + " x " + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
+      this->cds_MemHumData->AsString   = "XOR( $" + this->cb_B->Text + " x $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1010" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
@@ -462,6 +462,7 @@ void __fastcall Tf_Memory::FormCreate(TObject *Sender)
   this->rb_Hex->Checked = true;
   this->LastDataType = 2;
   this->LastSelLine = 0;
+  this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP( )"); //29;
   this->b_Add->Click();
 }
 //---------------------------------------------------------------------------

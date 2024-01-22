@@ -13,11 +13,10 @@
 Tf_CPUNode *f_CPUNode;
 //---------------------------------------------------------------------------
 //Constructor for a Node
-TNode::TNode(int pIntID, int pX, int pY, int pType, char *pName)
+TNode::TNode(int pIntID, int pX, int pY, int pType, String pName)
 {
     this->InternalID = pIntID;
-    strncpy(this->Name,pName,sizeof(this->Name));
-    this->Name[sizeof(this->Name)-1] = '\0';
+    this->Name = pName;
 
     this->X = pX;
     this->Y = pY;
@@ -26,16 +25,18 @@ TNode::TNode(int pIntID, int pX, int pY, int pType, char *pName)
 	 this->TagFlag = false;
 
     //Each Node has 2 input and 2 output (exept for NOT which only eval Up)
-    this->IDInUp    = 0;
-    this->IDInDown  = 0;
-    this->IDOutUp   = 0;
-    this->IDOutDown = 0;
+    this->PinInUp    = 0;
+    this->PinInDown  = 0;
+    this->PinOutUp   = 0;
+    this->PinOutDown = 0;
 
     //Output on eigther a Pin or an other Node
-    this->NameOutUp[0]   = '\0';
-    this->NameOutDown[0] = '\0';
-    this->OutUp   = NULL;
-    this->OutDown = NULL;
+    this->NameOutUp     = "";
+    this->NameOutDown   = "";
+    this->NodeOutUp     = NULL;
+    this->NodeOutDown   = NULL;
+    this->IDNodeOutUp   = -1;
+    this->IDNodeOutDown = -1;
 
     //Internal State
     this->Active      = false;
@@ -54,67 +55,67 @@ TNode::TNode(int pIntID, int pX, int pY, int pType, char *pName)
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Input Up
-void TNode::SetInUp(int vID/*, TNode *pID*/)
+void TNode::SetInUp(int pPin/*, TNode *pID*/)
 {
-  this->IDInUp = vID;
+  this->PinInUp = pPin;
   //this->InUp = pID;
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Input Down
-void TNode::SetInDown(int vID/*, TNode *pID*/)
+void TNode::SetInDown(int pPin/*, TNode *pID*/)
 {
-  this->IDInDown = vID;
+  this->PinInDown = pPin;
   //this->InDown = pID;
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Output Up
-void TNode::SetOutUp(int vID, TNode *pID) 
+void TNode::SetOutUp(int pPin, TNode *pID)
 {
-  this->IDOutUp = vID;
-  this->OutUp = pID;
+  this->PinOutUp = pPin;
+  this->NodeOutUp = pID;
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Output Down
-void TNode::SetOutDown(int vID, TNode *pID)
+void TNode::SetOutDown(int pPin, TNode *pID)
 {
-  this->IDOutDown = vID;
-  this->OutDown = pID;
+  this->PinOutDown = pPin;
+  this->NodeOutDown = pID;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Input Up
-int TNode::GetID_InUp(void)
+int TNode::GetPin_InUp(void)
 {
-  return this->IDInUp;
+  return this->PinInUp;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Input Down
-int TNode::GetID_InDown(void)
+int TNode::GetPin_InDown(void)
 {
-  return this->IDInDown;
+  return this->PinInDown;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Output Up
-int TNode::GetID_OutUp(void)
+int TNode::GetPin_OutUp(void)
 {
-  return this->IDOutUp;
+  return this->PinOutUp;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Output Down
-int TNode::GetID_OutDown(void)
+int TNode::GetPin_OutDown(void)
 {
-  return this->IDOutDown;
+  return this->PinOutDown;
 }
 //---------------------------------------------------------------------------
 //Get pointer to Output Node Up
-TNode * TNode::GetOutUp(void)
+TNode * TNode::GetNodeOutUp(void)
 {
-  return this->OutUp; //gives the Output Up node
+  return this->NodeOutUp; //gives the Output Up node
 }
 //---------------------------------------------------------------------------
 //Get pointer to Output Node Down
-TNode * TNode::GetOutDown(void)
+TNode * TNode::GetNodeOutDown(void)
 {
-  return this->OutDown; //gives the Output Down node
+  return this->NodeOutDown; //gives the Output Down node
 }
 //---------------------------------------------------------------------------
 //Get Actual Internal State
@@ -138,11 +139,11 @@ void TNode::SetType(int pType)
 //Check if connected to a Pin (In or Out) or not
 int TNode::GetInOutType(void)
 {
-  if(this->IDInUp > 0 || this->IDInDown > 0)
+  if(this->PinInUp > 0 || this->PinInDown > 0)
   {
     return 1; //Input, Green/Yellow
   }
-  else if(this->IDOutUp > 0 || this->IDOutDown > 0)
+  else if(this->PinOutUp > 0 || this->PinOutDown > 0)
   {
     return 2; //Output, Blue/Purple
   }
@@ -190,13 +191,13 @@ void TNode::Send()
   //Each node sends internal state to Up and Down Output Node by calling remote Receive methode
   if(!this->DeleteFlag)
   {
-      NodeCurr = this->OutUp;
+      NodeCurr = this->NodeOutUp;
       if(NodeCurr != NULL)
       {
         NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
       }
 
-      NodeCurr = this->OutDown;
+      NodeCurr = this->NodeOutDown;
       if(NodeCurr != NULL)
       {
         NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
@@ -242,6 +243,11 @@ void TNode::Work(void)
 	  this->Active = ! this->InUpAct;
       break;
 	}
+	case 6: //Link
+	{
+	  this->Active = this->InUpAct || this->InDownAct;
+      break;
+	}
   }
 
   //Reset the Inputs
@@ -269,39 +275,24 @@ __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 {
-  ifstream FileId;
-  bool LineOk;
+  //ifstream FileId;
+  //bool LineOk;
   TNode* Node;
   TNode* NodeCible;
   int X, Y, Type;
-  int LineCmp;
-  char Name[50];
-  char Buffer[200];
-  char *SubBuff;
+  int ListNodeCount, LinkCount, NodeTypeCount;
+  String Name, FileType;
+  //char Buffer[200];
+  //char *SubBuff;
+  //char NameBuffer[50];
+  int ID, IDOutUp, IDOutDown;
   int PinInUp, PinInDown, PinOutUp, PinOutDown;
-  char NameInUp[50], NameInDown[50], NameOutUp[50], NameOutDown[50];
+  String NameInUp, NameInDown, NameOutUp, NameOutDown;
 
   this->sb_Main->Panels->Items[0]->Text = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
 
-  //Flush all nodes...if any
-  for(int i = 0; i<NodeCmp; i++)
-  {
-     Node = (TNode*)this->NodeList->Items[i];
-     delete Node;
-  }
-
-  this->NodeSelect = NULL;
-  this->NodeType = 0;
-  this->NodeCmp = 0;
-
-  FileId.open("NodeList.ndl");
-  if(FileId.fail() || FileId.bad())
-  {
-    return;
-  }
-
+  /*FileId.open("NodeList.ndl");
   LineOk = true;
-
   while (!FileId.eof())
   {
      FileId.getline(Buffer,200);
@@ -309,7 +300,8 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
      {
        //Chop line by ;
        SubBuff = strtok (Buffer,";");
-       if (SubBuff != NULL){strncpy(Name,SubBuff,50); Name[49]='\0'; SubBuff = strtok (NULL, ";");} else {LineOk = false;}
+       if (SubBuff != NULL){strncpy(NameBuffer,SubBuff,50); Name = NameBuffer; SubBuff = strtok (NULL, ";");}
+       else {LineOk = false;}
        if (SubBuff != NULL){X          = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
        if (SubBuff != NULL){Y          = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
        if (SubBuff != NULL){Type       = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
@@ -317,8 +309,10 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
        if (SubBuff != NULL){PinInDown  = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
        if (SubBuff != NULL){PinOutUp   = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
        if (SubBuff != NULL){PinOutDown = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){strncpy(NameOutUp,SubBuff,50);   NameOutUp[49]='\0';   SubBuff = strtok (NULL, ";");} else {NameOutUp[0] = '\0';}
-       if (SubBuff != NULL){strncpy(NameOutDown,SubBuff,50); NameOutDown[49]='\0'; SubBuff = strtok (NULL, ";");}else {NameOutDown[0] = '\0';}
+       if (SubBuff != NULL){strncpy(NameBuffer,SubBuff,50); NameOutUp   = NameBuffer; SubBuff = strtok (NULL, ";");}
+       else {NameOutUp="";}
+       if (SubBuff != NULL){strncpy(NameBuffer,SubBuff,50); NameOutDown = NameBuffer; SubBuff = strtok (NULL, ";");}
+       else {NameOutDown="";}
 
        //Init each Node with all Info from File
        if (LineOk)
@@ -329,72 +323,248 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
            if (PinInDown != 0)  { Node->SetInDown(PinInDown); }
            if (PinOutUp != 0)   { Node->SetOutUp(PinOutUp, NULL); }
            if (PinOutDown != 0) { Node->SetOutDown(PinOutDown, NULL); }
-           if(strlen(NameOutUp) > 0)  { strncpy(Node->NameOutUp,NameOutUp,50); Node->NameOutUp[49]='\0'; }
-           if(strlen(NameOutDown) > 0){ strncpy(Node->NameOutDown,NameOutDown,50); Node->NameOutDown[49]='\0'; }
+           if(NameOutUp != "")
+              Node->NameOutUp   = NameOutUp;
+           if(NameOutDown != "")
+              Node->NameOutDown = NameOutDown;
            NodeCmp++; //0
 
-           NameOutUp[0]   = '\0';
-           NameOutDown[0] = '\0';
+           NameOutUp = "";
+           NameOutDown = "";
        }
      }
   }
 
-  FileId.close();
+  FileId.close();*/
+
+   if (this->NodeOpenDialog->Execute() == true) {
+
+     //Flush all nodes...if any
+     for (int i = 0; i<this->NodeCmp; i++) {
+        Node = (TNode*)this->NodeList->Items[i];
+        delete Node;
+     }
+     this->NodeList->Clear();
+
+     this->NodeSelect = NULL;
+     this->NodeType = 0;
+     this->NodeCmp = 0;
+     this->pgLoading->Position = 0;
+
+      try {
+         this->XMLDoc->FileName = this->NodeOpenDialog->FileName;
+         this->XMLDoc->Active = true;
+         _di_IXMLNode XmlRoot = XMLDoc->DocumentElement;
+         //_di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[0];
+         FileType = XmlRoot->GetAttribute("Type");
+         if (FileType == "Dyn CPU Sim") {
+            _di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[0];
+            LinkCount = Param->GetAttribute("LinkCount");
+
+            if (Param->ChildNodes->Nodes[0]->IsTextElement)
+            {
+              _di_IXMLNode OrType = XmlRoot->ChildNodes->Nodes[0];
+              NodeTypeCount = OrType->GetAttribute("Count");
+            }
+            if (Param->ChildNodes->Nodes[1]->IsTextElement)
+            {
+              _di_IXMLNode AndType = XmlRoot->ChildNodes->Nodes[1];
+              NodeTypeCount = AndType->GetAttribute("Count");
+            }
+            if (Param->ChildNodes->Nodes[2]->IsTextElement)
+            {
+              _di_IXMLNode NorType = XmlRoot->ChildNodes->Nodes[2];
+              NodeTypeCount = NorType->GetAttribute("Count");
+            }
+            if (Param->ChildNodes->Nodes[3]->IsTextElement)
+            {
+              _di_IXMLNode NandType = XmlRoot->ChildNodes->Nodes[3];
+              NodeTypeCount = NandType->GetAttribute("Count");
+            }
+            if (Param->ChildNodes->Nodes[4]->IsTextElement)
+            {
+              _di_IXMLNode XorType = XmlRoot->ChildNodes->Nodes[4];
+              NodeTypeCount = XorType->GetAttribute("Count");
+            }
+            if (Param->ChildNodes->Nodes[5]->IsTextElement)
+            {
+              _di_IXMLNode NotType = XmlRoot->ChildNodes->Nodes[5];
+              NodeTypeCount = NotType->GetAttribute("Count");
+            }
+
+            _di_IXMLNode NodeState = XmlRoot->ChildNodes->Nodes[1];
+            ListNodeCount = StrToInt(NodeState->GetAttribute("NodeCount"));
+            this->pgLoading->Max = ListNodeCount*2;
+
+            _di_IXMLNodeList AllNode = NodeState->ChildNodes;
+            if (ListNodeCount != AllNode->Count)
+               throw;
+
+            for(int i = 0; i < AllNode->Count; i++) {
+               ID   = AllNode->Get(i)->GetAttribute("ID");
+               Name = AllNode->Get(i)->GetAttribute("Name");
+
+               _di_IXMLNode NodeType   = AllNode->Get(i)->ChildNodes->Nodes[0];
+               _di_IXMLNode NodePos    = AllNode->Get(i)->ChildNodes->Nodes[1];
+               _di_IXMLNode NodeOut    = AllNode->Get(i)->ChildNodes->Nodes[2];
+               _di_IXMLNode NodePinIn  = AllNode->Get(i)->ChildNodes->Nodes[3];
+               _di_IXMLNode NodePinOut = AllNode->Get(i)->ChildNodes->Nodes[4];
+
+               Type = NodeType->GetAttribute("Code");
+               //TypeName = NodeType->GetAttribute("Name");
+               X = NodePos->GetAttribute("X");
+               Y = NodePos->GetAttribute("Y");
+               IDOutUp     = NodeOut->GetAttribute("IDUp");
+               IDOutDown   = NodeOut->GetAttribute("IDDown");
+               NameOutUp   = NodeOut->GetAttribute("NameUp");
+               NameOutDown = NodeOut->GetAttribute("NameDown");
+               //NodeOut->Text;
+               PinInUp   = NodePinIn->GetAttribute("NbUp");
+               PinInDown = NodePinIn->GetAttribute("NbDown");
+               //NodePinIn->Text;
+               PinOutUp   = NodePinOut->GetAttribute("NbUp");
+               PinOutDown = NodePinOut->GetAttribute("NbDown");
+               //NodePinOut->Text;
+
+               Node = new TNode(ID, X, Y, Type, Name);
+               this->NodeList->Add(Node);
+
+               if (PinInUp    != 0)
+                  Node->SetInUp(PinInUp);
+               if (PinInDown  != 0)
+                  Node->SetInDown(PinInDown);
+               if (PinOutUp   != 0)
+                  Node->SetOutUp(PinOutUp, NULL);
+               if (PinOutDown != 0)
+                  Node->SetOutDown(PinOutDown, NULL);
+
+               if (IDOutUp != -1) {
+                 Node->IDNodeOutUp = IDOutUp;
+                 //NodeCible = (TNode*)this->NodeList->Items[IDOutUp];
+                 //Node->SetOutUp(0,NodeCible);
+               }
+
+               if (IDOutDown != -1) {
+                 Node->IDNodeOutDown = IDOutDown;
+                 //NodeCible = (TNode*)this->NodeList->Items[IDOutDown];
+                 //Node->SetOutDown(0,NodeCible);
+               }
+
+               if(NameOutUp   != "")
+                  Node->NameOutUp   = NameOutUp;
+               if(NameOutDown != "")
+                  Node->NameOutDown = NameOutDown;
+               this->NodeCmp++;
+
+               NameOutUp = "";
+               NameOutDown = "";
+               this->pgLoading->Position++;
+            }
+         }
+         this->XMLDoc->Active = false;
+
+         Node = NULL;
+         //Look for each Node with a Output ID in Up or Down and Links it to the coresponding "Downstream" Node
+         for (int i = 0; i<this->NodeCmp; i++) {
+            Node = (TNode*)this->NodeList->Items[i];
+            if (Node->IDNodeOutUp != -1) {
+               NodeCible = (TNode*)this->NodeList->Items[Node->IDNodeOutUp];
+               if (NodeCible->Name == Node->NameOutUp) {
+                  Node->SetOutUp(0,NodeCible);
+               } else
+                  throw;
+            }
+            if (Node->IDNodeOutDown != -1) {
+               NodeCible = (TNode*)this->NodeList->Items[Node->IDNodeOutDown];
+               if (NodeCible->Name == Node->NameOutDown) {
+                  Node->SetOutDown(0,NodeCible);
+               } else
+                  throw;
+            }
+            this->pgLoading->Position++;
+         }
+     }
+	  catch (Exception &E)
+	  {
+		  Application->MessageBox( L"Invalid File", L"Loading Error", MB_OK | MB_ICONINFORMATION);
+     }
 
   //Look for each Node with a Output Name in Up or Down and Links it to the coresponding "Downstream" Node
-  for(int j = 0; j<NodeCmp; j++)
+/*  for(int j = 0; j<NodeCmp; j++)
   {
     Node = (TNode*)this->NodeList->Items[j];
-    if(strlen(Node->NameOutUp) > 0)
-    {
-       for(int i = 0; i<NodeCmp; i++)
-       {
+    if (Node->NameOutUp != "") {
+       for(int i = 0; i<NodeCmp; i++){
           NodeCible = (TNode*)this->NodeList->Items[i];
-          if(strncmp(NodeCible->Name, Node->NameOutUp, sizeof(Node->NameOutUp)) == 0)
-          {
+          if(NodeCible->Name == Node->NameOutUp) {
             Node->SetOutUp(0,NodeCible);
             i = NodeCmp;
           }
        }
     }
-    if(strlen(Node->NameOutDown) > 0)
-    {
-       for(int i = 0; i<NodeCmp; i++)
+    if (Node->NameOutDown != "") {
+       for (int i = 0; i<NodeCmp; i++)
        {
           NodeCible = (TNode*)this->NodeList->Items[i];
-          if(strncmp(NodeCible->Name, Node->NameOutDown, sizeof(Node->NameOutDown)) == 0)
-          {
+          if(NodeCible->Name == Node->NameOutDown) {
             Node->SetOutDown(0,NodeCible);
             i = NodeCmp;
           }
        }
     }
-  }
+  }*/
+     //Update internal state for Not gates
+     for(int i = 0; i<NodeCmp; i++) {
+        Node = (TNode*)this->NodeList->Items[i];
+        Node->Work();
+     }
+     //Update internal state for Not gates
+     for(int i = 0; i<NodeCmp; i++) {
+        Node = (TNode*)this->NodeList->Items[i];
+        Node->Send();
+     }
 
-  //Update internal state for Not gates
-  for(int i = 0; i<NodeCmp; i++)
-  {
-     Node = (TNode*)this->NodeList->Items[i];
-     Node->Work();
-     Node->Send();
-  }
 
-  this->CallDrawArea();
+   }
+
+   this->pgLoading->Position = 0;
+   this->CallDrawArea();
 }
+
+//---------------------------------------------------------------------------
+/*
+<?xml version="1.0"?>
+<FileType Type="Dyn CPU Sim">
+  <Param LinkCount="12000">
+    <OR count="1200"></OR>
+    <AND count="1000"></AND>
+    <NOR count="1000"></NOR>
+    <NAND count="1000"></NAND>
+    <XOR count="1000"></XOR>
+    <NOT count="1000"></NOT>
+  </Param>
+  <NodeState NodeCount="6209">
+    <Node ID="124" Name="ClockPin">
+      <Type Code="1" Name="OR"></Type>
+      <Position X="250" Y="250"></Position>
+      <Output IDUp="125" IDDown="128" NameUp="ClockPin2" NameDown="ClockPin3">True</Output>
+      <PinIn NbUp="1" NbDown="0">True</PinIn>
+      <PinOut NbUp="0" NbDown="0">False</PinOut>
+    </Node>
+<!--[...]-->
+  </NodeState>
+</FileType>
+*/
+
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 {
-  ofstream FileId;
+/*  ofstream FileId;
   String Buffer;
   TNode* NodeCurr;
 
   FileId.open("NodeList.ndl");
 
-  if(FileId.fail() || FileId.bad())
-  {
-    ShowMessage("Error");
-    return;
-  }
   for (int i = 0; i<NodeCmp; i++)
   {
      NodeCurr = (TNode*)this->NodeList->Items[i];
@@ -411,13 +581,139 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
      }
   }
   FileId.close();
-  this->ItsUpdated = false;
-  
-  if(FileId.fail())
-  {
-    ShowMessage("Error");
-    return;
-  }
+  this->ItsUpdated = false;*/
+
+   TNode* NodeCurr;
+   int CountOr=0, CountAnd=0, CountNor=0, CountNand=0, CountXor=0, CountNot=0;
+   int CountLink = 0;
+
+   //this->NodeSaveDialog->Title = this->CPUName;
+   this->NodeSaveDialog->FileName = this->NodeOpenDialog->FileName; //"NodeList_XML.Ndl";
+   this->pgLoading->Position = 0;
+
+   if (this->NodeCmp > 0 && this->NodeSaveDialog->Execute() == true)
+   {
+     _di_IXMLDocument XmlRoot = NewXMLDocument();
+     XmlRoot->Options = TXMLDocOptions() << doNodeAutoIndent;
+
+	  _di_IXMLNode FileType = XmlRoot->CreateElement("FileType", "");
+     XmlRoot->ChildNodes->Add(FileType);
+	  FileType->SetAttribute("Type", (String)"Dyn CPU Sim");
+
+     for (int i = 0; i<this->NodeCmp; i++)
+     {
+        NodeCurr = (TNode*)this->NodeList->Items[i];
+        if(! NodeCurr->DeleteFlag)
+        {
+           if(NodeCurr->NameOutUp != "")
+             CountLink++;
+           if(NodeCurr->NameOutDown != "")
+             CountLink++;
+
+			  switch(NodeCurr->GetType())
+			  { case 0:{CountOr++;   break; }
+			    case 1:{CountAnd++;  break; }
+             case 2:{CountNor++;  break; }
+             case 3:{CountNand++; break; }
+             case 4:{CountXor++;  break; }
+             case 5:{CountNot++;  break; }
+           }
+
+        }
+     }
+
+        _di_IXMLNode Param = XmlRoot->CreateElement("Param", "");
+        FileType->ChildNodes->Add(Param);
+		  Param->SetAttribute("LinkCount", (int) CountLink );
+
+           _di_IXMLNode OrType = XmlRoot->CreateElement("OR", "");
+           Param->ChildNodes->Add(OrType);
+           OrType->SetAttribute("Count", (int) CountOr );
+           //OrType->Text = "";
+           _di_IXMLNode AndType = XmlRoot->CreateElement("AND", "");
+           Param->ChildNodes->Add(AndType);
+           AndType->SetAttribute("Count", (int) CountAnd );
+           //AndType->Text = "";
+           _di_IXMLNode NorType = XmlRoot->CreateElement("NOR", "");
+           Param->ChildNodes->Add(NorType);
+           NorType->SetAttribute("Count", (int) CountNor );
+           //Nor->Text = "";
+           _di_IXMLNode NandType = XmlRoot->CreateElement("NAND", "");
+           Param->ChildNodes->Add(NandType);
+           NandType->SetAttribute("Count", (int) CountNand );
+           //NandType->Text = "";
+           _di_IXMLNode XorType = XmlRoot->CreateElement("XOR", "");
+           Param->ChildNodes->Add(XorType);
+           XorType->SetAttribute("Count", (int) CountXor );
+           //XorType->Text = "";
+           _di_IXMLNode NotType = XmlRoot->CreateElement("NOT", "");
+           Param->ChildNodes->Add(NotType);
+           NotType->SetAttribute("Count", (int) CountNot );
+           //NotType->Text = "";
+
+        _di_IXMLNode NodeState = XmlRoot->CreateElement("NodeState", "");
+        FileType->ChildNodes->Add(NodeState);
+        NodeState->SetAttribute("NodeCount", (int) this->NodeCmp);
+
+        _di_IXMLNode Node;
+        _di_IXMLNode Type;
+        _di_IXMLNode Position;
+        _di_IXMLNode Output;
+        _di_IXMLNode PinIn;
+        _di_IXMLNode PinOut;
+
+     this->pgLoading->Max = this->NodeCmp;
+     for (int i = 0; i<this->NodeCmp; i++)
+     {
+        NodeCurr = (TNode*)this->NodeList->Items[i];
+        if(! NodeCurr->DeleteFlag)
+        {
+           _di_IXMLNode Node = XmlRoot->CreateElement("Node", "");
+           NodeState->ChildNodes->Add(Node);
+           Node->SetAttribute("ID",  (int) NodeCurr->InternalID);
+           Node->SetAttribute("Name",(String) NodeCurr->Name);
+
+              _di_IXMLNode Type = XmlRoot->CreateElement("Type", "");
+              Node->ChildNodes->Add(Type);
+              Type->SetAttribute("Code",(int) NodeCurr->GetType());
+              Type->SetAttribute("Name",(String) NodeCurr->GetType()==0?"OR":
+                                                    NodeCurr->GetType()==1?"AND":
+                                                       NodeCurr->GetType()==2?"NOR":
+                                                          NodeCurr->GetType()==3?"NAND":
+                                                             NodeCurr->GetType()==4?"XOR":
+                                                                NodeCurr->GetType()==5?"NOT":"LNK");
+
+              _di_IXMLNode Position = XmlRoot->CreateElement("Position", "");
+              Node->ChildNodes->Add(Position);
+              Position->SetAttribute("X",(int) NodeCurr->X);
+              Position->SetAttribute("Y",(int) NodeCurr->Y);
+
+              _di_IXMLNode Output = XmlRoot->CreateElement("Output", "");
+              Node->ChildNodes->Add(Output);
+              Output->SetAttribute("IDUp",   NodeCurr->NameOutUp!=""   ? NodeCurr->GetNodeOutUp()->InternalID   :-1);
+              Output->SetAttribute("IDDown", NodeCurr->NameOutDown!="" ? NodeCurr->GetNodeOutDown()->InternalID :-1);
+              Output->SetAttribute("NameUp",  (String) NodeCurr->NameOutUp);
+              Output->SetAttribute("NameDown",(String) NodeCurr->NameOutDown);
+              Output->Text = NodeCurr->GetActive() ? "True" : "False";
+
+              _di_IXMLNode PinIn = XmlRoot->CreateElement("PinIn", "");
+              Node->ChildNodes->Add(PinIn);
+              PinIn->SetAttribute("NbUp",  (int) NodeCurr->GetPin_InUp());
+              PinIn->SetAttribute("NbDown",(int) NodeCurr->GetPin_InDown());
+              PinIn->Text = NodeCurr->GetPin_InUp()==0 && NodeCurr->GetPin_InDown()==0 ? "False" : "True";
+
+              _di_IXMLNode PinOut = XmlRoot->CreateElement("PinOut", "");
+              Node->ChildNodes->Add(PinOut);
+              PinOut->SetAttribute("NbUp",  (int) NodeCurr->GetPin_OutUp());
+              PinOut->SetAttribute("NbDown",(int) NodeCurr->GetPin_OutDown());
+              PinOut->Text = NodeCurr->GetPin_OutUp()==0 && NodeCurr->GetPin_OutDown()==0 ? "False" : "True";
+        }
+        this->pgLoading->Position++;
+     }
+     this->ItsUpdated = false;
+     XmlRoot->SaveToFile(this->NodeSaveDialog->FileName);
+     this->pgLoading->Position = 0;
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_StartClick(TObject *Sender)
@@ -478,17 +774,22 @@ void Tf_CPUNode::ResetAllNode(void)
 {
   TNode* NodeCurr;
 
-  for(int i = 0; i<NodeCmp; i++)
+  for(int i = 0; i<this->NodeCmp; i++)
   {
     NodeCurr = (TNode*)this->NodeList->Items[i];
     NodeCurr->Reset();
   }
 
   //Update internal state for Not gates
-  for(int i = 0; i<NodeCmp; i++)
+  for(int i = 0; i<this->NodeCmp; i++)
   {
      NodeCurr = (TNode*)this->NodeList->Items[i];
      NodeCurr->Work();
+  }
+  //Update internal state for Not gates
+  for(int i = 0; i<this->NodeCmp; i++)
+  {
+     NodeCurr = (TNode*)this->NodeList->Items[i];
      NodeCurr->Send();
   }
 
@@ -506,8 +807,8 @@ void Tf_CPUNode::ReadInput(void)
   for(int i = 0; i<NodeCmp; i++)
   {
     NodeCurr = (TNode*)this->NodeList->Items[i];
-    IDUp = NodeCurr->GetID_InUp();
-    IDDown = NodeCurr->GetID_InDown();
+    IDUp = NodeCurr->GetPin_InUp();
+    IDDown = NodeCurr->GetPin_InDown();
 
     if(! NodeCurr->DeleteFlag)
     {
@@ -544,8 +845,8 @@ void Tf_CPUNode::WriteOutput(void)
   for(int i = 0; i<NodeCmp; i++)
   {
     NodeCurr = (TNode*)this->NodeList->Items[i];
-    IDUp = NodeCurr->GetID_OutUp();
-    IDDown = NodeCurr->GetID_OutDown();
+    IDUp = NodeCurr->GetPin_OutUp();
+    IDDown = NodeCurr->GetPin_OutDown();
 
     if(! NodeCurr->DeleteFlag)
     {
@@ -739,6 +1040,23 @@ void Tf_CPUNode::DrawArea(int NbDraw)
 				   this->Canvas->Polygon(Triangle, 2);
 				   break;
 			   }
+            case 6: //LINK Line
+            {
+				   if (NodeCurr == NodeSelect)
+					   this->Canvas->Pen->Color = clWhite;
+               else if (NodeCurr->GetActive()) {
+				      if (NodeCurr->TagFlag)
+				         this->Canvas->Pen->Color = clLtGray;
+				      else
+				         this->Canvas->Pen->Color = clRed;
+			      } else
+					   this->Canvas->Pen->Color = clBlack;
+
+				   this->Canvas->MoveTo( StartX + (NodeCurr->X * GridSize)              , StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
+				   this->Canvas->LineTo( StartX + (NodeCurr->X * GridSize) + ObjSize    , StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
+				   this->Canvas->Pen->Color = clBlack;
+				   break;
+            }
 			 }
 		   }//if in bounds
 
@@ -759,7 +1077,7 @@ void Tf_CPUNode::DrawArea(int NbDraw)
 		   }
 
 		   //Line Out Up
-		   NodeUp = NodeCurr->GetOutUp();
+		   NodeUp = NodeCurr->GetNodeOutUp();
 		   if (NodeUp != NULL)
 		   {
 			   if(!( ((StartX + (NodeCurr->X * GridSize)) < 0    && (StartX + (NodeUp->X * GridSize)) < 0    )||
@@ -776,7 +1094,7 @@ void Tf_CPUNode::DrawArea(int NbDraw)
 		   }
 
 		   //Line Out Down
-		   NodeDown = NodeCurr->GetOutDown();
+		   NodeDown = NodeCurr->GetNodeOutDown();
 		   if (NodeDown != NULL)
 		   {
 			   if(!( ((StartX + (NodeCurr->X * GridSize)) < 0    && (StartX + (NodeDown->X * GridSize)) < 0    )||
@@ -811,12 +1129,12 @@ void Tf_CPUNode::UpdateNode(void)
   TagFollowList(this->NodeSelect, 10, false);
 
   //Read data from Edit Window and Update the selected Node
-  strncpy(NodeSelect->Name, AnsiString(f_GraphEdit->e_Name->Text).c_str(), 50);
+  NodeSelect->Name = f_GraphEdit->e_Name->Text;
   NodeSelect->X = StrToInt(f_GraphEdit->e_PosX->Text);
   NodeSelect->Y = StrToInt(f_GraphEdit->e_PosY->Text);
   NodeSelect->SetType(f_GraphEdit->cb_Type->ItemIndex);
-  strncpy(NodeSelect->NameOutUp, AnsiString(f_GraphEdit->e_NameOutUp->Text).c_str(), 50);
-  strncpy(NodeSelect->NameOutDown, AnsiString(f_GraphEdit->e_NameOutDown->Text).c_str(), 50);
+  NodeSelect->NameOutUp   = f_GraphEdit->e_NameOutUp->Text;
+  NodeSelect->NameOutDown = f_GraphEdit->e_NameOutDown->Text;
 
   NodeSelect->SetInUp(StrToInt(f_GraphEdit->e_PinIDInUp->Text));
   NodeSelect->SetInDown(StrToInt(f_GraphEdit->e_PinIDInDown->Text));
@@ -827,53 +1145,52 @@ void Tf_CPUNode::UpdateNode(void)
   {
     NodeSelect->SetInUp(0);
     NodeSelect->SetInDown(0);
-    strncat(NodeSelect->Name, "DELETEDELETEDELETEDELETEDELETEDELETEDELETEDELETE", sizeof(NodeSelect->Name));
+    NodeSelect->Name = NodeSelect->Name + "DELETEDELETEDELETEDELETEDELETE" ;
   }
 
   //If Node Name changed or deleted, update Nodes conneted to it "Upstream"
   for(int i = 0; i<NodeCmp; i++)
   {
     NodeCible = (TNode*)this->NodeList->Items[i];
-    if(strncmp(AnsiString(f_GraphEdit->l_SaveName->Caption).c_str(), NodeCible->NameOutUp, sizeof(NodeCible->NameOutUp)) == 0)
+    if(f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutUp)
     {
 	   if(NodeSelect->DeleteFlag)
        {
-          NodeCible->NameOutUp[0] = '\0';
+          NodeCible->NameOutUp = "";
           NodeCible->SetOutUp(0, NULL);
        }
        else if(f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text)
        {
-          strncpy(NodeCible->NameOutUp, AnsiString(f_GraphEdit->e_Name->Text).c_str(), sizeof(NodeCible->NameOutUp));
+          NodeCible->NameOutUp = f_GraphEdit->e_Name->Text;
        }
     }
-    if(strncmp(AnsiString(f_GraphEdit->l_SaveName->Caption).c_str(), NodeCible->NameOutDown, sizeof(NodeCible->NameOutDown)) == 0)
+    if(f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutDown)
     {
        if(NodeSelect->DeleteFlag)
        {
-          NodeCible->NameOutDown[0] = '\0';
+          NodeCible->NameOutDown = "";
           NodeCible->SetOutDown(0, NULL);
        }
        else if(f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text)
        {
-          strncpy(NodeCible->NameOutDown, AnsiString(f_GraphEdit->e_Name->Text).c_str(), sizeof(NodeCible->NameOutUp));
+          NodeCible->NameOutDown = f_GraphEdit->e_Name->Text;
        }
     }
   }
   //If Output Node Up Changed / Removed
   if (f_GraphEdit->e_NameOutUp->Text != f_GraphEdit->l_NameOutUp->Caption || NodeSelect->DeleteFlag)
   {
-    if(strlen(NodeSelect->NameOutUp) > 0)
+    if(NodeSelect->NameOutUp != "")
     {
        int i = 0;
        while(i<NodeCmp)
        {
           NodeCible = (TNode*)this->NodeList->Items[i];
-          if(NodeSelect->DeleteFlag || strncmp(NodeCible->Name, NodeSelect->NameOutUp, sizeof(NodeSelect->NameOutUp)) == 0)
+          if(NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutUp)
           {
             NodeSelect->SetOutUp(0,NodeCible);
             i = NodeCmp;
           }
-          //}
           i++;
        }
     }
@@ -885,13 +1202,13 @@ void Tf_CPUNode::UpdateNode(void)
   //If Output Node Down Changed / Removed
   if (f_GraphEdit->e_NameOutDown->Text != f_GraphEdit->l_NameOutDown->Caption || NodeSelect->DeleteFlag)
   {
-    if(strlen(NodeSelect->NameOutDown) > 0)
+    if(NodeSelect->NameOutDown != "")
     {
        int i = 0;
        while(i<NodeCmp)
        {
           NodeCible = (TNode*)this->NodeList->Items[i];
-          if(NodeSelect->DeleteFlag || strncmp(NodeCible->Name, NodeSelect->NameOutDown, sizeof(NodeSelect->NameOutDown)) == 0)
+          if(NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutDown)
           {
             NodeSelect->SetOutDown(0,NodeCible);
             i = NodeCmp;
@@ -953,7 +1270,7 @@ void __fastcall Tf_CPUNode::b_OrClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-bool Tf_CPUNode::NodeNameExists(char *pName)
+bool Tf_CPUNode::NodeNameExists(String pName)
 {
     TNode* NodeCurr;
     bool Found = false;
@@ -963,7 +1280,7 @@ bool Tf_CPUNode::NodeNameExists(char *pName)
        NodeCurr = (TNode*)this->NodeList->Items[i];
        if(! NodeCurr->DeleteFlag)
        {
-          if(strncmp(pName, NodeCurr->Name, sizeof(NodeCurr->Name)) == 0)
+          if(pName == NodeCurr->Name)
           {
              Found = true;
              i = NodeCmp;
@@ -1021,10 +1338,10 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                 f_GraphEdit->l_NameOutUp->Caption = NodeCurr->NameOutUp;
                 f_GraphEdit->l_NameOutDown->Caption = NodeCurr->NameOutDown;
 
-                f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetID_InUp());
-                f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetID_InDown());
-                f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetID_OutUp());
-                f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetID_OutDown());
+                f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
+                f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
+                f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
+                f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
 
                 f_GraphEdit->Visible = true;
                 i = NodeCmp;
@@ -1058,13 +1375,13 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
 
     int NodeNameNumber = NodeCmp;
 	Name = "Node" + IntToStr(NodeNameNumber);
-    while(NodeNameExists(AnsiString(Name).c_str()))
+    while(NodeNameExists(Name))
     {
       NodeNameNumber++;
       Name = "Node" + IntToStr(NodeNameNumber);
     }
 
-    NodeCurr = new TNode(NodeCmp, pX, pY, NodeType, AnsiString(Name).c_str());
+    NodeCurr = new TNode(NodeCmp, pX, pY, NodeType, Name);
     NodeCmp++;
 
 	this->NodeList->Add(NodeCurr);
@@ -1147,9 +1464,9 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
 				TagFollowList(this->NodeSelect, 10, false);
 				this->NodeSelect = NodeCurr;
 
-                this->NodeSelect->NameOutUp[0] = '\0';
+                this->NodeSelect->NameOutUp == "";
                 this->NodeSelect->SetOutUp(0, NULL);
-                this->NodeSelect->NameOutDown[0] = '\0';
+                this->NodeSelect->NameOutDown == "";
                 this->NodeSelect->SetOutDown(0, NULL);
                 //Draw
                 this->Invalidate();
@@ -1168,10 +1485,10 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                 f_GraphEdit->l_NameOutUp->Caption = NodeCurr->NameOutUp;
                 f_GraphEdit->l_NameOutDown->Caption = NodeCurr->NameOutDown;
 
-                f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetID_InUp());
-                f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetID_InDown());
-                f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetID_OutUp());
-                f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetID_OutDown());
+                f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
+                f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
+                f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
+                f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
 
                 f_GraphEdit->Visible = true;
                 i = NodeCmp;
@@ -1186,8 +1503,8 @@ void Tf_CPUNode::TagFollowList(TNode *NodeTag, int Depth, bool Sel)
   if(Depth > 0 && NodeTag != NULL)
   {
 	NodeTag->TagFlag = Sel;
-	TagFollowList(NodeTag->GetOutUp(), Depth-1, Sel);
-	TagFollowList(NodeTag->GetOutDown(), Depth-1, Sel);
+	TagFollowList(NodeTag->GetNodeOutUp(), Depth-1, Sel);
+	TagFollowList(NodeTag->GetNodeOutDown(), Depth-1, Sel);
   }
 }
 //---------------------------------------------------------------------------

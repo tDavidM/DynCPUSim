@@ -527,27 +527,21 @@ void Tf_Ram::Set(String Addr, String Value, String Page)
 
    this->AddrToXY(Addr, X, Y);
 
-   if(this->rb_Bin->Checked)
-   {
+   if (this->rb_Bin->Checked) {
 	   Data = Value.UpperCase();
 	   Data = HexToBin(Data.SubString(1,1)) + HexToBin(Data.SubString(2,1));
-   }
-   else if(this->rb_Dec->Checked)
-   {
+   } else if(this->rb_Dec->Checked) {
 	   Data = Value.UpperCase();
 	   Data = IntToStr( (StrToInt(HexToDec(Data.SubString(1,1))) * 16) + StrToInt(HexToDec(Data.SubString(2,1))) );
-   }
-   else
-   {
+   } else{
 	   Data = Value;
    }
 
-   this->sg_Ram->Cells[X][Y] = Data;
-
-   if (this->CurrentPage != Page)
-   {
+   if (this->CurrentPage != Page) {
 	  this->SwapPage(this->CurrentPage, Page);
    }
+
+   this->sg_Ram->Cells[X][Y] = Data;
 }
 //---------------------------------------------------------------------------
 void Tf_Ram::Get(String Addr, char *Value, String Page)
@@ -558,15 +552,16 @@ void Tf_Ram::Get(String Addr, char *Value, String Page)
    this->AddrToXY(Addr, X, Y);
    Data = this->sg_Ram->Cells[X][Y];
 
-   if(this->rb_Dec->Checked)
-   {
-             Data = DecToHex(Data);
-             Data = HexToBin(Data.SubString(1,1)) + HexToBin(Data.SubString(2,1));
+   if (this->rb_Dec->Checked) {
+     Data = DecToHex(Data);
+     Data = HexToBin(Data.SubString(1,1)) + HexToBin(Data.SubString(2,1));
+   } else if (this->rb_Hex->Checked) {
+     Data = Data.UpperCase();
+     Data = HexToBin(Data.SubString(1,1)) + HexToBin(Data.SubString(2,1));
    }
-   else if (this->rb_Hex->Checked)
-   {
-             Data = Data.UpperCase();
-             Data = HexToBin(Data.SubString(1,1)) + HexToBin(Data.SubString(2,1));
+
+   if (this->CurrentPage != Page) {
+	  this->SwapPage(this->CurrentPage, Page);
    }
 
    strncpy(Value,AnsiString(Data).c_str(),8);

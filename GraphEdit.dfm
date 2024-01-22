@@ -170,7 +170,7 @@ object f_GraphEdit: Tf_GraphEdit
     OnKeyPress = e_NameOutUpKeyPress
   end
   object cb_Type: TComboBox
-    Left = 89
+    Left = 88
     Top = 133
     Width = 192
     Height = 21
@@ -183,7 +183,8 @@ object f_GraphEdit: Tf_GraphEdit
       'NOR'
       'NAND'
       'XOR'
-      'NOT')
+      'NOT'
+      'LINK')
   end
   object e_PinIDInUp: TEdit
     Left = 88

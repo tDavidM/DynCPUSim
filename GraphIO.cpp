@@ -158,9 +158,7 @@ void __fastcall Tf_GraphIO::b_ResetClick(TObject *Sender)
   {
      CurrPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(i));
      if (CurrPin != NULL)
-     {
         CurrPin->Checked = false;
-     }
   }
 }
 //---------------------------------------------------------------------------

@@ -17,6 +17,11 @@
 #include "GraphEdit.h"
 #include "Memory.h"
 #include "Ram.h"
+#include <Vcl.Dialogs.hpp>
+#include <Xml.Win.msxmldom.hpp>
+#include <Xml.XMLDoc.hpp>
+#include <Xml.xmldom.hpp>
+#include <Xml.XMLIntf.hpp>
 
 #define VK_KEY_1 0x31
 #define VK_KEY_2 0x32
@@ -30,8 +35,8 @@ class TNode
 private:
   int Type;
 
-  int IDInUp, IDInDown, IDOutUp, IDOutDown;
-  TNode /* *InUp, *InDown,*/ *OutUp, *OutDown;
+  int PinInUp, PinInDown, PinOutUp, PinOutDown;
+  TNode /* *InUp, *InDown,*/ *NodeOutUp, *NodeOutDown;
   int  ActiveDelay;
   bool Active;
   bool InUpAct, InDownAct, InActiveUp, InActiveDown;
@@ -39,9 +44,13 @@ private:
 
 public:
   int X, Y;
-  char Name[50];
-  char NameOutUp[50];
-  char NameOutDown[50];
+
+  String Name;
+  String NameOutUp;
+  String NameOutDown;
+
+  int  IDNodeOutUp, IDNodeOutDown;
+
   int  InternalID;
   bool DeleteFlag;
   bool TagFlag;
@@ -50,17 +59,17 @@ public:
   void Receive(bool pAct);
   void Work(void);
 
-  void SetInUp(int vID/*, TNode *pID*/);
-  void SetInDown(int vID/*, TNode *pID*/);
-  void SetOutUp(int vID, TNode *pID);
-  void SetOutDown(int vID, TNode *pID);
+  void SetInUp(int pPin/*, TNode *pID*/);
+  void SetInDown(int pPin/*, TNode *pID*/);
+  void SetOutUp(int pPin, TNode *pID);
+  void SetOutDown(int pPin, TNode *pID);
 
   void Reset(void);
   
-  int GetID_InUp(void);
-  int GetID_InDown(void);
-  int GetID_OutUp(void);
-  int GetID_OutDown(void);
+  int GetPin_InUp(void);
+  int GetPin_InDown(void);
+  int GetPin_OutUp(void);
+  int GetPin_OutDown(void);
 
   int  GetType(void);
   void SetType(int pType);
@@ -68,10 +77,10 @@ public:
   bool GetActive(void);
   int  GetInOutType(void);
 
-  TNode * GetOutUp(void);
-  TNode * GetOutDown(void);
+  TNode * GetNodeOutUp(void);
+  TNode * GetNodeOutDown(void);
 
-  TNode(int pIntID, int pX, int pY, int pType, char *pName);
+  TNode(int pIntID, int pX, int pY, int pType, String pName);
 };
 
 class Tf_CPUNode : public TForm
@@ -107,6 +116,10 @@ __published:	// Composants gérés par l'EDI
    TPanel *Panel1;
    TLabel *l_Speed;
    TTrackBar *tb_Speed;
+   TSaveDialog *NodeSaveDialog;
+   TOpenDialog *NodeOpenDialog;
+   TXMLDocument *XMLDoc;
+   TProgressBar *pgLoading;
     void __fastcall b_InitClick(TObject *Sender);
     void __fastcall b_StartClick(TObject *Sender);
     void __fastcall t_WorkTimer(TObject *Sender);
@@ -162,7 +175,7 @@ public:		// Déclarations de l'utilisateur
     __fastcall Tf_CPUNode(TComponent* Owner);
     void UpdateNode(void);
     void ResetAllNode(void);
-	bool NodeNameExists(char *pName);
+	bool NodeNameExists(String pName);
 	void EmptyFollowList(void);
 };
 

@@ -1,7 +1,7 @@
 object f_CPUNode: Tf_CPUNode
   Left = 0
   Top = 0
-  Caption = 'GraphCPUNode'
+  Caption = 'Dynamic CPU Simulation'
   ClientHeight = 615
   ClientWidth = 1071
   Color = clBtnFace
@@ -32,8 +32,6 @@ object f_CPUNode: Tf_CPUNode
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     Visible = False
-    ExplicitWidth = 984
-    ExplicitHeight = 478
   end
   object p_zoom: TPanel
     Left = 1031
@@ -76,8 +74,6 @@ object f_CPUNode: Tf_CPUNode
     SimpleText = 
       #9#9#9#9#9#9#9#9'Mouse: Left=Select, Right=Move, Middle=Create, Shift+Lef' +
       't=Link(1), Ctrl+Left=Link(2)'
-    ExplicitTop = 531
-    ExplicitWidth = 1000
   end
   object HeaderControl1: THeaderControl
     Left = 0
@@ -274,6 +270,14 @@ object f_CPUNode: Tf_CPUNode
       OnChange = tb_SpeedChange
     end
   end
+  object pgLoading: TProgressBar
+    Left = 857
+    Top = 598
+    Width = 198
+    Height = 16
+    Anchors = [akRight, akBottom]
+    TabOrder = 20
+  end
   object t_Work: TTimer
     Enabled = False
     OnTimer = t_WorkTimer
@@ -307,5 +311,26 @@ object f_CPUNode: Tf_CPUNode
     OnTimer = t_DrawMulti3Timer
     Left = 112
     Top = 88
+  end
+  object NodeSaveDialog: TSaveDialog
+    DefaultExt = '.ndl'
+    Filter = 'CPU Sim File|*.ndl'
+    Options = [ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Left = 352
+    Top = 88
+  end
+  object NodeOpenDialog: TOpenDialog
+    DefaultExt = '.ndl'
+    Filter = 'CPU Sim File|*.ndl'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 272
+    Top = 88
+  end
+  object XMLDoc: TXMLDocument
+    NodeIndentStr = '   '
+    Options = [doNodeAutoCreate, doNodeAutoIndent, doAttrNull, doAutoPrefix, doNamespaceDecl]
+    Left = 312
+    Top = 56
+    DOMVendorDesc = 'MSXML'
   end
 end
