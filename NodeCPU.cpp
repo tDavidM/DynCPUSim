@@ -349,6 +349,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
      this->NodeSelect = NULL;
      this->NodeType = 0;
      this->NodeCmp = 0;
+     this->NodeMaxID = 0;
      this->pgLoading->Position = 0;
 
       try {
@@ -398,7 +399,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 
             _di_IXMLNodeList AllNode = NodeState->ChildNodes;
             if (ListNodeCount != AllNode->Count)
-               throw;
+               ShowMessage("Error NodeCount");
 
             for(int i = 0; i < AllNode->Count; i++) {
                ID   = AllNode->Get(i)->GetAttribute("ID");
@@ -425,6 +426,9 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
                PinOutUp   = NodePinOut->GetAttribute("NbUp");
                PinOutDown = NodePinOut->GetAttribute("NbDown");
                //NodePinOut->Text;
+
+               if (this->NodeMaxID < ID)
+                  this->NodeMaxID = ID;
 
                Node = new TNode(ID, X, Y, Type, Name);
                this->NodeList->Add(Node);
@@ -468,24 +472,35 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
          for (int i = 0; i<this->NodeCmp; i++) {
             Node = (TNode*)this->NodeList->Items[i];
             if (Node->IDNodeOutUp != -1) {
-               NodeCible = (TNode*)this->NodeList->Items[Node->IDNodeOutUp];
-               if (NodeCible->Name == Node->NameOutUp) {
-                  Node->SetOutUp(0,NodeCible);
-               } else
-                  throw;
+               for(int j = 0; j<NodeCmp; j++) {
+                  NodeCible = (TNode*)this->NodeList->Items[j];
+                  if (Node->IDNodeOutUp == NodeCible->InternalID) {
+
+                     if (NodeCible->Name == Node->NameOutUp) {
+                        Node->SetOutUp(0,NodeCible);
+                     } else
+                        ShowMessage("NodeID:"+IntToStr(Node->InternalID)+"("+Node->Name+") Error[Up]["+NodeCible->Name+"]:"+
+                                      IntToStr(Node->IDNodeOutUp)+"("+NodeCible->Name+")"); //throw;
+                  }
+               }
             }
             if (Node->IDNodeOutDown != -1) {
-               NodeCible = (TNode*)this->NodeList->Items[Node->IDNodeOutDown];
-               if (NodeCible->Name == Node->NameOutDown) {
-                  Node->SetOutDown(0,NodeCible);
-               } else
-                  throw;
+               for(int j = 0; j<NodeCmp; j++) {
+                  NodeCible = (TNode*)this->NodeList->Items[j];
+                  if (Node->IDNodeOutDown == NodeCible->InternalID) {
+
+                     if (NodeCible->Name == Node->NameOutDown) {
+                        Node->SetOutDown(0,NodeCible);
+                     } else
+                        ShowMessage("NodeID:"+IntToStr(Node->InternalID)+"("+Node->Name+") Error[Up]["+NodeCible->Name+"]:"+
+                                      IntToStr(Node->IDNodeOutUp)+"("+NodeCible->Name+")"); //throw;
+                  }
+               }
             }
             this->pgLoading->Position++;
          }
      }
-	  catch (Exception &E)
-	  {
+	  catch (Exception &E) {
 		  Application->MessageBox( L"Invalid File", L"Loading Error", MB_OK | MB_ICONINFORMATION);
      }
 
@@ -514,17 +529,15 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
     }
   }*/
      //Update internal state for Not gates
-     for(int i = 0; i<NodeCmp; i++) {
+     for (int i = 0; i<NodeCmp; i++) {
         Node = (TNode*)this->NodeList->Items[i];
         Node->Work();
      }
-     //Update internal state for Not gates
-     for(int i = 0; i<NodeCmp; i++) {
+     //Update internal state for Not gates, must be done in 2 loops
+     for (int i = 0; i<NodeCmp; i++) {
         Node = (TNode*)this->NodeList->Items[i];
         Node->Send();
      }
-
-
    }
 
    this->pgLoading->Position = 0;
@@ -585,7 +598,7 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 
    TNode* NodeCurr;
    int CountOr=0, CountAnd=0, CountNor=0, CountNand=0, CountXor=0, CountNot=0;
-   int CountLink = 0;
+   int CountLink = 0, CountNode = 0;
 
    //this->NodeSaveDialog->Title = this->CPUName;
    this->NodeSaveDialog->FileName = this->NodeOpenDialog->FileName; //"NodeList_XML.Ndl";
@@ -605,6 +618,7 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
         NodeCurr = (TNode*)this->NodeList->Items[i];
         if(! NodeCurr->DeleteFlag)
         {
+           CountNode++;
            if(NodeCurr->NameOutUp != "")
              CountLink++;
            if(NodeCurr->NameOutDown != "")
@@ -653,7 +667,7 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 
         _di_IXMLNode NodeState = XmlRoot->CreateElement("NodeState", "");
         FileType->ChildNodes->Add(NodeState);
-        NodeState->SetAttribute("NodeCount", (int) this->NodeCmp);
+        NodeState->SetAttribute("NodeCount", (int) CountNode);
 
         _di_IXMLNode Node;
         _di_IXMLNode Type;
@@ -738,23 +752,17 @@ void __fastcall Tf_CPUNode::t_WorkTimer(TObject *Sender)
   this->ReadInput();
 
   //Communicate internal state
-  for(int i = 0; i<NodeCmp; i++)
-  {
+  for (int i = 0; i<NodeCmp; i++) {
      NodeCurr = (TNode*)this->NodeList->Items[i];
      if(! NodeCurr->DeleteFlag)
-     {
        NodeCurr->Send();
-     }
   }
 
   //Update internal state
-  for(int i = 0; i<NodeCmp; i++)
-  {
+  for (int i = 0; i<NodeCmp; i++) {
      NodeCurr = (TNode*)this->NodeList->Items[i];
      if(! NodeCurr->DeleteFlag)
-     {
        NodeCurr->Work();
-     }
   }
 
   //Write to Output
@@ -763,10 +771,8 @@ void __fastcall Tf_CPUNode::t_WorkTimer(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::t_DrawTimer(TObject *Sender)
 {
-  if(this->cb_ActiveDraw->Checked) {
-     //Draw
+  if(this->cb_ActiveDraw->Checked)
      this->CallDrawArea();
-  }
 }
 //---------------------------------------------------------------------------
 
@@ -774,21 +780,18 @@ void Tf_CPUNode::ResetAllNode(void)
 {
   TNode* NodeCurr;
 
-  for(int i = 0; i<this->NodeCmp; i++)
-  {
+  for (int i = 0; i<this->NodeCmp; i++) {
     NodeCurr = (TNode*)this->NodeList->Items[i];
     NodeCurr->Reset();
   }
 
   //Update internal state for Not gates
-  for(int i = 0; i<this->NodeCmp; i++)
-  {
+  for (int i = 0; i<this->NodeCmp; i++) {
      NodeCurr = (TNode*)this->NodeList->Items[i];
      NodeCurr->Work();
   }
   //Update internal state for Not gates
-  for(int i = 0; i<this->NodeCmp; i++)
-  {
+  for (int i = 0; i<this->NodeCmp; i++) {
      NodeCurr = (TNode*)this->NodeList->Items[i];
      NodeCurr->Send();
   }
@@ -804,32 +807,24 @@ void Tf_CPUNode::ReadInput(void)
   int IDUp, IDDown;
 
   //Scan for Node with Input Pin ID
-  for(int i = 0; i<NodeCmp; i++)
-  {
+  for (int i = 0; i<NodeCmp; i++) {
     NodeCurr = (TNode*)this->NodeList->Items[i];
     IDUp = NodeCurr->GetPin_InUp();
     IDDown = NodeCurr->GetPin_InDown();
 
-    if(! NodeCurr->DeleteFlag)
-    {
+    if (! NodeCurr->DeleteFlag) {
         //Pin connected to Input Up
-        if(IDUp > 0)
-        {
+        if (IDUp > 0) {
           CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDUp));
           if (CurrPin != NULL)
-          {
             NodeCurr->Receive(CurrPin->Checked);
-          }
         }
 
         //Pin connected to Input Down
-        if(IDDown > 0)
-        {
+        if (IDDown > 0) {
           CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDDown));
           if (CurrPin != NULL)
-          {
             NodeCurr->Receive(CurrPin->Checked);
-          }
         }
     }
   }
@@ -842,32 +837,24 @@ void Tf_CPUNode::WriteOutput(void)
   int IDUp, IDDown;
 
   //Scan for Node with Output Pin ID
-  for(int i = 0; i<NodeCmp; i++)
-  {
+  for (int i = 0; i<NodeCmp; i++) {
     NodeCurr = (TNode*)this->NodeList->Items[i];
     IDUp = NodeCurr->GetPin_OutUp();
     IDDown = NodeCurr->GetPin_OutDown();
 
-    if(! NodeCurr->DeleteFlag)
-    {
+    if (! NodeCurr->DeleteFlag) {
         //Pin connected to Output Up
-        if(IDUp > 0)
-        {
+        if (IDUp > 0) {
           CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDUp));
           if (CurrPin != NULL)
-          {
             CurrPin->Checked = NodeCurr->GetActive();
-          }
         }
 
         //Pin connected to Output Down
-        if(IDDown > 0)
-        {
+        if (IDDown > 0) {
           CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDDown));
           if (CurrPin != NULL)
-          {
             CurrPin->Checked = NodeCurr->GetActive();
-          }
         }
      }
   }
@@ -918,10 +905,8 @@ void Tf_CPUNode::DrawArea(int NbDraw)
   this->Canvas->Pen->Color   = clBlack;
   //this->Canvas->FillRect(ClientRect);
 
-  for(int i = 0; i<NodeCmp; i++)
-  {
-	 if(i%4 == NbDraw)
-	 {
+  for (int i = 0; i<NodeCmp; i++) {
+	 if (i%4 == NbDraw) {
 		 //Node, Black Inactive, Red Active
 		 NodeCurr = (TNode*)this->NodeList->Items[i];
 
@@ -931,8 +916,7 @@ void Tf_CPUNode::DrawArea(int NbDraw)
 		   this->Canvas->Brush->Color = clBlack;
 		 this->Canvas->Pen->Color   = clBlack;
 
-		 if(! NodeCurr->DeleteFlag)
-		 {
+		 if(! NodeCurr->DeleteFlag) {
 		   if((StartX + (NodeCurr->X * GridSize)) > 0 &&
 			  (StartY + (NodeCurr->Y * GridSize)) > 0 &&
 			  (StartX + (NodeCurr->X * GridSize)) < MaxX &&
@@ -940,11 +924,8 @@ void Tf_CPUNode::DrawArea(int NbDraw)
 		   {
 			 DrawCmpItem++;
 			 if(NodeCurr == NodeSelect)
-			 {
 				 this->Canvas->Brush->Color = clWhite;
-			 }
-			 else if(NodeCurr->GetInOutType() == 0 && NodeCurr->GetActive())
-			 {
+			 else if(NodeCurr->GetInOutType() == 0 && NodeCurr->GetActive()) {
 				 if (NodeCurr->TagFlag)
 				   this->Canvas->Brush->Color = clLtGray;
 				 else
@@ -967,8 +948,7 @@ void Tf_CPUNode::DrawArea(int NbDraw)
 				 this->Canvas->Brush->Color = clBlue;
 			 }
 
-			 switch(NodeCurr->GetType())
-			 {
+			 switch(NodeCurr->GetType()) {
 			   case 0: //OR Circle
 			   {
 				   this->Canvas->Ellipse(StartX + (NodeCurr->X * GridSize),
@@ -1149,96 +1129,71 @@ void Tf_CPUNode::UpdateNode(void)
   }
 
   //If Node Name changed or deleted, update Nodes conneted to it "Upstream"
-  for(int i = 0; i<NodeCmp; i++)
-  {
+  for (int i = 0; i<NodeCmp; i++) {
     NodeCible = (TNode*)this->NodeList->Items[i];
-    if(f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutUp)
-    {
-	   if(NodeSelect->DeleteFlag)
-       {
+    if (f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutUp) {
+	    if (NodeSelect->DeleteFlag) {
           NodeCible->NameOutUp = "";
           NodeCible->SetOutUp(0, NULL);
-       }
-       else if(f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text)
-       {
+       } else if (f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text) {
           NodeCible->NameOutUp = f_GraphEdit->e_Name->Text;
        }
     }
-    if(f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutDown)
-    {
-       if(NodeSelect->DeleteFlag)
-       {
+    if (f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutDown) {
+       if (NodeSelect->DeleteFlag) {
           NodeCible->NameOutDown = "";
           NodeCible->SetOutDown(0, NULL);
-       }
-       else if(f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text)
-       {
+       } else if (f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text) {
           NodeCible->NameOutDown = f_GraphEdit->e_Name->Text;
        }
     }
   }
   //If Output Node Up Changed / Removed
-  if (f_GraphEdit->e_NameOutUp->Text != f_GraphEdit->l_NameOutUp->Caption || NodeSelect->DeleteFlag)
-  {
-    if(NodeSelect->NameOutUp != "")
-    {
+  if (f_GraphEdit->e_NameOutUp->Text != f_GraphEdit->l_NameOutUp->Caption || NodeSelect->DeleteFlag) {
+    if (NodeSelect->NameOutUp != "") {
        int i = 0;
-       while(i<NodeCmp)
-       {
+       while (i<NodeCmp) {
           NodeCible = (TNode*)this->NodeList->Items[i];
-          if(NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutUp)
-          {
+          if(NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutUp) {
             NodeSelect->SetOutUp(0,NodeCible);
             i = NodeCmp;
           }
           i++;
        }
-    }
-    else
-    {
+    } else {
        NodeSelect->SetOutUp(0,NULL);
     }
   }
   //If Output Node Down Changed / Removed
-  if (f_GraphEdit->e_NameOutDown->Text != f_GraphEdit->l_NameOutDown->Caption || NodeSelect->DeleteFlag)
-  {
-    if(NodeSelect->NameOutDown != "")
-    {
+  if (f_GraphEdit->e_NameOutDown->Text != f_GraphEdit->l_NameOutDown->Caption || NodeSelect->DeleteFlag) {
+    if (NodeSelect->NameOutDown != "") {
        int i = 0;
-       while(i<NodeCmp)
-       {
+       while (i<NodeCmp) {
           NodeCible = (TNode*)this->NodeList->Items[i];
-          if(NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutDown)
-          {
+          if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutDown) {
             NodeSelect->SetOutDown(0,NodeCible);
             i = NodeCmp;
           }
           i++;
        }
-    }
-    else
-    {
+    } else {
        NodeSelect->SetOutDown(0,NULL);
     }
   }
 
   //Update Output if Removed
-  if(f_GraphEdit->e_NameOutUp->Text == "")
-  {
+  if (f_GraphEdit->e_NameOutUp->Text == "")
     NodeSelect->SetOutUp(StrToInt(f_GraphEdit->e_PinIDOutUp->Text), NULL);
-  }
-  if(f_GraphEdit->e_NameOutDown->Text == "")
-  {
+
+  if (f_GraphEdit->e_NameOutDown->Text == "")
     NodeSelect->SetOutDown(StrToInt(f_GraphEdit->e_PinIDOutDown->Text), NULL);
-  }
-  if(NodeSelect->DeleteFlag)
-  {
+
+  if (NodeSelect->DeleteFlag) {
     NodeSelect->SetOutUp(0,   NULL);
     NodeSelect->SetOutDown(0, NULL);
   }
 
-  if(!NodeSelect->DeleteFlag)
-  {
+  if(!NodeSelect->DeleteFlag) {
 	if(this->cb_ColorLine->Checked)
 	  TagFollowList(this->NodeSelect, 10, true);
   }
@@ -1275,13 +1230,10 @@ bool Tf_CPUNode::NodeNameExists(String pName)
     TNode* NodeCurr;
     bool Found = false;
 
-    for(int i = 0; i<NodeCmp; i++)
-    {
+    for (int i = 0; i<NodeCmp; i++) {
        NodeCurr = (TNode*)this->NodeList->Items[i];
-       if(! NodeCurr->DeleteFlag)
-       {
-          if(pName == NodeCurr->Name)
-          {
+       if (! NodeCurr->DeleteFlag) {
+          if (pName == NodeCurr->Name) {
              Found = true;
              i = NodeCmp;
           }
@@ -1302,27 +1254,25 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
   bool Found;
 
   //Left Click = Select
-  if(Button == mbLeft && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt)))
-  {
+  if (Button == mbLeft && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))) {
 	  this->SelectList->Clear();
 
-      this->MouseDownX = X;
+     this->MouseDownX = X;
 	  this->MouseDownY = Y;
-      for(int i = 0; i<NodeCmp; i++)
-      {
+     for (int i = 0; i<NodeCmp; i++) {
          NodeCurr = (TNode*)this->NodeList->Items[i];
-         if(! NodeCurr->DeleteFlag)
-         {
+         if (! NodeCurr->DeleteFlag) {
              if(   X >= (StartX + (NodeCurr->X * GridSize))
                 && X <  (StartX + (NodeCurr->X * GridSize) + ObjSize)
                 && Y >= (StartY + (NodeCurr->Y * GridSize))
-                && Y <  (StartY + (NodeCurr->Y * GridSize) + ObjSize) )
-			 {
-				if(this->cb_ColorLine->Checked)
-				   TagFollowList(this->NodeSelect, 10, false);
-				this->NodeSelect = NodeCurr;
-				if(this->cb_ColorLine->Checked)
-				   TagFollowList(this->NodeSelect, 10, true);
+                && Y <  (StartY + (NodeCurr->Y * GridSize) + ObjSize) ) {
+
+                if(this->cb_ColorLine->Checked)
+                   TagFollowList(this->NodeSelect, 10, false);
+                this->NodeSelect = NodeCurr;
+
+                if(this->cb_ColorLine->Checked)
+                   TagFollowList(this->NodeSelect, 10, true);
                 this->CallDrawArea();
 
                 f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
@@ -1350,19 +1300,18 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
       }
   }
   //Right Click = Move Selected
-  else if(Button == mbRight && NodeSelect != NULL)
-  {
+  else if(Button == mbRight && NodeSelect != NULL) {
     this->SelectList->Clear();
     this->ItsUpdated = true;
 
-	NodeSelect->X = (X - StartX) / GridSize;
-	NodeSelect->Y = (Y - StartY) / GridSize;
-	f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
-	f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
+	 NodeSelect->X = (X - StartX) / GridSize;
+    NodeSelect->Y = (Y - StartY) / GridSize;
+    f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
+    f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
 
     //Draw
     this->Invalidate();
-	this->CallDrawArea();
+    this->CallDrawArea();
   }
   //Middle Click = Create
   else if(Button == mbMiddle)
@@ -1373,39 +1322,34 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
     pX = (X - StartX) / GridSize;
     pY = (Y - StartY) / GridSize;
 
-    int NodeNameNumber = NodeCmp;
-	Name = "Node" + IntToStr(NodeNameNumber);
-    while(NodeNameExists(Name))
-    {
-      NodeNameNumber++;
-      Name = "Node" + IntToStr(NodeNameNumber);
+    this->NodeMaxID++;
+    Name = "Node" + IntToStr(this->NodeMaxID);
+    while (NodeNameExists(Name)) {
+      this->NodeMaxID++;
+      Name = "Node" + IntToStr(this->NodeMaxID);
     }
 
-    NodeCurr = new TNode(NodeCmp, pX, pY, NodeType, Name);
+    NodeCurr = new TNode(this->NodeMaxID, pX, pY, NodeType, Name);
     NodeCmp++;
 
-	this->NodeList->Add(NodeCurr);
-	TagFollowList(this->NodeSelect, 10, false);
-	this->NodeSelect = NodeCurr;
+    this->NodeList->Add(NodeCurr);
+    TagFollowList(this->NodeSelect, 10, false);
+    this->NodeSelect = NodeCurr;
 
     //Draw
     this->CallDrawArea();
   }
   //Left Click + Shift or Ctlr = Link Selected
-  else if(Button == mbLeft && (Shift.Contains(ssCtrl) || Shift.Contains(ssShift)))
-  {
+  else if (Button == mbLeft && (Shift.Contains(ssCtrl) || Shift.Contains(ssShift))) {
       this->MouseDownX = X;
       this->MouseDownY = Y;
 
-      if(NodeSelect != NULL)
-      {
+      if (NodeSelect != NULL) {
           Found = false;
 
-          for(int i = 0; i<NodeCmp; i++)
-          {
+          for (int i = 0; i<NodeCmp; i++) {
              NodeCurr = (TNode*)this->NodeList->Items[i];
-             if(! NodeCurr->DeleteFlag)
-             {
+             if (! NodeCurr->DeleteFlag) {
                  if(   X >= (StartX + (NodeCurr->X * GridSize))
                     && X <  (StartX + (NodeCurr->X * GridSize) + ObjSize)
                     && Y >= (StartY + (NodeCurr->Y * GridSize))
@@ -1413,95 +1357,85 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                  {
                     //this->NodeSelect = NodeCurr;
                     if (Shift.Contains(ssShift))
-                    {
                       f_GraphEdit->e_NameOutUp->Text = NodeCurr->Name;
-                    }
                     else if(Shift.Contains(ssCtrl))
-                    {
                       f_GraphEdit->e_NameOutDown->Text = NodeCurr->Name;
-                    }
+
                     f_GraphEdit->Visible = true;
                     Found = true;
                     i = NodeCmp;
                  }
              }
           }
-          if(Found)
-          {
+          if(Found) {
               this->SelectList->Clear();
 
               UpdateNode();
               if (Shift.Contains(ssShift))
-              {
                 f_GraphEdit->l_NameOutUp->Caption = NodeCurr->Name;
-              }
               else if(Shift.Contains(ssCtrl))
-              {
                 f_GraphEdit->l_NameOutDown->Caption = NodeCurr->Name;
-              }
+
               //Draw
               this->CallDrawArea();
           }
       }
   }
   //Left Click + Alt = Link Remove
-  else if(Button == mbLeft && Shift.Contains(ssAlt))
+  else if (Button == mbLeft && Shift.Contains(ssAlt))
   {
-      this->SelectList->Clear();
+     this->SelectList->Clear();
 
-      this->MouseDownX = X;
-      this->MouseDownY = Y;
-      for(int i = 0; i<NodeCmp; i++)
-      {
-         NodeCurr = (TNode*)this->NodeList->Items[i];
-         if(! NodeCurr->DeleteFlag)
-         {
-             if(   X >= (StartX + (NodeCurr->X * GridSize))
+     this->MouseDownX = X;
+     this->MouseDownY = Y;
+     for (int i = 0; i<NodeCmp; i++) {
+        NodeCurr = (TNode*)this->NodeList->Items[i];
+        if (! NodeCurr->DeleteFlag) {
+            if(   X >= (StartX + (NodeCurr->X * GridSize))
                 && X <  (StartX + (NodeCurr->X * GridSize) + ObjSize)
                 && Y >= (StartY + (NodeCurr->Y * GridSize))
-                && Y <  (StartY + (NodeCurr->Y * GridSize) + ObjSize) )
-			 {
-				TagFollowList(this->NodeSelect, 10, false);
-				this->NodeSelect = NodeCurr;
+                && Y <  (StartY + (NodeCurr->Y * GridSize) + ObjSize) ) {
 
-                this->NodeSelect->NameOutUp == "";
-                this->NodeSelect->SetOutUp(0, NULL);
-                this->NodeSelect->NameOutDown == "";
-                this->NodeSelect->SetOutDown(0, NULL);
-                //Draw
-                this->Invalidate();
-                this->CallDrawArea();
+				   TagFollowList(this->NodeSelect, 10, false);
+				   this->NodeSelect = NodeCurr;
 
-                f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
-                f_GraphEdit->e_Name->Text = NodeCurr->Name;
-                f_GraphEdit->cb_Delete->Checked = NodeCurr->DeleteFlag;
-                f_GraphEdit->l_SaveName->Caption = NodeCurr->Name;
-                f_GraphEdit->e_PosX->Text = IntToStr(NodeCurr->X);
-                f_GraphEdit->e_PosY->Text = IntToStr(NodeCurr->Y);
-                f_GraphEdit->cb_Type->ItemIndex = NodeCurr->GetType();
+               this->NodeSelect->NameOutUp = "";
+               this->NodeSelect->SetOutUp(0, NULL);
+               this->NodeSelect->NameOutDown = "";
+               this->NodeSelect->SetOutDown(0, NULL);
+               //Draw
+               this->Invalidate();
+               this->CallDrawArea();
 
-                f_GraphEdit->e_NameOutUp->Text = NodeCurr->NameOutUp;
-                f_GraphEdit->e_NameOutDown->Text = NodeCurr->NameOutDown;
-                f_GraphEdit->l_NameOutUp->Caption = NodeCurr->NameOutUp;
-                f_GraphEdit->l_NameOutDown->Caption = NodeCurr->NameOutDown;
+               f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
+               f_GraphEdit->e_Name->Text = NodeCurr->Name;
+               f_GraphEdit->cb_Delete->Checked = NodeCurr->DeleteFlag;
+               f_GraphEdit->l_SaveName->Caption = NodeCurr->Name;
+               f_GraphEdit->e_PosX->Text = IntToStr(NodeCurr->X);
+               f_GraphEdit->e_PosY->Text = IntToStr(NodeCurr->Y);
+               f_GraphEdit->cb_Type->ItemIndex = NodeCurr->GetType();
 
-                f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
-                f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
-                f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
-                f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
+               f_GraphEdit->e_NameOutUp->Text = NodeCurr->NameOutUp;
+               f_GraphEdit->e_NameOutDown->Text = NodeCurr->NameOutDown;
+               f_GraphEdit->l_NameOutUp->Caption = NodeCurr->NameOutUp;
+               f_GraphEdit->l_NameOutDown->Caption = NodeCurr->NameOutDown;
 
-                f_GraphEdit->Visible = true;
-                i = NodeCmp;
-             }
+               f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
+               f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
+               f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
+               f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
+
+               f_GraphEdit->Visible = true;
+               i = NodeCmp;
+            }
          }
       }
-  }
+   }
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::TagFollowList(TNode *NodeTag, int Depth, bool Sel)
 {
-  if(Depth > 0 && NodeTag != NULL)
-  {
+  if (Depth > 0 && NodeTag != NULL) {
 	NodeTag->TagFlag = Sel;
 	TagFollowList(NodeTag->GetNodeOutUp(), Depth-1, Sel);
 	TagFollowList(NodeTag->GetNodeOutDown(), Depth-1, Sel);
@@ -1566,37 +1500,28 @@ void __fastcall Tf_CPUNode::FormMouseWheel(TObject *Sender, TShiftState Shift,
 
   //Mouse Wheel update Zoom
   if( WheelDelta > 0)
-  {
     this->tb_Size->Position--;
-  }
   else
-  {
     this->tb_Size->Position++;
-  }
 
   Handled = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 {
-  if(PassedMsg.message == WM_KEYDOWN )
-  {
+  if (PassedMsg.message == WM_KEYDOWN ) {
 	  // add support for SelectList ??? :p
 	  
-	  if(Screen->ActiveForm == f_CPUNode)
-	  {
+	  if (Screen->ActiveForm == f_CPUNode) {
 		  //Catch arrows for mouvment
-		  switch (PassedMsg.wParam)
-		  {
+		  switch (PassedMsg.wParam) {
 			case VK_UP:
 			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL)
-			  {
-				NodeSelect->Y--;
-				f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
-			  }
-			  else
-				this->OffSetY += (GridSize * ((tb_Size->Position + 1) * 10) );
+			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+				 NodeSelect->Y--;
+				 f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
+			  } else
+				 this->OffSetY += (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
 			  this->CallDrawArea();
@@ -1604,13 +1529,11 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 			}
 			case VK_DOWN:
 			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL)
-			  {
-				NodeSelect->Y++;
-				f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
-			  }
-			  else
-				this->OffSetY -= (GridSize * ((tb_Size->Position + 1) * 10) );
+			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+				 NodeSelect->Y++;
+				 f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
+			  } else
+				 this->OffSetY -= (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
 			  this->CallDrawArea();
@@ -1618,13 +1541,11 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 			}
 			case VK_LEFT:
 			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL)
-			  {
-				NodeSelect->X--;
-				f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
-			  }
-			  else
-				this->OffSetX += (GridSize * ((tb_Size->Position + 1) * 10) );
+			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+				 NodeSelect->X--;
+				 f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
+			  } else
+				 this->OffSetX += (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
 			  this->CallDrawArea();
@@ -1632,13 +1553,11 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 			}
 			case VK_RIGHT:
 			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL)
-			  {
-				NodeSelect->X++;
-				f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
-			  }
-			  else
-				this->OffSetX -= (GridSize * ((tb_Size->Position + 1) * 10) );
+			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+				 NodeSelect->X++;
+				 f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
+			  } else
+			   	this->OffSetX -= (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
 			  this->CallDrawArea();
@@ -1661,10 +1580,8 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {
-  if(Key == VK_DELETE && NodeSelect != NULL)
-  {
-    if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes)
-    {
+  if (Key == VK_DELETE && NodeSelect != NULL) {
+    if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes) {
 	  f_GraphEdit->cb_Delete->Checked = true;
 	  this->UpdateNode();
     }
@@ -1681,22 +1598,21 @@ void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
     b_XOr->Click();
   else if(Key == VK_KEY_6 || Key == VK_NUMPAD6)
 	b_Not->Click();
-  else if (this->cb_QuickEdit->Checked)
-  {
-	if(Key == 'O' && NodeSelect != NULL)
-	  f_GraphEdit->cb_Type->ItemIndex = 0;
-	else if(Key == 'A' && NodeSelect != NULL)
-	  f_GraphEdit->cb_Type->ItemIndex = 1;
-	else if(Key == 'R' && NodeSelect != NULL)
-	  f_GraphEdit->cb_Type->ItemIndex = 2;
-	else if(Key == 'D' && NodeSelect != NULL)
-	  f_GraphEdit->cb_Type->ItemIndex = 3;
-	else if(Key == 'X' && NodeSelect != NULL)
-	  f_GraphEdit->cb_Type->ItemIndex = 4;
-	else if(Key == 'N' && NodeSelect != NULL)
-	  f_GraphEdit->cb_Type->ItemIndex = 5;
+  else if (this->cb_QuickEdit->Checked) {
+    if(Key == 'O' && NodeSelect != NULL)
+      f_GraphEdit->cb_Type->ItemIndex = 0;
+    else if(Key == 'A' && NodeSelect != NULL)
+	   f_GraphEdit->cb_Type->ItemIndex = 1;
+    else if(Key == 'R' && NodeSelect != NULL)
+      f_GraphEdit->cb_Type->ItemIndex = 2;
+    else if(Key == 'D' && NodeSelect != NULL)
+      f_GraphEdit->cb_Type->ItemIndex = 3;
+    else if(Key == 'X' && NodeSelect != NULL)
+      f_GraphEdit->cb_Type->ItemIndex = 4;
+    else if(Key == 'N' && NodeSelect != NULL)
+      f_GraphEdit->cb_Type->ItemIndex = 5;
 
-	UpdateNode();
+    UpdateNode();
   }
 }
 //---------------------------------------------------------------------------
@@ -1733,8 +1649,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 
   //Catch cursor mouvment when "drag & drop" of the Canvas
   if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift))
-     && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) )
-  {
+     && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) ) {
       this->OffSetX += X - this->MouseDownX;
       this->OffSetY += Y - this->MouseDownY;
       this->MouseDownX = X;
@@ -1747,22 +1662,16 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->CallDrawArea();
 
       this->sb_Main->Panels->Items[0]->Text = "Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
-  }
-  else if(Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl))
-  {
+  } else if (Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
 	  this->SelectList->Clear();
-      for(int i = 0; i<NodeCmp; i++)
-      {
+      for (int i = 0; i<NodeCmp; i++) {
           NodeCurr = (TNode*)this->NodeList->Items[i];
-          if(! NodeCurr->DeleteFlag)
-          {
+          if(! NodeCurr->DeleteFlag) {
              if(  (  (this->MouseDownX < X && StartX+(NodeCurr->X*GridSize) >= this->MouseDownX && StartX+(NodeCurr->X*GridSize) <= X)
                    ||(this->MouseDownX > X && StartX+(NodeCurr->X*GridSize) <= this->MouseDownX && StartX+(NodeCurr->X*GridSize) >= X) )
                 &&(  (this->MouseDownY < Y && StartY+(NodeCurr->Y*GridSize) >= this->MouseDownY && StartY+(NodeCurr->Y*GridSize) <= Y)
                    ||(this->MouseDownY > Y && StartY+(NodeCurr->Y*GridSize) <= this->MouseDownY && StartY+(NodeCurr->Y*GridSize) >= Y) ) )
-             {
-				this->SelectList->Add(NodeCurr);
-             }
+				    this->SelectList->Add(NodeCurr);
           }
       }
       //Draw
@@ -1781,10 +1690,9 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->MouseDownX = X;
       this->MouseDownY = Y;
       
-      for(int i = 0; i<this->SelectList->Count; i++)
-      {
+      for (int i = 0; i<this->SelectList->Count; i++) {
           NodeCurr = (TNode*)this->SelectList->Items[i];
-		  NodeCurr->X += UpdateOffSetX;
+          NodeCurr->X += UpdateOffSetX;
           NodeCurr->Y += UpdateOffSetY;
           this->ItsUpdated = true;
       }
@@ -1798,11 +1706,9 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
   //Update status bar Info for Node Name/Type
   else
   {
-      for(int i = 0; i<NodeCmp; i++)
-      {
+      for (int i = 0; i<NodeCmp; i++) {
          NodeCurr = (TNode*)this->NodeList->Items[i];
-         if(! NodeCurr->DeleteFlag)
-         {
+         if (! NodeCurr->DeleteFlag) {
              if(   X >= (StartX + (NodeCurr->X * GridSize))
                 && X <  (StartX + (NodeCurr->X * GridSize) + ObjSize)
                 && Y >= (StartY + (NodeCurr->Y * GridSize))
@@ -1831,9 +1737,7 @@ void __fastcall Tf_CPUNode::FormPaint(TObject *Sender)
 void __fastcall Tf_CPUNode::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
   if(this->ItsUpdated && Application->MessageBox( L"Save changes before Quit?", L"Save changes", MB_YESNO) == mrYes)
-  {
       this->b_Save->Click();
-  }
 }
 //---------------------------------------------------------------------------
 

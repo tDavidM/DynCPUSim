@@ -291,155 +291,172 @@ void Tf_Memory::CreateLine(void)
 	  this->cds_MemCode->AsString      = "0100" + HexToBin(this->cb_B->Text) + BinData;
       break;
     }
-	case 7: //SKIPEQUAL
-    {
-	  this->cds_MemHumData->AsString   = "SKIPEQUAL( $" + this->cb_B->Text + " , $" + this->cb_C->Text + " )";
-	  this->cds_MemCode->AsString      = "0101" + HexToBin(this->cb_B->Text) + "0000"; //HexToBin(this->cb_C->Text);
-	  break;
-	}
-	case 8: //SKIPGREATER
+
+	case 7: //SKIPZERO
 	{
-	  this->cds_MemHumData->AsString   = "SKIPGREATER( $" + this->cb_B->Text + " , $" + this->cb_C->Text + " )";
-	  this->cds_MemCode->AsString      = "1101" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text);
+	  this->cds_MemHumData->AsString   = "SKIPZERO( $" + this->cb_D->Text + " )";
+	  this->cds_MemCode->AsString      = "111111110110" + HexToBin(this->cb_D->Text);
       break;
     }
-    case 9: //ADD
+
+	case 8: //SKIPEQUAL
+    {
+	  this->cds_MemHumData->AsString   = "SKIPEQUAL( $" + this->cb_B->Text + " , $" + this->cb_C->Text + " )";
+	  this->cds_MemCode->AsString      = "0101" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + "0000";
+	  break;
+	}
+	case 9: //SKIPGREATER
+	{
+	  this->cds_MemHumData->AsString   = "SKIPGREATER( $" + this->cb_B->Text + " , $" + this->cb_C->Text + " )";
+	  this->cds_MemCode->AsString      = "1101" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + "0000";
+      break;
+    }
+
+
+
+    case 10: //ADD
 	{
       this->cds_MemHumData->AsString   = "ADD( $" + this->cb_B->Text + " + $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "0110" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 10: //SUBTRACT
+    case 11: //SUBTRACT
 	{
       this->cds_MemHumData->AsString   = "SUBSTRACT( $" + this->cb_B->Text + " - $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "0111" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 11: //INC
+    case 12: //INC
 	{
-      this->cds_MemHumData->AsString   = "INC( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
-      this->cds_MemCode->AsString      = "11111001" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
+      this->cds_MemHumData->AsString   = "INC( $" + this->cb_D->Text + " )";
+      this->cds_MemCode->AsString      = "111111110100" + HexToBin(this->cb_D->Text);
       break;
     }
-    case 12: //DEC
+    case 13: //DEC
 	{
-      this->cds_MemHumData->AsString   = "DEC( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
-      this->cds_MemCode->AsString      = "11111010" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
+      this->cds_MemHumData->AsString   = "DEC( $" + this->cb_D->Text + " )";
+      this->cds_MemCode->AsString      = "111111110101" + HexToBin(this->cb_D->Text);
       break;
     }
-    case 13: //AND
+    case 14: //AND
 	{
       this->cds_MemHumData->AsString   = "AND( $" + this->cb_B->Text + " & $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1000" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 14: //OR
+    case 15: //OR
 	{
       this->cds_MemHumData->AsString   = "OR( $" + this->cb_B->Text + " | $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1001" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 15: //XOR
+    case 16: //XOR
 	{
       this->cds_MemHumData->AsString   = "XOR( $" + this->cb_B->Text + " x $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1010" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 16: //NOT
+    case 17: //NOT
 	{
       this->cds_MemHumData->AsString   = "NOT( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11110000" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 17: //LEFT SHIFT
+    case 18: //LEFT SHIFT
 	{
       this->cds_MemHumData->AsString   = "LEFTSH( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11110001" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 18: //RIGHT SHIFT
+    case 19: //RIGHT SHIFT
 	{
       this->cds_MemHumData->AsString   = "RIGHTSH( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11110011" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 19: //LEFT ROTATE
+    case 20: //LEFT ROTATE
 	{
       this->cds_MemHumData->AsString   = "LEFTRT( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11110010" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 20: //RIGHT ROTATE
+    case 21: //RIGHT ROTATE
 	{
       this->cds_MemHumData->AsString   = "RIGHTRT( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11110100" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 21: //LEFTCRRT
+    case 22: //LEFTCRRT
 	{
       this->cds_MemHumData->AsString   = "LEFTCRRT( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11111100" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 22: //RIGHTCRRT
+    case 23: //RIGHTCRRT
 	{
       this->cds_MemHumData->AsString   = "RIGHTCRRT( $" + this->cb_C->Text + " ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "11111101" + HexToBin(this->cb_C->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 23: //JUMP Reg
+    case 24: //JUMP Reg
 	{
       this->cds_MemHumData->AsString   = "JUMP( ) Goto #$" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "111101010000" + HexToBin(this->cb_D->Text);
       break;
     }
-    case 24: //JUMP Val
+    case 25: //JUMP Val
 	{
       this->cds_MemHumData->AsString   = "JUMP( ) Goto #" + BasePrefix + this->e_Data->Text;
       this->cds_MemCode->AsString      = "11110110" + BinData;
       break;
     }
-    case 25: //WIDEJUMP Reg
+    case 26: //WIDEJUMP Reg
     {
       this->cds_MemHumData->AsString   = "NOP( )";
       this->cds_MemCode->AsString      = "1111111100000000";//"1011";
       break;
     }
-    case 26: //WIDEJUMP Val
+    case 27: //WIDEJUMP Val
     {
       this->cds_MemHumData->AsString   = "NOP( )";
       this->cds_MemCode->AsString      = "1111111100000000";//"1100";
       break;
     }
-    case 27: //CARRYFLG
+    case 28: //CARRYFLG
 	{
       this->cds_MemHumData->AsString   = "CARRYFLG( ) -> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "111110110000" + HexToBin(this->cb_D->Text);
       break;
     }
-    case 28: //RAND
+    case 29: //RAND
 	{
       this->cds_MemHumData->AsString   = "RAND( ) -> $" + this->cb_D->Text;
-      this->cds_MemCode->AsString      = "111111100000" + HexToBin(this->cb_D->Text);
+      this->cds_MemCode->AsString      = "111111110111" + HexToBin(this->cb_D->Text);
       break;
     }
-    case 29: //NOP
+    case 30: //NOP
 	{
       this->cds_MemHumData->AsString   = "NOP( )";
-      this->cds_MemCode->AsString      = "1111111100000000";
+      this->cds_MemCode->AsString      = "1111111111110000";
       break;
     }
 
-    case 30: //COPY AND
+    case 31: //COPY AND
 	{
       this->cds_MemHumData->AsString   = "* COPY( $" + this->cb_B->Text + " )-> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1000" + HexToBin(this->cb_B->Text) + HexToBin(this->cb_B->Text) + HexToBin(this->cb_D->Text);
       break;
     }
-    case 31: //ERASE XOR
+    case 32: //ERASE XOR
 	{
       this->cds_MemHumData->AsString   = "* ERASE( )-> $" + this->cb_D->Text;
       this->cds_MemCode->AsString      = "1010" + HexToBin(this->cb_D->Text) + HexToBin(this->cb_D->Text) + HexToBin(this->cb_D->Text);
+      break;
+    }
+    case 33: //HALT SET
+	{
+      this->cds_MemHumData->AsString   = "* HALT( )";
+      this->cds_MemCode->AsString      = "0000000000001110";
       break;
     }
   }
@@ -462,7 +479,7 @@ void __fastcall Tf_Memory::FormCreate(TObject *Sender)
   this->rb_Hex->Checked = true;
   this->LastDataType = 2;
   this->LastSelLine = 0;
-  this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP( )"); //29;
+  this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP( )"); //30;
   this->b_Add->Click();
 }
 //---------------------------------------------------------------------------

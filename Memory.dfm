@@ -62,6 +62,7 @@ object f_Memory: Tf_Memory
     Width = 145
     Height = 21
     Anchors = [akLeft, akBottom]
+    DropDownCount = 18
     TabOrder = 0
     Text = 'OpCode'
     OnChange = cb_OpCodeChange
@@ -97,15 +98,17 @@ object f_Memory: Tf_Memory
       'RAND( ) -> $'
       'NOP( )'
       'COPY( $ ) -> $'
-      'ERASE( $ )')
+      'ERASE( $ )'
+      'HALT()')
   end
   object cb_D: TComboBox
     Left = 587
-    Top = 424
+    Top = 422
     Width = 90
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
+    DropDownCount = 16
     ItemIndex = 0
     TabOrder = 1
     Text = '0'
@@ -134,6 +137,7 @@ object f_Memory: Tf_Memory
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
+    DropDownCount = 16
     Enabled = False
     ItemIndex = 0
     TabOrder = 2
@@ -163,6 +167,7 @@ object f_Memory: Tf_Memory
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
+    DropDownCount = 16
     Enabled = False
     ItemIndex = 0
     TabOrder = 3

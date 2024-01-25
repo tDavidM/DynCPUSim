@@ -27,57 +27,61 @@ $ - for registers location.
 # - for ROM location.
 @ - for RAM location.
 
-Op-Codes (A [B]):
+Op-Codes (A [B [C]]):
 0000 - SET(BC)->$D   //BC specifies a fixed value
 0001 - READ(@BC)->$D //BC specifies 8 bits address for input
-0010 - WRITE(@BC,<-$D) //BC specifies 8 bits address for output
-0011 C- IFZERO($B)goto#$D //Branches if $B == 0, Goto relative address at $D
+0010 - WRITE(@BC)<-$D //BC specifies 8 bits address for output
+0011 C- IFZERO($B)goto#$D //Branches if $B == 0, Goto relative address at $D             IFGREATER($B,$C)goto#$D
 0100 - IFZERO($B)goto#CD //Branches if $B == 0, Goto relative address CD
-0101 *D- SKIPEQUAL($B,$C)
+0101 *D- SKIPEQUAL($B,$C)                                                                IFEQUAL($B,$C)goto#$D
 0110 - ADD($B+$C)->$D
 0111 - SUBTRACT($B-$C)->$D
 1000 - AND($B&$C)->$D
 1001 - OR($B|$C)->$D
 1010 - XOR($Bx$C)->$D
-1011 *B- //DO NOT USE, reserved for WIDEJUMP()goto#$C$D
-1100 - //DO NOT USE, reserved for WIDEJUMP()goto#BCD+0000
-1101 *D- SKIPGREATER($B,$C)
-1110 - //DO NOT USE, reserved for IFEQUAL($B,$C)goto#$D
+1011 -                                        WIDEJUMP()goto#BCD+0000
+1100 -                                        WRITE(@$B)<-CD
+1101 *D- SKIPGREATER($B,$C)                                                              GREATER($B,$C)->$D
+1110 -                                        LIBRE **************
+
 1111 0000 - NOT($C)->$D
-1111 0001 - LEFTSH($C)->$D
-1111 0010 - LEFTRT($C)->$D
-1111 0011 - RIGHTSH($C)->$D
-1111 0100 - RIGHTRT($C)->$D
-1111 0101 *C- JUMP()goto#$D //Goto relative address at $D
+1111 0001 - LEFTSHT($C)->$D
+1111 0010 - LEFTROT($C)->$D
+1111 0011 - RIGHTSHT($C)->$D
+1111 0100 - RIGHTROT($C)->$D
+1111 0101 -??                                 SKIPEQUAL($C,$D)
 1111 0110 - JUMP()goto#CD //Goto relative address CD
 1111 0111 - READ(@$C)->$D
-1111 1000 - WRITE(@$C,<-$D)
-1111 1001 - INC($C)->$D //?
-1111 1010 - DEC($C)->$D //?
-1111 1011 *BC- CARRYFLG()->$D //Output the value of the carry flag on a register
-1111 1100 - LEFTCRRT($C)->$D
-1111 1101 - RIGHTCRRT($C)->$D
-1111 1110 *BC- RAND()->$D //Base on operation on prime number clocks 11 13 17 19 23 37 41 53 
-1111 1111 *BCD- NOP()
+1111 1000 - WRITE(@$C)<-$D
+1111 1001 -??                                 SKIPGREATER($C,$D)
+1111 1010 -??                                 IFZERO($C)goto#$D //Branches if $C == 0, Goto relative address at $D
+1111 1011 -???                                WIDEJUMP()goto#$C$D
+1111 1100 -?? LEFTCRROT($C)->$D
+1111 1101 -?? RIGHTCRROT($C)->$D
+1111 1110 -?? RIGHTARSHT($C)->$D
 
-0101 - (PROPOSED) 
-1011 - (PROPOSED) WIDEJUMP()goto#0000+BCD
-1101 - (PROPOSED) IFGREATER($B,$C)goto#$D
-1111 0101 - (PROPOSED) SKIPEQUAL($C,$D)
-1111 1011 - (PROPOSED) SKIPGREATER($C,$D)
-1111 1110 - (PROPOSED) WIDEJUMP()goto#$C$D
-1111 1111 0001 - (PROPOSED) JUMP()goto#$D //Goto relative address at $D
-1111 1111 0010 - (PROPOSED) CARRYFLG()->$D //Output the value of the carry flag on a register
-1111 1111 0011 - (PROPOSED) RAND()->$D //Base on operation on prime number clocks 11 13 17 19 23 37 41 53 
-1111 1111 1111 - (PROPOSED) NOP()
+1111 1111 0000 -? JUMP()goto#$D //Goto relative address at $D
+1111 1111 0001 -? CARRYFLG()->$D //Output the value of the carry flag on a register
+1111 1111 0010 -?? RESETCARRY()
+1111 1111 0011 -?? SETCARRY()
+1111 1111 0100 -? INC($D)
+1111 1111 0101 -? DEC($D)
+1111 1111 0110 -?? SKIPZERO($D)
+1111 1111 0111 -?? RAND()->$D
+1111 1111 1000                                                                           
+1111 1111 1001                                                                           
+1111 1111 1010                                                                           
+1111 1111 1111                                                                           
+1111 1111 1100                                                                           
+1111 1111 1101                                                                           
+1111 1111 1110                                                                           
+1111 1111 1111 - NOP()
+
+
 
 ToDo/Idea:
 Add TagNode in Simulation
-consider SKIPEQL($B,$C)
-consider SKIPGREATER($B,$C)
-Consider IFEQUAL($B,$C)#$D //Branches if $B == $C, Goto relative address at $D WHERE $C CAN ONLY BE 0-7 AND $D CAN ONLY BE 8-15
-plan WIDEJUMP()#BCD
-plan WIDEJUMP()#$C$D
+Erase all registers with Set() any value to register F
 
 Tricks
 Copy($B)->$D accomplished with AND($B,$C)->$D where $B and $C are the same location

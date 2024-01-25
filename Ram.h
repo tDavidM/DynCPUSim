@@ -40,6 +40,7 @@ __published:	// Composants gérés par l'EDI
 	TButton *b_Import;
 	TOpenDialog *od_Import;
 	TUpDown *ud_Page;
+   TButton *b_ClearP;
     void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
     void __fastcall FormCreate(TObject *Sender);
     void __fastcall sg_RamKeyPress(TObject *Sender, char &Key);
@@ -54,6 +55,7 @@ __published:	// Composants gérés par l'EDI
 	void __fastcall e_PageExit(TObject *Sender);
 	void __fastcall b_ImportClick(TObject *Sender);
 	void __fastcall ud_PageClick(TObject *Sender, TUDBtnType Button);
+   void __fastcall b_ClearPClick(TObject *Sender);
 private:	// Déclarations de l'utilisateur
     int LastDataType;
 	int LastX, LastY;

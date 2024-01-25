@@ -48,25 +48,25 @@ object f_Ram: Tf_Ram
   object b_Save: TButton
     Left = 8
     Top = 8
-    Width = 75
+    Width = 65
     Height = 17
     Caption = 'Save'
     TabOrder = 1
     OnClick = b_SaveClick
   end
   object b_Load: TButton
-    Left = 104
+    Left = 88
     Top = 8
-    Width = 75
+    Width = 65
     Height = 17
     Caption = 'Load'
     TabOrder = 2
     OnClick = b_LoadClick
   end
   object rb_Hex: TRadioButton
-    Left = 459
+    Left = 491
     Top = 8
-    Width = 113
+    Width = 86
     Height = 17
     Caption = 'Hexadecimal'
     Checked = True
@@ -75,7 +75,7 @@ object f_Ram: Tf_Ram
     OnClick = rb_HexClick
   end
   object rb_Dec: TRadioButton
-    Left = 383
+    Left = 415
     Top = 8
     Width = 62
     Height = 17
@@ -84,7 +84,7 @@ object f_Ram: Tf_Ram
     OnClick = rb_DecClick
   end
   object rb_Bin: TRadioButton
-    Left = 307
+    Left = 347
     Top = 8
     Width = 54
     Height = 17
@@ -104,9 +104,9 @@ object f_Ram: Tf_Ram
     OnKeyPress = sg_RamKeyPress
   end
   object b_Import: TButton
-    Left = 200
+    Left = 168
     Top = 8
-    Width = 75
+    Width = 65
     Height = 17
     Caption = 'Import'
     TabOrder = 7
@@ -121,6 +121,15 @@ object f_Ram: Tf_Ram
     Orientation = udHorizontal
     TabOrder = 8
     OnClick = ud_PageClick
+  end
+  object b_ClearP: TButton
+    Left = 248
+    Top = 8
+    Width = 65
+    Height = 17
+    Caption = 'Clear Page'
+    TabOrder = 9
+    OnClick = b_ClearPClick
   end
   object sd_Ram: TSaveDialog
     DefaultExt = '.xml'

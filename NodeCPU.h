@@ -149,17 +149,17 @@ private:	// Déclarations de l'utilisateur
     void __fastcall AppMessage(TMsg& PassedMsg, bool& Handled);
 
     TList* NodeList;
-	TList* SelectList;
-	//TList* FollowList;
-	TNode *NodeSelect;
+    TList* SelectList;
+    //TList* FollowList;
+    TNode *NodeSelect;
 
-    int NodeCmp;
+    int NodeCmp, NodeMaxID;
     int NodeType;
 
-	bool ItsUpdated;
-	int DrawCmpItem;
-	int DrawCmpLine;
-   int DrawTimerSpeed;
+    bool ItsUpdated;
+    int DrawCmpItem;
+    int DrawCmpLine;
+    int DrawTimerSpeed;
 
     int MouseDownX, MouseDownY;
     int OffSetX, OffSetY;
