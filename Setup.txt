@@ -33,61 +33,61 @@ $ - for registers location.
 @ - for RAM location.
 
 Op-Codes (A [B [C]]): 
-0000 - SET(BC)->$D                     //BC specifies a fixed value
-0001 - READ(@BC)->$D                   //BC specifies 8 bits address to fetch value from RAM to store in $D
-0010 - WRITE(@BC)<-$D                  //BC specifies 8 bits address to store value to RAM from $D
-0011 -??? IFNOTZERO($B)goto#CD         //Branches if $B != 0, Goto relative 8 bits address CD
-0100 - IFZERO($B)goto#CD               //Branches if $B == 0, Goto relative 8 bits address CD
-0101 -??? SKIPIF($B=CD)                //Skip the following instruction if $B == CD
-0110 - ADD($B+$C)->$D
-0111 - SUBTRACT($B-$C)->$D
-1000 - AND($B&$C)->$D
-1001 - OR($B|$C)->$D
-1010 - XOR($Bx$C)->$D
-1011 -??? WIDEJUMP()goto#0000+BCD      //goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
-1100 -??? WRITE(@$B)<-CD               //write CD to RAM at address $B
-1101 -??? GREATEST($B,$C)->$D          //set $D to the greatest value betweem $B and $C
-1110 -??? WIDEJUMP()goto#$B+CD"        //goto absolute 16 bits address $B+CD (full 64K range)
+0000 - SET   - Set(BC)->$D                       //BC specifies a fixed value
+0001 - GETA  - ReadAddr(@BC)->$D                 //BC specifies 8 bits address to fetch value from RAM to store in $D
+0010 - SETA  - WriteAddr(@BC)<-$D                //BC specifies 8 bits address to store value to RAM from $D
+0011 - IFNZ  - IfNotZero($B)goto#CD         (???)//Branches if $B != 0, Goto relative 8 bits address CD
+0100 - IFZ   - IfZero($B)goto#CD                 //Branches if $B == 0, Goto relative 8 bits address CD
+0101 - SIF   - SkipIf($B=CD)                (???)//Skip the following instruction if $B == CD
+0110 - ADD   - Add($B+$C)->$D
+0111 - SUB   - Subtract($B-$C)->$D
+1000 - AND   - And($B&$C)->$D
+1001 - OR    - Or($B|$C)->$D
+1010 - XOR   - Xor($B^$C)->$D
+1011 - WJMP  - WideJump()goto#0000+BCD      (???)//goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
+1100 - SETV  - WriteVal(@$B)<-CD            (???)//write CD to RAM at address $B
+1101 - GRT   - Greatest($B_$C)->$D          (???)//set $D to the greatest value betweem $B and $C
+1110 - WJMPV - WideJumpVal()goto#$B+CD      (???)//goto absolute 16 bits address $B+CD (full 64K range)
 
-1111 0000 - NOT($C)->$D
-1111 0001 - LEFTSHIFT($C)->$D
-1111 0010 - LEFTROTATE($C)->$D         //circular
-1111 0011 - RIGHTSHIFT($C)->$D         //logical shift(insert zero)
-1111 0100 - RIGHTROTATE($C)->$D        //circular
-1111 0101 -?? SKIPEQUAL($C=$D)         //Skip the following instruction if $C == $D
-1111 0110 - JUMP()goto#CD              //Goto relative 8 bits address CD
-1111 0111 - READ(@$C)->$D              //fetch value from RAM at $C to store in $D
-1111 1000 - WRITE(@$C)<-$D             //write $D to RAM at address $C
-1111 1001 -?? SKIPGREATER($C>$D)       //Skip the following instruction if $C > $D
-1111 1010 -?? IFZERO($C)goto#$D        //Branches if $C == 0, Goto relative 8 bits address at $D
-1111 1011 -??? WIDEJUMP()goto#$C$D     //goto absolute 16 bits address $C$D (full 64K range)
-1111 1100 -?? LEFTCRROT($C)->$D        //through carry
-1111 1101 -?? RIGHTCRROT($C)->$D       //through carry
-1111 1110 -?? RIGHTARSHT($C)->$D       //arithmetic shift(insert one)
+1111 0000 - NOT   - Not($C)->$D
+1111 0001 - LSHT  - LeftShift($C)->$D        (??)//droped bit is sent to carry
+1111 0010 - LROT  - LeftRotate($C)->$D        (?)//circular
+1111 0011 - RSHT  - RightShift($C)->$D        (?)//logical shift(insert zero), droped bit is sent to carry
+1111 0100 - RROT  - RightRotate($C)->$D       (?)//circular
+1111 0101 - SEQ   - SkipEqual($C=$D)         (??)//Skip the following instruction if $C == $D
+1111 0110 - JMPA  - JumpAddr()goto#CD        (??)//Goto relative 8 bits address CD
+1111 0111 - GETR  - ReadReg(@$C)->$D             //fetch value from RAM at $C to store in $D
+1111 1000 - SETR  - WriteReg(@$C)<-$D            //write $D to RAM at address $C
+1111 1001 - SGRT  - SkipGreater($C>$D)       (??)//Skip the following instruction if $C > $D
+1111 1010 - IFZR  - IfZeroReg($C)goto#$D     (??)//Branches if $C == 0, Goto relative 8 bits address at $D
+1111 1011 - WJMPR - WideJumpReg()goto#$C$D  (???)//goto absolute 16 bits address $C$D (full 64K range)
+1111 1100 - LROTC - LeftCrRot($C)->$D        (??)//through carry
+1111 1101 - RROTC - RightCrRot($C)->$D       (??)//through carry
+1111 1110 - RSHTA - RightArSht($C)->$D       (??)//arithmetic shift(insert one)
 
-1111 1111 0000 -? JUMP()goto#$D        //Goto relative address at $D
-1111 1111 0001 -? CARRYFLG()->$D       //Output the value of the carry flag on a register
-1111 1111 0010 -?? RESETCARRY()
-1111 1111 0011 -?? SETCARRY()
-1111 1111 0100 -? INC($D)              //Increment $D by 1 and stores the result in $D
-1111 1111 0101 -? DEC($D)              //Decrement $D by 1 and stores the result in $D
-1111 1111 0110 -?? SKIPZERO($D)        //Skip the following instruction if $D == 0
-1111 1111 0111 -?? RAND()->$D
-1111 1111 1000 -??? SKIPNOTZERO($D)    //Skip the following instruction if $D != 0
-1111 1111 1001 -??? SKIPNOTCARRY($D)   //Skip the following instruction if carry flag set
-1111 1111 1010 -??? DECSKIPNOTZERO($D) //skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0
+1111 1111 0000 - JMPR  - JumpReg()goto#$D     (?)//Goto relative address at $D
+1111 1111 0001 - CFLG  - CarryFlg()->$D       (?)//Output the value of the carry flag on a register
+1111 1111 0010 - RSTC  - ResetCarry()        (??)
+1111 1111 0011 - SETC  - SetCarry()          (??)
+1111 1111 0100 - INC   - Increment($D)        (?)//Increment $D by 1 and stores the result in $D
+1111 1111 0101 - DEC   - Decrement($D)        (?)//Decrement $D by 1 and stores the result in $D
+1111 1111 0110 - SIFZ  - SkipZero($D)        (??)//Skip the following instruction if $D == 0
+1111 1111 0111 - RND   - Random()->$D          (??)
+1111 1111 1000 - SIFNZ - SkipNotZero($D)    (???)//Skip the following instruction if $D != 0
+1111 1111 1001 - SIFNC - SkipNotCarry($D)   (???)//Skip the following instruction if carry flag set
+1111 1111 1010 - DSINZ - DecSkipNotZero($D) (???)//skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0
 1111 1111 1011 - Unused
 1111 1111 1100 - Unused
 1111 1111 1101 - Unused
 1111 1111 1110 - Unused
-1111 1111 1111 - NOP()
-
+1111 1111 1111 - NOP   - NOP()
 
 
 ToDo/Idea:
 Add TagNode/Hint in Simulation
 Erase all registers with Set() any value to register F
 improve carryflag on substraction 
+sort instruction in dropdown
 
 Tricks
 Copy($B)->$D accomplished with AND($B,$C)->$D where $B and $C are the same location

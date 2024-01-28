@@ -63,43 +63,11 @@ object f_Memory: Tf_Memory
     Height = 21
     Anchors = [akLeft, akBottom]
     DropDownCount = 18
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 0
     Text = 'OpCode'
     OnChange = cb_OpCodeChange
-    Items.Strings = (
-      'SET( Data ) -> $'
-      'READ( @Data ) -> $'
-      'WRITE( @Data, <- $ )'
-      'READ( @$ ) -> $'
-      'WRITE( @$, <- $ )'
-      'IFZERO( $ ) Goto #$'
-      'IFZERO( $ ) Goto #Data'
-      'SKIPEQUAL( $ , $ )'
-      'SKIPGREATER( $ , $ )'
-      'ADD( $ + $ ) -> $'
-      'SUBSTRACT( $ - $ ) -> $'
-      'INC( $ ) -> $'
-      'DEC( $ ) -> $'
-      'AND( $ & $ ) -> $'
-      'OR( $ | $ ) -> $'
-      'XOR( $ x $ ) -> $'
-      'NOT( $ ) -> $'
-      'LEFTSH( $ ) -> $'
-      'RIGHTSH( $ ) -> $'
-      'LEFTRT( $ ) -> $'
-      'RIGHTRT( $ ) -> $'
-      'LEFTCRRT( $ ) -> $'
-      'RIGHTCRRT( $ ) -> $'
-      'JUMP( ) Goto #$'
-      'JUMP( ) Goto #Data'
-      '//WIDEJUMP'
-      '//WIDEJUMP'
-      'CARRYFLG( ) -> $'
-      'RAND( ) -> $'
-      'NOP( )'
-      'COPY( $ ) -> $'
-      'ERASE( $ )'
-      'HALT()')
   end
   object cb_D: TComboBox
     Left = 587

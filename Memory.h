@@ -12,6 +12,29 @@
 #include <DBGrids.hpp>
 #include <Grids.hpp>
 #include <Dialogs.hpp>
+#include <Xml.Win.msxmldom.hpp>
+#include <Xml.XMLDoc.hpp>
+#include <Xml.xmldom.hpp>
+#include <Xml.XMLIntf.hpp>
+
+//---------------------------------------------------------------------------
+
+class TInstruc
+{
+public:
+   int ID, DataWidth, NbParam;
+   String Name, OpCode, Descr, Comm;
+   bool DataAct, FieldBAct, FieldCAct, FieldDAct;
+   bool BlockAFix, BlockBFix, BlockCFix, BlockDFix;
+   String BlockASource, BlockAVal, BlockBSource, BlockBVal,
+          BlockCSource, BlockCVal, BlockDSource, BlockDVal;
+   String HeadMnemo, HeadSuffix,
+          Param1Type, Param1Source, Param1Suffix,
+          Param2Type, Param2Source, Param2Suffix,
+          Param3Type, Param3Source, Param3Suffix;
+
+  TInstruc(int pID, String pName, String pOpCode);
+};
 //---------------------------------------------------------------------------
 class Tf_Memory : public TForm
 {
@@ -72,6 +95,9 @@ __published:	// Composants gérés par l'EDI
 private:	// Déclarations de l'utilisateur
     int LastDataType;
     int LastSelLine;
+    int InstrucCmp;
+
+    TList* InstrucList;
 
     void CreateLine(void);
     int DeltaToAddr(int Delta);
@@ -83,6 +109,7 @@ private:	// Déclarations de l'utilisateur
 public:		// Déclarations de l'utilisateur
     __fastcall Tf_Memory(TComponent* Owner);
     void MoveAddrByDelta(int Delta);
+    void LoadInstructionSet(_di_IXMLNode pInstructionSet);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Memory *f_Memory;

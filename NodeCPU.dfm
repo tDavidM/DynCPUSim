@@ -12,6 +12,7 @@ object f_CPUNode: Tf_CPUNode
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  ShowHint = False
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown

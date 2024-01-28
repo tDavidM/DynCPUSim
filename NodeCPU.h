@@ -12,16 +12,17 @@
 #include <ToolWin.hpp>
 #include <XPMan.hpp>
 #include <Vcl.Menus.hpp>
-//---------------------------------------------------------------------------
-#include "GraphIO.h"
-#include "GraphEdit.h"
-#include "Memory.h"
-#include "Ram.h"
 #include <Vcl.Dialogs.hpp>
 #include <Xml.Win.msxmldom.hpp>
 #include <Xml.XMLDoc.hpp>
 #include <Xml.xmldom.hpp>
 #include <Xml.XMLIntf.hpp>
+
+//---------------------------------------------------------------------------
+#include "GraphIO.h"
+#include "GraphEdit.h"
+#include "Memory.h"
+#include "Ram.h"
 
 #define VK_KEY_1 0x31
 #define VK_KEY_2 0x32
@@ -152,6 +153,8 @@ private:	// Déclarations de l'utilisateur
     TList* SelectList;
     //TList* FollowList;
     TNode *NodeSelect;
+
+    _di_IXMLNode InstructionSetXML;
 
     int NodeCmp, NodeMaxID;
     int NodeType;

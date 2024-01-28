@@ -140,17 +140,11 @@ void TNode::SetType(int pType)
 int TNode::GetInOutType(void)
 {
   if(this->PinInUp > 0 || this->PinInDown > 0)
-  {
     return 1; //Input, Green/Yellow
-  }
   else if(this->PinOutUp > 0 || this->PinOutDown > 0)
-  {
     return 2; //Output, Blue/Purple
-  }
   else
-  {
     return 0; //Normal, Black/Red
-  } 
 }
 //---------------------------------------------------------------------------
 //Reset Internal State, Inputs States and Activity on Inputs
@@ -168,15 +162,11 @@ void TNode::Reset(void)
 void TNode::Receive(bool pAct)
 {
   //When a node receives input, it is stacked in Up than Down
-  if(!this->DeleteFlag)
-  {
-      if(!this->InActiveUp)
-      {
+  if (!this->DeleteFlag) {
+      if (!this->InActiveUp) {
         this->InUpAct = pAct;
         this->InActiveUp = true;
-      }
-      else if (!this->InActiveDown)
-      {
+      } else if (!this->InActiveDown) {
         this->InDownAct = pAct;
         this->InActiveDown = true;
       }
@@ -189,19 +179,14 @@ void TNode::Send()
   TNode* NodeCurr;
   
   //Each node sends internal state to Up and Down Output Node by calling remote Receive methode
-  if(!this->DeleteFlag)
-  {
+  if (!this->DeleteFlag) {
       NodeCurr = this->NodeOutUp;
-      if(NodeCurr != NULL)
-      {
+      if (NodeCurr != NULL)
         NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
-      }
 
       NodeCurr = this->NodeOutDown;
-      if(NodeCurr != NULL)
-      {
+      if (NodeCurr != NULL)
         NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
-      }
   }
 }
 //---------------------------------------------------------------------------
@@ -209,42 +194,34 @@ void TNode::Send()
 void TNode::Work(void)
 {
   //Update internal state
-  switch (this->Type)
-  {
-    case 0: //OR
-	{
+  switch (this->Type) {
+    case 0: { //OR
 	  this->Active = this->InUpAct || this->InDownAct;
       break;
 	}
-	case 1: //AND
-	{
+	case 1: { //AND
 	  this->Active = this->InUpAct && this->InDownAct;
       break;
 	}
-	case 2: //NOR
-	{
+	case 2: { //NOR
 	  this->Active = !(this->InUpAct || this->InDownAct);
       break;
 	}
-	case 3: //NAND
-	{
+	case 3: { //NAND
       //this->ActiveDelay = this->Active;
 	  this->Active = !(this->InUpAct && this->InDownAct);
       //this->ActiveDelay = this->Active ? 3 : this->ActiveDelay - 1;
       break;
 	}
-	case 4: //XOR
-	{
+	case 4: { //XOR
 	  this->Active = this->InUpAct != this->InDownAct;
       break;
 	}
-	case 5: //NOT
-	{
+	case 5: { //NOT
 	  this->Active = ! this->InUpAct;
       break;
 	}
-	case 6: //Link
-	{
+	case 6: { //Link
 	  this->Active = this->InUpAct || this->InDownAct;
       break;
 	}
@@ -359,41 +336,33 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
          //_di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[0];
          FileType = XmlRoot->GetAttribute("Type");
          if (FileType == "Dyn CPU Sim") {
-            _di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[0];
+
+            _di_IXMLNode InstructionSet = XmlRoot->ChildNodes->Nodes[0];
+            f_Memory->LoadInstructionSet(InstructionSet);
+            this->InstructionSetXML = InstructionSet;
+
+            _di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[1];
             LinkCount = Param->GetAttribute("LinkCount");
 
-            if (Param->ChildNodes->Nodes[0]->IsTextElement)
-            {
-              _di_IXMLNode OrType = XmlRoot->ChildNodes->Nodes[0];
+            /*_di_IXMLNode OrType = Param->ChildNodes->Nodes[0];
               NodeTypeCount = OrType->GetAttribute("Count");
-            }
-            if (Param->ChildNodes->Nodes[1]->IsTextElement)
-            {
-              _di_IXMLNode AndType = XmlRoot->ChildNodes->Nodes[1];
-              NodeTypeCount = AndType->GetAttribute("Count");
-            }
-            if (Param->ChildNodes->Nodes[2]->IsTextElement)
-            {
-              _di_IXMLNode NorType = XmlRoot->ChildNodes->Nodes[2];
-              NodeTypeCount = NorType->GetAttribute("Count");
-            }
-            if (Param->ChildNodes->Nodes[3]->IsTextElement)
-            {
-              _di_IXMLNode NandType = XmlRoot->ChildNodes->Nodes[3];
-              NodeTypeCount = NandType->GetAttribute("Count");
-            }
-            if (Param->ChildNodes->Nodes[4]->IsTextElement)
-            {
-              _di_IXMLNode XorType = XmlRoot->ChildNodes->Nodes[4];
-              NodeTypeCount = XorType->GetAttribute("Count");
-            }
-            if (Param->ChildNodes->Nodes[5]->IsTextElement)
-            {
-              _di_IXMLNode NotType = XmlRoot->ChildNodes->Nodes[5];
-              NodeTypeCount = NotType->GetAttribute("Count");
-            }
 
-            _di_IXMLNode NodeState = XmlRoot->ChildNodes->Nodes[1];
+              _di_IXMLNode AndType = Param->ChildNodes->Nodes[1];
+              NodeTypeCount = AndType->GetAttribute("Count");
+
+              _di_IXMLNode NorType = Param->ChildNodes->Nodes[2];
+              NodeTypeCount = NorType->GetAttribute("Count");
+
+              _di_IXMLNode NandType = Param->ChildNodes->Nodes[3];
+              NodeTypeCount = NandType->GetAttribute("Count");
+
+              _di_IXMLNode XorType = Param->ChildNodes->Nodes[4];
+              NodeTypeCount = XorType->GetAttribute("Count");
+
+              _di_IXMLNode NotType = Param->ChildNodes->Nodes[5];
+              NodeTypeCount = NotType->GetAttribute("Count");*/
+
+            _di_IXMLNode NodeState = XmlRoot->ChildNodes->Nodes[2];
             ListNodeCount = StrToInt(NodeState->GetAttribute("NodeCount"));
             this->pgLoading->Max = ListNodeCount*2;
 
@@ -464,7 +433,8 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
                NameOutDown = "";
                this->pgLoading->Position++;
             }
-         }
+         } else
+           ShowMessage("Error Invalid File");
          this->XMLDoc->Active = false;
 
          Node = NULL;
@@ -612,6 +582,8 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 	  _di_IXMLNode FileType = XmlRoot->CreateElement("FileType", "");
      XmlRoot->ChildNodes->Add(FileType);
 	  FileType->SetAttribute("Type", (String)"Dyn CPU Sim");
+
+     FileType->ChildNodes->Add(this->InstructionSetXML);
 
      for (int i = 0; i<this->NodeCmp; i++)
      {
@@ -1719,6 +1691,8 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                 Type = NodeCurr->GetType();
 
                 this->sb_Main->Panels->Items[0]->Text = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[Type] + "]";
+                //this->Hint = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[Type] + "]";
+                //f_CPUNode->Hint
 
                 i = NodeCmp;
              }
