@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <FileType Type="Dyn CPU Sim">
   <InstructionSet>
-    <Instruction ID="0" Name="SET" OpCode="0000">
+    <Instruction ID="0" Name="SET" OpCode="0000" DisplayOrder="0">
 	  <Desc>Set (BC)-&gt;$D</Desc>
 	  <Comment>BC specifies a fixed value</Comment>
 	  <DataField Data="True" Width="Double" B="False" C="False" D="True"/>
@@ -17,7 +17,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="1" Name="READADDR" OpCode="0001">
+    <Instruction ID="1" Name="READADDR" OpCode="0001" DisplayOrder="1">
 	  <Desc>ReadAddr (@BC)-&gt;$D</Desc>
 	  <Comment>BC specifies 8 bits address to fetch value from RAM to store in $D</Comment>
 	  <DataField Data="True" Width="Double" B="False" C="False" D="True"/>
@@ -33,7 +33,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="2" Name="WRITEADDR" OpCode="0010">
+    <Instruction ID="2" Name="WRITEADDR" OpCode="0010" DisplayOrder="3">
 	  <Desc>WriteAddr (@BC)&lt;-$D</Desc>
 	  <Comment>BC specifies 8 bits address to store value to RAM from $D</Comment>
 	  <DataField Data="True" Width="Double" B="False" C="False" D="True"/>
@@ -49,7 +49,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="3" Name="IFNOTZERO" OpCode="0011">
+    <Instruction ID="3" Name="IFNOTZERO" OpCode="0011" DisplayOrder="6">
 	  <Desc>IfNotZero ($B)goto#CD</Desc>
 	  <Comment>Branches if $B != 0, Goto relative 8 bits address CD</Comment>
 	  <DataField Data="True" Width="Double" B="True" C="False" D="False"/>
@@ -65,7 +65,7 @@
 		<Param2 Type="#" Source="Data" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="4" Name="IFZERO" OpCode="0100">
+    <Instruction ID="4" Name="IFZERO" OpCode="0100" DisplayOrder="7">
 	  <Desc>IfZero ($B)goto#CD</Desc>
 	  <Comment>Branches if $B == 0, Goto relative 8 bits address CD</Comment>
 	  <DataField Data="True" Width="Double" B="True" C="False" D="False"/>
@@ -81,7 +81,7 @@
 		<Param2 Type="#" Source="Data" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="5" Name="SKIPIF" OpCode="0101">
+    <Instruction ID="5" Name="SKIPIF" OpCode="0101" DisplayOrder="11">
 	  <Desc>SkipIf ($B=CD)</Desc>
 	  <Comment>Skip the following instruction if $B == CD</Comment>
 	  <DataField Data="True" Width="Double" B="True" C="False" D="False"/>
@@ -97,7 +97,7 @@
 		<Param2 Type="" Source="Data" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="6" Name="ADD" OpCode="0110">
+    <Instruction ID="6" Name="ADD" OpCode="0110" DisplayOrder="21">
 	  <Desc>Add ($B+$C)-&gt;$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="True" C="True" D="True"/>
@@ -114,7 +114,7 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="7" Name="SUBTRACT" OpCode="0111">
+    <Instruction ID="7" Name="SUBTRACT" OpCode="0111" DisplayOrder="22">
 	  <Desc>Subtract ($B-$C)-&gt;$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="True" C="True" D="True"/>
@@ -131,7 +131,7 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="8" Name="AND" OpCode="1000">
+    <Instruction ID="8" Name="AND" OpCode="1000" DisplayOrder="26">
 	  <Desc>And ($B&amp;$C)-&gt;$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="True" C="True" D="True"/>
@@ -148,7 +148,7 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="9" Name="OR" OpCode="1001">
+    <Instruction ID="9" Name="OR" OpCode="1001" DisplayOrder="27">
 	  <Desc>Or ($B|$C)-&gt;$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="True" C="True" D="True"/>
@@ -165,7 +165,7 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="10" Name="XOR" OpCode="1010">
+    <Instruction ID="10" Name="XOR" OpCode="1010" DisplayOrder="28">
 	  <Desc>Xor ($B^$C)-&gt;$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="True" C="True" D="True"/>
@@ -182,7 +182,7 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="11" Name="WIDEJUMP" OpCode="1011">
+    <Instruction ID="11" Name="WIDEJUMP" OpCode="1011" DisplayOrder="18">
 	  <Desc>WideJump ()goto#0000+BCD</Desc>
 	  <Comment>goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)</Comment>
 	  <DataField Data="True" Width="Triple" B="False" C="False" D="False"/>
@@ -193,11 +193,11 @@
 		<Block Name="D" Fix="False" Source=""/>
 	  </CodeBlock>
 	  <TextBlock NbParam="1">
-	    <Head Mnemonic="WJMP" Suffix="  () goto #0000"/>
+	    <Head Mnemonic="WJMP" Suffix="  () goto #0x0 + "/>
 		<Param1 Type="" Source="Data" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="12" Name="WRITEVAL" OpCode="1100">
+    <Instruction ID="12" Name="WRITEVAL" OpCode="1100" DisplayOrder="5">
 	  <Desc>WriteVal (@$B)&lt;-CD</Desc>
 	  <Comment>write CD to RAM at address $B</Comment>
 	  <DataField Data="True" Width="Double" B="True" C="False" D="False"/>
@@ -213,7 +213,7 @@
 		<Param2 Type="" Source="Data" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="13" Name="GREATEST" OpCode="1101">
+    <Instruction ID="13" Name="GREATEST" OpCode="1101" DisplayOrder="25">
 	  <Desc>Greatest ($B_$C)->$D</Desc>
 	  <Comment>set $D to the greatest value betweem $B and $C</Comment>
 	  <DataField Data="False" Width="" B="True" C="True" D="True"/>
@@ -230,23 +230,23 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="14" Name="WIDEJUMPVAL" OpCode="1110">
+    <Instruction ID="14" Name="WIDEJUMPVAL" OpCode="1110" DisplayOrder="19">
 	  <Desc>WideJumpVal ()goto#$B+CD</Desc>
 	  <Comment>goto absolute 16 bits address $B+CD (full 64K range)</Comment>
 	  <DataField Data="True" Width="Double" B="True" C="False" D="False"/>
 	  <CodeBlock>
 	    <Block Name="A" Fix="True" Source="">1110</Block>
 		<Block Name="B" Fix="False" Source="B"/>
-		<Block Name="C" Fix="False" Source="data"/>
+		<Block Name="C" Fix="False" Source="Data"/>
 		<Block Name="D" Fix="False" Source=""/>
 	  </CodeBlock>
 	  <TextBlock NbParam="2">
 	    <Head Mnemonic="WJMPV" Suffix=" () goto "/>
-		<Param1 Type="#$" Source="B" Suffix=""/>
+		<Param1 Type="#$" Source="B" Suffix=" + "/>
 		<Param2 Type="" Source="Data" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="15" Name="NOT" OpCode="11110000">
+    <Instruction ID="15" Name="NOT" OpCode="11110000" DisplayOrder="29">
 	  <Desc>Not ($C)->$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -262,7 +262,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="16" Name="LEFTSHIFT" OpCode="11110001">
+    <Instruction ID="16" Name="LEFTSHIFT" OpCode="11110001" DisplayOrder="30">
 	  <Desc>LeftShift ($C)->$D</Desc>
 	  <Comment>droped bit is sent to carry</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -278,7 +278,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="17" Name="LEFTROTATE" OpCode="11110010">
+    <Instruction ID="17" Name="LEFTROTATE" OpCode="11110010" DisplayOrder="33">
 	  <Desc>LeftRotate ($C)->$D</Desc>
 	  <Comment>circular</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -294,7 +294,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="18" Name="RIGHTSHIFT" OpCode="11110011">
+    <Instruction ID="18" Name="RIGHTSHIFT" OpCode="11110011" DisplayOrder="31">
 	  <Desc>RightShift ($C)->$D</Desc>
 	  <Comment>logical shift(insert zero), droped bit is sent to carry</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -310,7 +310,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="19" Name="RIGHTROTATE" OpCode="11110100">
+    <Instruction ID="19" Name="RIGHTROTATE" OpCode="11110100" DisplayOrder="34">
 	  <Desc>RightRotate ($C)->$D</Desc>
 	  <Comment>circular</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -326,7 +326,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="20" Name="SKIPEQUAL" OpCode="11110101">
+    <Instruction ID="20" Name="SKIPEQUAL" OpCode="11110101" DisplayOrder="12">
 	  <Desc>SkipEqual ($C=$D)</Desc>
 	  <Comment>Skip the following instruction if $C == $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -342,7 +342,7 @@
 		<Param2 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="21" Name="JUMPADDR" OpCode="11110110">
+    <Instruction ID="21" Name="JUMPADDR" OpCode="11110110" DisplayOrder="16">
 	  <Desc>JumpAddr ()goto#CD</Desc>
 	  <Comment>Goto relative 8 bits address CD</Comment>
 	  <DataField Data="True" Width="Double" B="False" C="False" D="False"/>
@@ -357,7 +357,7 @@
 		<Param1 Type="#" Source="Data" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="22" Name="READREG" OpCode="11110111">
+    <Instruction ID="22" Name="READREG" OpCode="11110111" DisplayOrder="2">
 	  <Desc>ReadReg (@$C)->$D</Desc>
 	  <Comment>fetch value from RAM at $C to store in $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -373,7 +373,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="23" Name="WRITEREG" OpCode="11111000">
+    <Instruction ID="23" Name="WRITEREG" OpCode="11111000" DisplayOrder="4">
 	  <Desc>WriteReg (@$C)&lt;-$D</Desc>
 	  <Comment>write $D to RAM at address $C</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -389,9 +389,9 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="24" Name="SKIPGREATER" OpCode="11111001">
-	  <Desc>Skip the following instruction if $C > $D</Desc>
-	  <Comment>SkipGreater ($C>$D)</Comment>
+    <Instruction ID="24" Name="SKIPGREATER" OpCode="11111001" DisplayOrder="13">
+	  <Desc>SkipGreater ($C>$D)</Desc>
+	  <Comment>Skip the following instruction if $C > $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
 	  <CodeBlock>
 	    <Block Name="A" Fix="True" Source="">1111</Block>
@@ -405,7 +405,7 @@
 		<Param2 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="25" Name="IFZEROREG" OpCode="11111010">
+    <Instruction ID="25" Name="IFZEROREG" OpCode="11111010" DisplayOrder="8">
 	  <Desc>IfZeroReg ($C)goto#$D</Desc>
 	  <Comment>Branches if $C == 0, Goto relative 8 bits address at $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -421,7 +421,7 @@
 		<Param2 Type="#$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="26" Name="WIDEJUMPREG" OpCode="11111011">
+    <Instruction ID="26" Name="WIDEJUMPREG" OpCode="11111011" DisplayOrder="20">
 	  <Desc>WideJumpReg ()goto#$C$D</Desc>
 	  <Comment>goto absolute 16 bits address $C$D (full 64K range)</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -433,11 +433,11 @@
 	  </CodeBlock>
 	  <TextBlock NbParam="2">
 	    <Head Mnemonic="WJMPR" Suffix=" () goto "/>
-		<Param1 Type="#$" Source="C" Suffix=""/>
+		<Param1 Type="#$" Source="C" Suffix=" + "/>
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="27" Name="LEFTCRROT" OpCode="11111100">
+    <Instruction ID="27" Name="LEFTCRROT" OpCode="11111100" DisplayOrder="35">
 	  <Desc>LeftCrRot ($C)->$D</Desc>
 	  <Comment>through carry</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -453,7 +453,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="28" Name="RIGHTCRROT" OpCode="11111101">
+    <Instruction ID="28" Name="RIGHTCRROT" OpCode="11111101" DisplayOrder="36">
 	  <Desc>RightCrRot ($C)->$D</Desc>
 	  <Comment>through carry</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -469,7 +469,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="29" Name="RIGHTARSHT" OpCode="11111110">
+    <Instruction ID="29" Name="RIGHTARSHT" OpCode="11111110" DisplayOrder="32">
 	  <Desc>RightArSht ($C)->$D</Desc>
 	  <Comment>arithmetic shift(insert one)</Comment>
 	  <DataField Data="False" Width="" B="False" C="True" D="True"/>
@@ -485,7 +485,7 @@
 		<Param2 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="30" Name="JUMPREG" OpCode="111111110000">
+    <Instruction ID="30" Name="JUMPREG" OpCode="111111110000" DisplayOrder="17">
 	  <Desc>JumpReg ()goto#$D</Desc>
 	  <Comment>Goto relative address at $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -500,7 +500,7 @@
 		<Param1 Type="#$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="31" Name="CARRYFLAG" OpCode="111111110001">
+    <Instruction ID="31" Name="CARRYFLAG" OpCode="111111110001" DisplayOrder="37">
 	  <Desc>CarryFlg ()->$D</Desc>
 	  <Comment>Output the value of the carry flag on a register</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -515,7 +515,7 @@
 		<Param1 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="32" Name="RESETCARRY" OpCode="111111110010">
+    <Instruction ID="32" Name="RESETCARRY" OpCode="111111110010" DisplayOrder="38">
 	  <Desc>ResetCarry ()</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="False"/>
@@ -529,7 +529,7 @@
 	    <Head Mnemonic="RSTC" Suffix=" ()"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="33" Name="SETCARRY" OpCode="111111110011">
+    <Instruction ID="33" Name="SETCARRY" OpCode="111111110011" DisplayOrder="39">
 	  <Desc>SetCarry ()</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="False"/>
@@ -543,7 +543,7 @@
 	    <Head Mnemonic="SETC" Suffix=" ()"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="34" Name="INCREMENT" OpCode="111111110100">
+    <Instruction ID="34" Name="INCREMENT" OpCode="111111110100" DisplayOrder="23">
 	  <Desc>Increment ($D)</Desc>
 	  <Comment>Increment $D by 1 and stores the result in $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -558,7 +558,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="35" Name="DECREMENT" OpCode="111111110101">
+    <Instruction ID="35" Name="DECREMENT" OpCode="111111110101" DisplayOrder="24">
 	  <Desc>Decrement ($D)</Desc>
 	  <Comment>Decrement $D by 1 and stores the result in $D</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -573,7 +573,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="36" Name="SKIPZERO" OpCode="111111110110">
+    <Instruction ID="36" Name="SKIPZERO" OpCode="111111110110" DisplayOrder="10">
 	  <Desc>SkipZero ($D)</Desc>
 	  <Comment>Skip the following instruction if $D == 0</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -588,7 +588,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="37" Name="RANDOM" OpCode="111111110111">
+    <Instruction ID="37" Name="RANDOM" OpCode="111111110111" DisplayOrder="40">
 	  <Desc>Random ()->$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -603,7 +603,7 @@
 		<Param1 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="38" Name="SKIPNOTZERO" OpCode="111111111000">
+    <Instruction ID="38" Name="SKIPNOTZERO" OpCode="111111111000" DisplayOrder="9">
 	  <Desc>SkipNotZero ($D)</Desc>
 	  <Comment>Skip the following instruction if $D != 0</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -618,7 +618,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="39" Name="SKIPNOTCARRY" OpCode="111111111001">
+    <Instruction ID="39" Name="SKIPNOTCARRY" OpCode="111111111001" DisplayOrder="14">
 	  <Desc>SkipNotCarry ($D)</Desc>
 	  <Comment>Skip the following instruction if carry flag set</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -633,7 +633,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="40" Name="DECSKIPNOTZERO" OpCode="111111111010">
+    <Instruction ID="40" Name="DECSKIPNOTZERO" OpCode="111111111010" DisplayOrder="15">
 	  <Desc>DecSkipNotZero ($D)</Desc>
 	  <Comment>skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -648,7 +648,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="41" Name="NOP" OpCode="111111111111">
+    <Instruction ID="41" Name="NOP" OpCode="111111111111" DisplayOrder="41">
 	  <Desc>NOP ()</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="False"/>
@@ -662,7 +662,7 @@
 	    <Head Mnemonic="NOP" Suffix=" () "/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="42" Name="COPY" OpCode="1000">
+    <Instruction ID="42" Name="COPY" OpCode="1000" DisplayOrder="42">
 	  <Desc>* Copy ($B)-&gt;$D</Desc>
 	  <Comment></Comment>
 	  <DataField Data="False" Width="" B="True" C="False" D="True"/>
@@ -678,7 +678,7 @@
 		<Param3 Type="$" Source="D" Suffix=""/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="43" Name="RESET" OpCode="1010">
+    <Instruction ID="43" Name="RESET" OpCode="1010" DisplayOrder="43">
 	  <Desc>* Reset ($D)</Desc>
 	  <Comment>Reset a register to zero</Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="True"/>
@@ -693,7 +693,7 @@
 		<Param1 Type="$" Source="D" Suffix=" )"/>
 	  </TextBlock>
     </Instruction>
-    <Instruction ID="44" Name="HALT" OpCode="0000">
+    <Instruction ID="44" Name="HALT" OpCode="0000" DisplayOrder="44">
 	  <Desc>* Halt ()</Desc>
 	  <Comment>Halt executon until Pin 29 pulled LOW </Comment>
 	  <DataField Data="False" Width="" B="False" C="False" D="False"/>
