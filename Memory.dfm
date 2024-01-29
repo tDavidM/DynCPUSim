@@ -23,13 +23,12 @@ object f_Memory: Tf_Memory
   PixelsPerInch = 96
   TextHeight = 13
   object l_Data: TLabel
-    Left = 171
-    Top = 427
+    Left = 205
+    Top = 425
     Width = 27
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Data:'
-    ExplicitTop = 437
   end
   object l_AddrTx: TLabel
     Left = 8
@@ -48,18 +47,26 @@ object f_Memory: Tf_Memory
     Caption = '0x0000'
   end
   object l_Sort: TLabel
-    Left = 8
-    Top = 451
+    Left = 136
+    Top = 475
     Width = 24
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Sort:'
     Visible = False
   end
+  object l_Width: TLabel
+    Left = 336
+    Top = 425
+    Width = 76
+    Height = 13
+    Anchors = [akLeft, akBottom]
+    Caption = 'MaxData: 8 bits'
+  end
   object cb_OpCode: TComboBox
     Left = 8
-    Top = 424
-    Width = 145
+    Top = 422
+    Width = 185
     Height = 21
     Anchors = [akLeft, akBottom]
     DropDownCount = 18
@@ -70,9 +77,9 @@ object f_Memory: Tf_Memory
     OnChange = cb_OpCodeChange
   end
   object cb_D: TComboBox
-    Left = 587
+    Left = 607
     Top = 422
-    Width = 90
+    Width = 70
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
@@ -99,9 +106,9 @@ object f_Memory: Tf_Memory
       'F')
   end
   object cb_C: TComboBox
-    Left = 471
-    Top = 424
-    Width = 90
+    Left = 519
+    Top = 422
+    Width = 70
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
@@ -129,9 +136,9 @@ object f_Memory: Tf_Memory
       'F')
   end
   object cb_B: TComboBox
-    Left = 352
-    Top = 424
-    Width = 90
+    Left = 431
+    Top = 422
+    Width = 70
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
@@ -159,9 +166,9 @@ object f_Memory: Tf_Memory
       'F')
   end
   object e_Data: TEdit
-    Left = 203
-    Top = 424
-    Width = 121
+    Left = 237
+    Top = 422
+    Width = 94
     Height = 21
     Anchors = [akLeft, akBottom]
     TabOrder = 4
@@ -170,9 +177,9 @@ object f_Memory: Tf_Memory
     OnKeyPress = e_DataKeyPress
   end
   object rb_Bin: TRadioButton
-    Left = 203
-    Top = 446
-    Width = 113
+    Left = 237
+    Top = 444
+    Width = 93
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Binary'
@@ -180,9 +187,9 @@ object f_Memory: Tf_Memory
     OnClick = rb_BinClick
   end
   object rb_Dec: TRadioButton
-    Left = 203
-    Top = 463
-    Width = 113
+    Left = 237
+    Top = 461
+    Width = 93
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Decimal'
@@ -190,9 +197,9 @@ object f_Memory: Tf_Memory
     OnClick = rb_DecClick
   end
   object rb_Hex: TRadioButton
-    Left = 203
-    Top = 480
-    Width = 113
+    Left = 237
+    Top = 478
+    Width = 93
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Hexadecimal'
@@ -245,12 +252,13 @@ object f_Memory: Tf_Memory
     TitleFont.Height = -11
     TitleFont.Name = 'Tahoma'
     TitleFont.Style = []
+    OnDblClick = dbg_MemDblClick
   end
   object e_Sort: TEdit
-    Left = 40
-    Top = 448
-    Width = 113
-    Height = 21
+    Left = 161
+    Top = 472
+    Width = 65
+    Height = 19
     Anchors = [akLeft, akBottom]
     Enabled = False
     TabOrder = 12
@@ -293,6 +301,13 @@ object f_Memory: Tf_Memory
     Caption = 'Import'
     TabOrder = 16
   end
+  object e_Comment: TEdit
+    Left = 8
+    Top = 449
+    Width = 185
+    Height = 21
+    TabOrder = 17
+  end
   object cds_Mem: TClientDataSet
     Aggregates = <>
     FieldDefs = <>
@@ -304,22 +319,46 @@ object f_Memory: Tf_Memory
     Left = 144
     Top = 40
     object cds_MemAddress: TIntegerField
+      DisplayWidth = 8
       FieldKind = fkCalculated
       FieldName = 'Address'
+      Visible = False
+      Calculated = True
+    end
+    object cds_MemAddrHex: TStringField
+      FieldKind = fkCalculated
+      FieldName = 'AddrHex'
+      Size = 4
       Calculated = True
     end
     object cds_MemAddrDelta: TIntegerField
       FieldName = 'AddrDelta'
       Visible = False
     end
+    object cds_MemMnemonic: TStringField
+      FieldName = 'Mnemonic'
+      Size = 5
+    end
     object cds_MemHumData: TStringField
+      DisplayLabel = 'HumanReadable'
+      DisplayWidth = 32
       FieldName = 'HumData'
       Size = 64
     end
     object cds_MemCode: TStringField
-      DisplayWidth = 24
+      DisplayLabel = 'MachineCode'
+      DisplayWidth = 18
       FieldName = 'Code'
       Size = 16
+    end
+    object cds_MemCodeHex: TStringField
+      FieldName = 'CodeHex'
+      Size = 4
+    end
+    object cds_MemComment: TStringField
+      DisplayWidth = 28
+      FieldName = 'Comment'
+      Size = 64
     end
     object cds_MemOpCode: TIntegerField
       FieldName = 'OpCode'

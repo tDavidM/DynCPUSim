@@ -22,7 +22,7 @@
 class TInstruc
 {
 public:
-   int ID, DataWidth, NbParam;
+   int ID, DataWidth, NbParam, DisplayOrder;
    String Name, OpCode, Descr, Comm;
    bool DataAct, FieldBAct, FieldCAct, FieldDAct;
    bool BlockAFix, BlockBFix, BlockCFix, BlockDFix;
@@ -33,7 +33,7 @@ public:
           Param2Type, Param2Source, Param2Suffix,
           Param3Type, Param3Source, Param3Suffix;
 
-  TInstruc(int pID, String pName, String pOpCode);
+  TInstruc(int pID, String pName, String pOpCode, int pDisplayOrder);
 };
 //---------------------------------------------------------------------------
 class Tf_Memory : public TForm
@@ -75,6 +75,12 @@ __published:	// Composants gérés par l'EDI
     TSaveDialog *sd_Mem;
     TOpenDialog *od_Mem;
     TButton *b_Import;
+   TLabel *l_Width;
+   TStringField *cds_MemMnemonic;
+   TStringField *cds_MemAddrHex;
+   TStringField *cds_MemCodeHex;
+   TEdit *e_Comment;
+   TStringField *cds_MemComment;
     void __fastcall cb_OpCodeChange(TObject *Sender);
     void __fastcall b_AddClick(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
@@ -92,6 +98,7 @@ __published:	// Composants gérés par l'EDI
     void __fastcall b_SaveClick(TObject *Sender);
     void __fastcall b_LoadClick(TObject *Sender);
     void __fastcall e_DataExit(TObject *Sender);
+   void __fastcall dbg_MemDblClick(TObject *Sender);
 private:	// Déclarations de l'utilisateur
     int LastDataType;
     int LastSelLine;
@@ -101,10 +108,10 @@ private:	// Déclarations de l'utilisateur
 
     void CreateLine(void);
     int DeltaToAddr(int Delta);
-    String BinToHex(String Hex);
+    String BinToHex(String Bin);
     String HexToDec(String Hex);
     String HexToBin(String Hex);
-    String DecToHex(String Hex);
+    String DecToHex(String pDec, int pMax=4095);
 
 public:		// Déclarations de l'utilisateur
     __fastcall Tf_Memory(TComponent* Owner);
