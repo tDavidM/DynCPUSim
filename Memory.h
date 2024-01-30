@@ -81,6 +81,8 @@ __published:	// Composants gérés par l'EDI
    TStringField *cds_MemCodeHex;
    TEdit *e_Comment;
    TStringField *cds_MemComment;
+   TButton *b_Clear;
+   TOpenDialog *od_Assembler;
     void __fastcall cb_OpCodeChange(TObject *Sender);
     void __fastcall b_AddClick(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
@@ -99,6 +101,8 @@ __published:	// Composants gérés par l'EDI
     void __fastcall b_LoadClick(TObject *Sender);
     void __fastcall e_DataExit(TObject *Sender);
    void __fastcall dbg_MemDblClick(TObject *Sender);
+   void __fastcall b_ClearClick(TObject *Sender);
+   void __fastcall b_ImportClick(TObject *Sender);
 private:	// Déclarations de l'utilisateur
     int LastDataType;
     int LastSelLine;
@@ -112,6 +116,7 @@ private:	// Déclarations de l'utilisateur
     String HexToDec(String Hex);
     String HexToBin(String Hex);
     String DecToHex(String pDec, int pMax=4095);
+    String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine);
 
 public:		// Déclarations de l'utilisateur
     __fastcall Tf_Memory(TComponent* Owner);

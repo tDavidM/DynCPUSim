@@ -314,7 +314,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 
   FileId.close();*/
 
-   if (this->NodeOpenDialog->Execute() == true) {
+   if (this->NodeOpenDialog->Execute()) {
 
      //Flush all nodes...if any
      for (int i = 0; i<this->NodeCmp; i++) {

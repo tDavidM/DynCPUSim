@@ -300,13 +300,24 @@ object f_Memory: Tf_Memory
     Height = 18
     Caption = 'Import'
     TabOrder = 16
+    OnClick = b_ImportClick
   end
   object e_Comment: TEdit
     Left = 8
     Top = 449
     Width = 185
     Height = 21
+    Anchors = [akLeft, akBottom]
     TabOrder = 17
+  end
+  object b_Clear: TButton
+    Left = 504
+    Top = 8
+    Width = 75
+    Height = 18
+    Caption = 'Clear'
+    TabOrder = 18
+    OnClick = b_ClearClick
   end
   object cds_Mem: TClientDataSet
     Aggregates = <>
@@ -399,7 +410,7 @@ object f_Memory: Tf_Memory
   object sd_Mem: TSaveDialog
     DefaultExt = '.xml'
     FileName = 'ROM.xml'
-    Filter = 'all|*.*|xml|*.xml'
+    Filter = 'xml|*.xml|all|*.*'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Save ROM to'
     Left = 184
@@ -408,10 +419,18 @@ object f_Memory: Tf_Memory
   object od_Mem: TOpenDialog
     DefaultExt = '.xml'
     FileName = 'ROM.xml'
-    Filter = 'all|*.*|xml|*.xml'
+    Filter = 'xml|*.xml|all|*.*'
     Options = [ofHideReadOnly, ofPathMustExist, ofEnableSizing]
     Title = 'Load ROM from'
     Left = 224
+    Top = 40
+  end
+  object od_Assembler: TOpenDialog
+    DefaultExt = '.asm'
+    Filter = 'asm|*.asm|txt|*.txt|all|*.*'
+    Options = [ofPathMustExist, ofEnableSizing]
+    Title = 'Load Program From'
+    Left = 304
     Top = 40
   end
 end

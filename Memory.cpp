@@ -184,22 +184,22 @@ String Tf_Memory::DecToHex(String pDec, int pMax)
       Div = Dec / 256;
       Dec = Dec % 256;
       switch (Div) {
-          case 0:{Stack  = "0"; break;}
-          case 1:{Stack  = "1"; break;}
-          case 2:{Stack  = "2"; break;}
-          case 3:{Stack  = "3"; break;}
-          case 4:{Stack  = "4"; break;}
-          case 5:{Stack  = "5"; break;}
-          case 6:{Stack  = "6"; break;}
-          case 7:{Stack  = "7"; break;}
-          case 8:{Stack  = "8"; break;}
-          case 9:{Stack  = "9"; break;}
-          case 10:{Stack = "A"; break;}
-          case 11:{Stack = "B"; break;}
-          case 12:{Stack = "C"; break;}
-          case 13:{Stack = "D"; break;}
-          case 14:{Stack = "E"; break;}
-          case 15:{Stack = "F"; break;}
+          case 0:{Stack  = Stack + "0"; break;}
+          case 1:{Stack  = Stack + "1"; break;}
+          case 2:{Stack  = Stack + "2"; break;}
+          case 3:{Stack  = Stack + "3"; break;}
+          case 4:{Stack  = Stack + "4"; break;}
+          case 5:{Stack  = Stack + "5"; break;}
+          case 6:{Stack  = Stack + "6"; break;}
+          case 7:{Stack  = Stack + "7"; break;}
+          case 8:{Stack  = Stack + "8"; break;}
+          case 9:{Stack  = Stack + "9"; break;}
+          case 10:{Stack = Stack + "A"; break;}
+          case 11:{Stack = Stack + "B"; break;}
+          case 12:{Stack = Stack + "C"; break;}
+          case 13:{Stack = Stack + "D"; break;}
+          case 14:{Stack = Stack + "E"; break;}
+          case 15:{Stack = Stack + "F"; break;}
       }
    }
    Div = Dec / 16;
@@ -854,8 +854,426 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
    this->rb_Hex->Checked = true;
    this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP ()");
    this->b_Add->Click();
+}
+//---------------------------------------------------------------------------
 
+void __fastcall Tf_Memory::b_ClearClick(TObject *Sender)
+{
+   this->b_Add->Enabled    = true;
+   this->b_Insert->Enabled = true;
+   this->b_Edit->Enabled   = true;
+   this->b_Delete->Enabled = true;
+
+   this->e_Comment->Enabled = true;
+   this->cb_OpCode->Enabled = true;
+   this->l_Width->Enabled   = true;
+
+   this->cds_Mem->EmptyDataSet();
+   this->rb_Hex->Checked = true;
+   this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP ()");
+   this->b_Add->Click();
 }
 //---------------------------------------------------------------------------
 
 
+void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
+{
+   String Line, LineLbl, LineData, LineComment, LineOpCode;
+   String LineParam[3], LbLName;
+   String InstrucText, InstrucCode, DataHex , DataLineText, DataLineCode;
+   int ParamCount=0, CurrParam=0, LineCount=1;
+   TInstruc* Instruc;
+   TStringList *ASMFile   = new TStringList;
+   TStringList *LabelList = new TStringList;
+   
+   LabelList->NameValueSeparator = '=';
+
+   if (this->od_Assembler->Execute()) {
+      //TTextReader * ASMFile = new TStreamReader(this->od_Assembler->FileName);   
+
+      this->b_Clear->Click();
+      this->b_Delete->Click();
+
+      this->b_Add->Enabled    = false;
+      this->b_Insert->Enabled = false;
+      this->b_Edit->Enabled   = false;
+      this->b_Delete->Enabled = false;
+
+      this->e_Comment->Enabled = false;
+      this->cb_OpCode->Enabled = false;
+      this->l_Width->Enabled   = false;
+
+      this->e_Data->Enabled = false;
+      this->l_Data->Enabled = false;
+      this->rb_Bin->Enabled = false;
+      this->rb_Dec->Enabled = false;
+      this->rb_Hex->Enabled = false;
+
+      this->cb_B->Enabled = false;
+      this->cb_C->Enabled = false;
+      this->cb_D->Enabled = false;
+
+      ASMFile->LoadFromFile(this->od_Assembler->FileName);
+
+      //First pass, remove empty or blank lines, comment lines and list labels
+      for(int i = 0; i<ASMFile->Count ; i++) {
+         Line = ASMFile->Strings[i];
+         LineComment = "";
+
+         //Extract Comment
+         if (Line.Pos(";") > 0) {
+           LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
+           LineData    = Line.SubString(1, Line.Pos(";")-1);
+         } else
+            LineData = Line;
+         //Remove blank lines
+         if (LineData.Trim() == "") {
+            ASMFile->Delete(i);
+            i--;
+         } else {
+
+            //Extract Label
+            LineLbl  = LineData.SubString(1,24);
+            LineLbl  = LineLbl.Trim();
+            LineData = LineData.SubString(25,LineData.Length()-24);
+            Line     = LineData + "  ;";
+
+            //Process Label
+            if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
+               LineLbl = LineLbl + " ";
+               LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
+               LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
+               LineLbl = LineLbl.Trim();
+               Line    = Line + ":" + LbLName + " ";
+
+               if (LabelList->IndexOfName(LbLName))
+                  LabelList->Add(LbLName + "=" + IntToStr(LineCount));
+               else
+                  LabelList->Values[LbLName] = IntToStr(LineCount);
+
+               if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
+                  LbLName = LineLbl.SubString(2, LineLbl.Length());
+                  Line    = Line + ":" + LbLName + " ";
+
+                  if (LabelList->IndexOfName(LbLName))
+                     LabelList->Add(LbLName + "=" + IntToStr(LineCount));
+                  else
+                     LabelList->Values[LineLbl] = IntToStr(LineCount);
+               }
+            }
+
+            Line = Line + LineComment;
+            ASMFile->Strings[i] = Line;
+            LineCount++;
+         }
+      }
+      
+      LineCount=1;
+      //Second pass, process instruction lines and any comments at the end of a line
+      for(int i = 0; i<ASMFile->Count ; i++) {
+         Line = ASMFile->Strings[i];
+         LineComment = "";
+         
+         //Extract Comment if at the end of a line
+         if (Line.Pos(";") > 0) {
+           LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
+           LineData    = Line.SubString(1, Line.Pos(";")-1);
+         } else
+            LineData = Line;
+
+         LineData = LineData.UpperCase();
+
+         //Remove Special chars
+         LineData = StringReplace(LineData, "GOTO", " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, ">",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "<",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "-",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "+",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "|",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "&",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "^",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "?",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "@",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "#",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "=",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "(",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, ")",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "\"",   " ", TReplaceFlags() << rfReplaceAll );
+         LineData = LineData.Trim();
+         
+         LineOpCode = LineData.SubString(1,5);
+         LineOpCode = LineOpCode.Trim();
+         //Skip empty line
+         if (LineOpCode != "") {    
+            LineData = LineData.SubString(7, LineData.Length());//-7);
+            LineData = LineData.Trim();
+
+            //Find the Instruction in the list
+            for (int i = 0; i<this->InstrucCmp; i++) {
+               Instruc = (TInstruc*)this->InstrucList->Items[i];
+               if (Instruc->HeadMnemo.UpperCase() == LineOpCode)
+                  break;
+            }
+
+            LineParam[0] = "";
+            LineParam[1] = "";
+            LineParam[2] = "";
+            ParamCount   = 0;
+            CurrParam    = 0;
+
+            //Process Params
+            if (LineData != "") {
+               if (LineData.Pos(",") > 0) {
+                  LineParam[0] = LineData.SubString(1, LineData.Pos(",")-1);
+                  LineParam[0] = LineParam[0].Trim();
+                  LineData = LineData.SubString(LineData.Pos(",")+1, LineData.Length());
+                  LineData = LineData.Trim();
+               } else {
+                  LineParam[0]  = LineData;
+                  ParamCount = 1;
+               }
+               if (ParamCount == 0) {
+                  if (LineData.Pos(",") > 0 ) {
+                     LineParam[1] = LineData.SubString(1, LineData.Pos(",")-1);
+                     LineParam[1] = LineParam[1].Trim();
+                     LineData = LineData.SubString(LineData.Pos(",")+1, LineData.Length());
+                     LineData = LineData.Trim();
+                  } else {
+                     LineParam[1] = LineData;
+                     ParamCount = 2;
+                  }
+                  if (ParamCount == 0) {
+                     if (LineData.Pos(",") > 0 ) {
+                        ShowMessage("Error");
+                     } else {
+                        LineParam[2] = LineData;
+                        ParamCount = 3;
+                     }
+                  }
+               }
+            }
+         
+            //DataLineText = LineData;
+            //DataLineCode = LineData;
+         
+            
+            //InstrucText = Instruc->HeadMnemo + "  " ; // + LineData;
+            //InstrucText = StringReplace(InstrucText, "0X",   "0x", TReplaceFlags() << rfReplaceAll );
+            //InstrucText = StringReplace(InstrucText, "0B",   "0b", TReplaceFlags() << rfReplaceAll );
+            //InstrucText = Instruc->Name + Instruc->HeadSuffix;
+            
+            //Print readable line
+            InstrucText = Instruc->HeadMnemo + Instruc->HeadSuffix;
+
+            if (Instruc->NbParam > 0) {
+               if (Instruc->Param1Source == "Data") {
+                  DataLineCode = DataToBin(LineParam[0], Instruc->DataWidth, LabelList, LineCount);
+                  DataLineText = "0x";
+                  for (int i=1; i<=Instruc->DataWidth; i+=4)
+                     DataLineText = DataLineText + BinToHex(DataLineCode.SubString(i,4));
+                  InstrucText = InstrucText + Instruc->Param1Type + DataLineText + Instruc->Param1Suffix;  
+               } else if (Instruc->Param1Source != "") {
+                  InstrucText = InstrucText + Instruc->Param1Type + LineParam[0].SubString(2,1) + Instruc->Param1Suffix;                      
+               }
+
+               if (Instruc->NbParam > 1) {
+                  if (Instruc->Param2Source == "Data") {
+                     DataLineCode = DataToBin(LineParam[1], Instruc->DataWidth, LabelList, LineCount);
+                     DataLineText = "0x";
+                     for (int i=1; i<=Instruc->DataWidth; i+=4)
+                        DataLineText = DataLineText + BinToHex(DataLineCode.SubString(i,4));
+                     InstrucText = InstrucText + Instruc->Param2Type + DataLineText + Instruc->Param2Suffix;  
+                  } else if (Instruc->Param2Source != "") {
+                     InstrucText = InstrucText + Instruc->Param2Type + LineParam[1].SubString(2,1) + Instruc->Param2Suffix;                      
+                  }
+           
+                  if (Instruc->NbParam > 2) {
+                     if (Instruc->Param3Source == "Data") {
+                        DataLineCode = DataToBin(LineParam[2], Instruc->DataWidth, LabelList, LineCount);
+                        DataLineText = "0x";
+                        for (int i=1; i<=Instruc->DataWidth; i+=4)
+                           DataLineText = DataLineText + BinToHex(DataLineCode.SubString(i,4));
+                        InstrucText = InstrucText + Instruc->Param3Type + DataLineText + Instruc->Param3Suffix;  
+                     } else if (Instruc->Param3Source != "") {
+                        InstrucText = InstrucText + Instruc->Param3Type + LineParam[2].SubString(2,1) + Instruc->Param3Suffix;                      
+                     }
+                  }
+               }
+            }
+
+
+            
+
+            //Compute Machine Code
+            InstrucCode = "";
+            if (Instruc->BlockAFix)
+              InstrucCode = Instruc->BlockAVal;
+            else if (Instruc->BlockASource == "Data") {
+              InstrucCode = DataToBin(LineParam[CurrParam], Instruc->DataWidth, LabelList, LineCount);
+              CurrParam++;
+            } else if (Instruc->BlockASource != "") {
+              InstrucCode = HexToBin(LineParam[CurrParam].SubString(2, LineParam[CurrParam].Length()));
+              CurrParam++;
+            }
+
+            if (Instruc->BlockBFix)
+              InstrucCode = InstrucCode + Instruc->BlockBVal;
+            else if (Instruc->BlockBSource == "Data") {
+              InstrucCode = InstrucCode + DataToBin(LineParam[CurrParam], Instruc->DataWidth, LabelList, LineCount);
+              CurrParam++;
+            } else if (Instruc->BlockBSource != "") {
+              InstrucCode = InstrucCode + HexToBin(LineParam[CurrParam].SubString(2, LineParam[CurrParam].Length()));  
+              CurrParam++;         
+            }
+
+            if (Instruc->BlockCFix)
+              InstrucCode = InstrucCode + Instruc->BlockCVal;
+            else if (Instruc->BlockCSource == "Data") {
+              InstrucCode = InstrucCode + DataToBin(LineParam[CurrParam], Instruc->DataWidth, LabelList, LineCount);
+              CurrParam++;
+            } else if (Instruc->BlockCSource != "") {
+              InstrucCode = InstrucCode + HexToBin(LineParam[CurrParam].SubString(2, LineParam[CurrParam].Length()));  
+              CurrParam++;         
+            }   
+
+           if (Instruc->BlockDFix)
+             InstrucCode = InstrucCode + Instruc->BlockDVal;
+            else if (Instruc->BlockDSource == "Data") {
+              InstrucCode = InstrucCode + DataToBin(LineParam[CurrParam], Instruc->DataWidth, LabelList, LineCount);
+              CurrParam++;
+            } else if (Instruc->BlockDSource != "") {
+              InstrucCode = InstrucCode + HexToBin(LineParam[CurrParam].SubString(2, LineParam[CurrParam].Length()));  
+              CurrParam++;         
+            }
+             
+            //Save to DataSet
+            this->cds_Mem->Append();
+            //this->cds_MemOpCode->AsInteger   = this->cb_OpCode->ItemIndex;
+            this->cds_MemMnemonic->AsString  = LineOpCode;
+            //this->cds_MemData->AsString      = ;
+            this->cds_MemComment->AsString   = LineComment;
+            //this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
+            //this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
+            //this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
+            //this->cds_MemDataType->AsInteger = BaseId;
+            this->cds_MemHumData->AsString   = InstrucText;
+            this->cds_MemCode->AsString      = InstrucCode;
+            this->cds_MemCodeHex->AsString   = BinToHex(InstrucCode.SubString(1,4)) + BinToHex(InstrucCode.SubString(5,4)) +
+                                               BinToHex(InstrucCode.SubString(9,4)) + BinToHex(InstrucCode.SubString(13,4));
+         
+            LineCount++;
+            this->cds_Mem->Post();
+         }
+      }
+      ASMFile->Clear();
+      
+   } 
+   ASMFile->Free();
+   LabelList->Free();
+   this->cds_Mem->First();  
+}
+//---------------------------------------------------------------------------
+String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine)
+{
+   String DataIn, DataOut = "", Addr;
+   int Delta;
+   
+   if (pData.SubString(1,2) == "::") {
+   //Absolute Addr (Higer bits)
+      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-2)];
+      if (Addr == "") {
+         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
+         Addr = "0";
+      }
+      
+      if (StrToInt(Addr) >= 65536 ) {
+         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Absolute Addr Out of Range");
+         Addr = "0";
+      }
+      Addr = DecToHex(Addr, 65535);
+      
+      //Left Padding
+      while(Addr.Length() < 4)
+         Addr = "0" + Addr;   
+      for (int i=1; i<=pSize/4; i++)
+         DataOut = DataOut + HexToBin(Addr.SubString(i,1));
+
+   }else if (pData.SubString(1,2) == ":*") {
+   //Absolute Addr (Lower bits)
+      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-2)];
+      if (Addr == "") {
+         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
+         Addr = "0";
+      }
+      
+      if (StrToInt(Addr) >= 65536 ) {
+         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Absolute Addr Out of Range");
+         Addr = "0";
+      }
+      Addr = DecToHex(Addr, 65535);
+      
+      //Left Padding
+      while(Addr.Length() < 4)
+         Addr = "0" + Addr;   
+      for (int i=4; i>pSize/4; i--)
+         DataOut = HexToBin(Addr.SubString(i,1)) + DataOut;
+                                                            
+   }else if (pData.SubString(1,1) == ":") {
+   //Relative  Addr  
+      //Lookup
+      if (pLabelList->Values[pData.SubString(2,pData.Length()-1)] == "") {
+         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
+         Delta = 0;
+      } else     
+      Delta = StrToInt(pLabelList->Values[pData.SubString(2,pData.Length()-1)]) - pCurrLine;
+
+
+      if (Delta < 128 && Delta > -128) {
+         if (Delta >=0)
+            Delta = (Delta-1)+128;
+         else {
+            Delta = abs(Delta);
+            Delta = 128 - Delta;
+         }
+         DataIn = DecToHex(IntToStr(Delta));
+         if (DataIn.Length() == 1)
+            DataIn = "0" + DataIn;
+      } else {
+         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Relative Addr Out of Range");
+         DataIn = "80";
+      }
+      DataOut = HexToBin(DataIn.SubString(1,1)) + HexToBin(DataIn.SubString(2,1));
+      
+   }else if (pData.SubString(1,2) == "0X") {
+   //Hex Value
+      DataIn = pData.SubString(3, pData.Length()); //,(pSize/4)-2);
+      //Left Padding
+      while(DataIn.Length() < pSize/4)
+         DataIn = "0" + DataIn;   
+      DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
+      for (int i=1; i<=pSize/4; i++)
+         DataOut = DataOut + HexToBin(DataIn.SubString(i,1));
+         
+   } else if (pData.SubString(1,2) == "0B") {
+   //Binary Value
+      DataOut = pData.SubString(3, pData.Length()); //,(pSize)-2);
+      //Left Padding
+      while(DataOut.Length() < pSize)
+         DataOut = "0" + DataOut;   
+         
+   } else {
+   //Decimal Value
+      DataIn = pData.SubString(1,(pSize/4)+1);
+      DataIn = DecToHex(DataIn);
+      //Left Padding
+      while(DataIn.Length() < pSize/4)
+         DataIn = "0" + DataIn;   
+      DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
+      for (int i=1; i<=pSize/4; i++)
+         DataOut = DataOut + HexToBin(DataIn.SubString(i,1));
+         
+   }
+   DataOut = DataOut.Trim();
+   return DataOut;
+}
+//---------------------------------------------------------------------------
