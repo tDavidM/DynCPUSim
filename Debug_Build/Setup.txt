@@ -2,7 +2,7 @@
  8 bits operations
  16 bits instructions
  11 x 8 bits general purpose registers
- 26 instructions
+ 44 instructions
  1 cycle per instruction
 
 -ROM/Program Memory 
@@ -44,23 +44,23 @@ Op-Codes (A [B [C]]):
 1000 - AND   - And($B&$C)->$D
 1001 - OR    - Or($B|$C)->$D
 1010 - XOR   - Xor($B^$C)->$D
-1011 - WJMP  - WideJump()goto#0000+BCD      (???)//goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
-1100 - SETV  - WriteVal(@$B)<-CD            (???)//write CD to RAM at address $B
-1101 - GRT   - Greatest($B_$C)->$D          (???)//set $D to the greatest value betweem $B and $C
-1110 - WJMPV - WideJumpVal()goto#$B+CD      (???)//goto absolute 16 bits address $B+CD (full 64K range)
+1011 - WJMP  - WideJump()goto#0000+BCD      (???)//Goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
+1100 - SETV  - WriteVal(@$B)<-CD            (???)//Write CD to RAM at address $B
+1101 - GRT   - Greatest($B_$C)->$D          (???)//Set $D to the greatest value betweem $B and $C
+1110 - WJMPV - WideJumpVal()goto#$B+CD      (???)//Goto absolute 16 bits address $B+CD (full 64K range)
 
 1111 0000 - NOT   - Not($C)->$D
-1111 0001 - LSHT  - LeftShift($C)->$D        (??)//droped bit is sent to carry
-1111 0010 - LROT  - LeftRotate($C)->$D        (?)//circular
-1111 0011 - RSHT  - RightShift($C)->$D        (?)//logical shift(insert zero), droped bit is sent to carry
-1111 0100 - RROT  - RightRotate($C)->$D       (?)//circular
+1111 0001 - LSHT  - LeftShift($C)->$D        (??)//Droped bit is sent to carry
+1111 0010 - LROT  - LeftRotate($C)->$D        (?)//Circular
+1111 0011 - RSHT  - RightShift($C)->$D        (?)//Logical shift(insert zero), droped bit is sent to carry
+1111 0100 - RROT  - RightRotate($C)->$D       (?)//Circular
 1111 0101 - SEQ   - SkipEqual($C=$D)         (??)//Skip the following instruction if $C == $D
 1111 0110 - JMPA  - JumpAddr()goto#CD        (??)//Goto relative 8 bits address CD
-1111 0111 - GETR  - ReadReg(@$C)->$D             //fetch value from RAM at $C to store in $D
-1111 1000 - SETR  - WriteReg(@$C)<-$D            //write $D to RAM at address $C
+1111 0111 - GETR  - ReadReg(@$C)->$D             //Fetch value from RAM at $C to store in $D
+1111 1000 - SETR  - WriteReg(@$C)<-$D            //Write $D to RAM at address $C
 1111 1001 - SGRT  - SkipGreater($C>$D)       (??)//Skip the following instruction if $C > $D
 1111 1010 - IFZR  - IfZeroReg($C)goto#$D     (??)//Branches if $C == 0, Goto relative 8 bits address at $D
-1111 1011 - WJMPR - WideJumpReg()goto#$C$D  (???)//goto absolute 16 bits address $C$D (full 64K range)
+1111 1011 - WJMPR - WideJumpReg()goto#$C$D  (???)//Goto absolute 16 bits address $C$D (full 64K range)
 1111 1100 - LROTC - LeftCrRot($C)->$D        (??)//through carry
 1111 1101 - RROTC - RightCrRot($C)->$D       (??)//through carry
 1111 1110 - RSHTA - RightArSht($C)->$D       (??)//arithmetic shift(insert one)
@@ -75,9 +75,9 @@ Op-Codes (A [B [C]]):
 1111 1111 0111 - RND   - Random()->$D          (??)
 1111 1111 1000 - SIFNZ - SkipNotZero($D)    (???)//Skip the following instruction if $D != 0
 1111 1111 1001 - SIFNC - SkipNotCarry($D)   (???)//Skip the following instruction if carry flag set
-1111 1111 1010 - DSINZ - DecSkipNotZero($D) (???)//skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0
-1111 1111 1011 - Unused
-1111 1111 1100 - Unused
+1111 1111 1010 - DSINZ - DecSkipNotZero($D) (???)//Skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0
+1111 1111 1011 - PUSH  - Push($D)           (???)//Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped )
+1111 1111 1100 - POP   - Pop($D)            (???)//Pop the value from the top of the internal stack to $D  (it is 16 bytes deep, the overflow is dropped )
 1111 1111 1101 - Unused
 1111 1111 1110 - Unused
 1111 1111 1111 - NOP   - NOP()
