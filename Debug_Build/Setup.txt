@@ -82,17 +82,19 @@ Op-Codes (A [B [C]]):
 1111 1111 1110 - Unused
 1111 1111 1111 - NOP   - NOP()
 
+Alias
+Copy($B)->$D accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000
+Erase()->$D accomplished with AND($B,$C)->$D where $B and $C are the fixed value register 0x00000000 and 0x11111111
+Trigger a debug halt with Set() any value to register E
+Erase all registers with Set() any value to register F
+
 
 ToDo/Idea:
 Add TagNode/Hint in Simulation
 Erase all registers with Set() any value to register F
 improve carryflag on substraction 
 
-Tricks
-Copy($B)->$D accomplished with AND($B,$C)->$D where $B and $C are the same location
-Erase()->$D accomplished with XOR($B,$C)->$D where $B and $C are the same location
-Erase all registers with Set() any value to register F
-Trigger a debug halt with Set() any value to register E
+
 
 Paterns
 -End program to avoid program starting back at the first location 

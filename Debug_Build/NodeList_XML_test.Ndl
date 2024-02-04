@@ -667,8 +667,8 @@
 			<Comment></Comment>
 			<DataField Data="False" Width="" B="True" C="False" D="True"/>
 			<CodeBlock>
-				<Block Name="A" Fix="True" Source="">1000</Block>
-				<Block Name="B" Fix="False" Source="B"></Block>
+				<Block Name="A" Fix="True" Source="">1001</Block>
+				<Block Name="B" Fix="True" Source="">1100</Block>
 				<Block Name="C" Fix="False" Source="B"></Block>
 				<Block Name="D" Fix="False" Source="D"></Block>
 			</CodeBlock>
@@ -683,9 +683,9 @@
 			<Comment>Reset a register to zero</Comment>
 			<DataField Data="False" Width="" B="False" C="False" D="True"/>
 			<CodeBlock>
-				<Block Name="A" Fix="True" Source="">1010</Block>
-				<Block Name="B" Fix="False" Source="D"></Block>
-				<Block Name="C" Fix="False" Source="D"></Block>
+				<Block Name="A" Fix="True" Source="">1000</Block>
+				<Block Name="B" Fix="True" Source="">1110</Block>
+				<Block Name="C" Fix="True" Source="">1100</Block>
 				<Block Name="D" Fix="False" Source="D"></Block>
 			</CodeBlock>
 			<TextBlock NbParam="1">
@@ -708,15 +708,15 @@
 			</TextBlock>
 		</Instruction>
 	</InstructionSet>
-  <Param LinkCount="14136">
-    <OR Count="6409"/>
+  <Param LinkCount="14141">
+    <OR Count="6413"/>
     <AND Count="2251"/>
     <NOR Count="4"/>
     <NAND Count="487"/>
     <XOR Count="49"/>
     <NOT Count="1008"/>
   </Param>
-  <NodeState NodeCount="10208">
+  <NodeState NodeCount="10212">
     <Node ID="0" Name="Pin70">
       <Type Code="0" Name="OR"/>
       <Position X="0" Y="7"/>
@@ -19598,7 +19598,7 @@
     </Node>
     <Node ID="2727" Name="Node2862">
       <Type Code="0" Name="OR"/>
-      <Position X="150" Y="26"/>
+      <Position X="151" Y="26"/>
       <Output IDUp="2785" IDDown="-1" NameUp="Node2920" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -19787,28 +19787,28 @@
     </Node>
     <Node ID="2754" Name="NoOpOutput">
       <Type Code="1" Name="AND"/>
-      <Position X="148" Y="27"/>
+      <Position X="149" Y="27"/>
       <Output IDUp="3223" IDDown="-1" NameUp="NOP" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
     <Node ID="2755" Name="Node2890">
       <Type Code="0" Name="OR"/>
-      <Position X="149" Y="27"/>
+      <Position X="150" Y="27"/>
       <Output IDUp="2785" IDDown="-1" NameUp="Node2920" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
     <Node ID="2756" Name="Node2891">
       <Type Code="0" Name="OR"/>
-      <Position X="148" Y="28"/>
+      <Position X="149" Y="28"/>
       <Output IDUp="2782" IDDown="-1" NameUp="Node2917" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
     <Node ID="2757" Name="Node2892">
       <Type Code="0" Name="OR"/>
-      <Position X="147" Y="29"/>
+      <Position X="148" Y="29"/>
       <Output IDUp="2782" IDDown="-1" NameUp="Node2917" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -19983,7 +19983,7 @@
     </Node>
     <Node ID="2782" Name="Node2917">
       <Type Code="1" Name="AND"/>
-      <Position X="147" Y="28"/>
+      <Position X="148" Y="28"/>
       <Output IDUp="2754" IDDown="-1" NameUp="NoOpOutput" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -20004,7 +20004,7 @@
     </Node>
     <Node ID="2785" Name="Node2920">
       <Type Code="1" Name="AND"/>
-      <Position X="149" Y="26"/>
+      <Position X="150" Y="26"/>
       <Output IDUp="2754" IDDown="-1" NameUp="NoOpOutput" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -23070,7 +23070,7 @@
     </Node>
     <Node ID="3223" Name="NOP">
       <Type Code="0" Name="OR"/>
-      <Position X="147" Y="26"/>
+      <Position X="148" Y="26"/>
       <Output IDUp="6522" IDDown="-1" NameUp="Node6522" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -30910,7 +30910,7 @@
     </Node>
     <Node ID="4344" Name="SignalPassBusAddrCtoB_1">
       <Type Code="0" Name="OR"/>
-      <Position X="145" Y="42"/>
+      <Position X="146" Y="42"/>
       <Output IDUp="243" IDDown="-1" NameUp="SignalPassBusAddrCtoB_2" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -44721,7 +44721,7 @@
     </Node>
     <Node ID="6522" Name="Node6522">
       <Type Code="1" Name="AND"/>
-      <Position X="147" Y="4"/>
+      <Position X="149" Y="4"/>
       <Output IDUp="10429" IDDown="10449" NameUp="Node10429" NameDown="Node10449">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -45303,7 +45303,7 @@
     <Node ID="6603" Name="SignalToggleBusAddrC_11c">
       <Type Code="0" Name="OR"/>
       <Position X="197" Y="13"/>
-      <Output IDUp="6602" IDDown="-1" NameUp="SignalToggleBusAddrC_11b" NameDown="">False</Output>
+      <Output IDUp="10453" IDDown="-1" NameUp="SignalToggleBusAddrC_11c2" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
@@ -45722,7 +45722,7 @@
     </Node>
     <Node ID="6667" Name="SignalToggleBusAddrA_101">
       <Type Code="0" Name="OR"/>
-      <Position X="145" Y="40"/>
+      <Position X="146" Y="40"/>
       <Output IDUp="6940" IDDown="-1" NameUp="SignalToggleBusAddrA_7b" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -47367,7 +47367,7 @@
     </Node>
     <Node ID="6905" Name="SignalPassBusAddrBtoA_2c">
       <Type Code="0" Name="OR"/>
-      <Position X="145" Y="43"/>
+      <Position X="147" Y="43"/>
       <Output IDUp="4331" IDDown="-1" NameUp="SignalPassBusAddrBtoA_2" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -71931,7 +71931,7 @@
     <Node ID="10422" Name="SignalPop_org">
       <Type Code="1" Name="AND"/>
       <Position X="171" Y="11"/>
-      <Output IDUp="10451" IDDown="10453" NameUp="SignalPop_0" NameDown="SignalPassBusAddrCtoA_2e">False</Output>
+      <Output IDUp="10460" IDDown="10453" NameUp="SignalPop_org1" NameDown="SignalToggleBusAddrC_11c2">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
@@ -72141,14 +72141,14 @@
     <Node ID="10452" Name="SignalPassBusAddrCtoA_2d">
       <Type Code="0" Name="OR"/>
       <Position X="175" Y="14"/>
-      <Output IDUp="10453" IDDown="-1" NameUp="SignalPassBusAddrCtoA_2e" NameDown="">False</Output>
+      <Output IDUp="6634" IDDown="-1" NameUp="SignalPassBusAddrCtoA_3" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
-    <Node ID="10453" Name="SignalPassBusAddrCtoA_2e">
+    <Node ID="10453" Name="SignalToggleBusAddrC_11c2">
       <Type Code="0" Name="OR"/>
-      <Position X="170" Y="14"/>
-      <Output IDUp="6634" IDDown="-1" NameUp="SignalPassBusAddrCtoA_3" NameDown="">False</Output>
+      <Position X="169" Y="13"/>
+      <Output IDUp="6602" IDDown="-1" NameUp="SignalToggleBusAddrC_11b" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
@@ -72170,6 +72170,34 @@
       <Type Code="0" Name="OR"/>
       <Position X="258" Y="66"/>
       <Output IDUp="7407" IDDown="-1" NameUp="SignalPush_3" NameDown="">False</Output>
+      <PinIn NbUp="0" NbDown="0">False</PinIn>
+      <PinOut NbUp="0" NbDown="0">False</PinOut>
+    </Node>
+    <Node ID="10457" Name="SignalALU_OR_2">
+      <Type Code="0" Name="OR"/>
+      <Position X="144" Y="50"/>
+      <Output IDUp="231" IDDown="-1" NameUp="ALUactOR" NameDown="">False</Output>
+      <PinIn NbUp="0" NbDown="0">False</PinIn>
+      <PinOut NbUp="0" NbDown="0">False</PinOut>
+    </Node>
+    <Node ID="10458" Name="SignalALU_OR_1">
+      <Type Code="0" Name="OR"/>
+      <Position X="147" Y="17"/>
+      <Output IDUp="10457" IDDown="-1" NameUp="SignalALU_OR_2" NameDown="">False</Output>
+      <PinIn NbUp="0" NbDown="0">False</PinIn>
+      <PinOut NbUp="0" NbDown="0">False</PinOut>
+    </Node>
+    <Node ID="10459" Name="Node10459">
+      <Type Code="0" Name="OR"/>
+      <Position X="169" Y="17"/>
+      <Output IDUp="10458" IDDown="-1" NameUp="SignalALU_OR_1" NameDown="">False</Output>
+      <PinIn NbUp="0" NbDown="0">False</PinIn>
+      <PinOut NbUp="0" NbDown="0">False</PinOut>
+    </Node>
+    <Node ID="10460" Name="SignalPop_org1">
+      <Type Code="0" Name="OR"/>
+      <Position X="171" Y="12"/>
+      <Output IDUp="10451" IDDown="10459" NameUp="SignalPop_0" NameDown="Node10459">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
