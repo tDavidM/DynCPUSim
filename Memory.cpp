@@ -875,18 +875,283 @@ void __fastcall Tf_Memory::b_ClearClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList)
+{
+   String Line, MacroName, LineLbl, LbLName, LineData;
+   TStringList *MacroLine;
+   TStringList *LocalLabelList;
+   TStringList *ASMFileInclude;
+   bool FoundEnd;
+
+   //Main loop, line Count will vary with Insert and Delete made here
+   for(int i = 0; i<pASMFile->Count ; i++) {
+      Line = pASMFile->Strings[i];
+      Line = Line.Trim();
+
+      //Looking for include tag
+      if (Line.SubString(1,9) == "#INCLUDE " ) {
+         // from #INCLUDE "exemple.asm" to exemple.asm
+         Line = Line.SubString(11,Line.Length()-11);
+         //Remove comment
+            if (Line.Pos(";")>0)
+               Line = Line.SubString(1,Line.Pos(";")-1);
+         Line = Line.Trim();
+
+         //remove the line with #include
+         pASMFile->Delete(i);
+
+         ASMFileInclude = new TStringList;
+         ASMFileInclude->LoadFromFile(ExtractFilePath(this->od_Assembler->FileName) + Line);
+         //Once opened, insert every line from the included file at that location
+         for(int j = 0; j<ASMFileInclude->Count ; j++) {
+            Line = ASMFileInclude->Strings[j];
+            pASMFile->Insert(i+j, Line);
+         }
+         //As #include was remove, line at i must be scanned again
+         i--;
+         ASMFileInclude->Free();
+      }
+
+      //Looking for Macro definition start tag
+      if (Line.SubString(1,1) == "[" ) {
+         //Exact the name of the Macro
+         Line = Line + " ";
+         MacroName = Line.SubString(2,Line.Pos(" ")-2);
+
+         if (pMacroUsageCmp->IndexOfName(MacroName.UpperCase()) > 0)
+            ShowMessage("Error: Macro " + MacroName + " Redefined");
+
+         //Add that name as index 0 to:
+         MacroLine      = new TStringList;
+         LocalLabelList = new TStringList;
+         //Keep the code of the Macro itself in MacroLine
+         pMacroList->Add(MacroLine);
+         //Keep the labels used in the Macro in LocalLabelList
+         pMacroLabelList->Add(LocalLabelList);
+         MacroLine->Add(MacroName.UpperCase());
+         LocalLabelList->Add(MacroName.UpperCase());
+
+         //Keep a list of the number of calls to a Macro to rewrite the lable with a unique name
+         pMacroUsageCmp->Add(MacroName.UpperCase() + "=0");
+         pASMFile->Delete(i);
+
+         FoundEnd = false;
+         //Loop until the Macro end tag ] is found
+         while ( i < pASMFile->Count && !FoundEnd ) {
+            Line = pASMFile->Strings[i];
+            Line = Line.TrimRight();
+
+            //Extract Label
+            if (Line.Pos("/"))
+               LineLbl  = Line.SubString(1, Line.Pos("/")-1);
+            else
+               LineLbl  = Line.SubString(1,24);
+            LineLbl  = LineLbl.Trim();
+
+            //Process Label
+            if(LineLbl.SubString(1,1) == ":" ) {
+               //First Label
+               LineLbl = LineLbl + " ";
+               LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
+               LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
+               LineLbl = LineLbl.Trim();
+
+               //Test if already defined
+               if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+                  LocalLabelList->Add(LbLName);
+               else
+                  ShowMessage("Error in macro " + MacroName + ": Label " + LbLName + " Redefined");
+
+               //Second Label
+               if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
+                  LbLName = LineLbl.SubString(2, LineLbl.Length());
+
+                  //Test if already defined
+                  if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+                     LocalLabelList->Add(LbLName.UpperCase());
+                  else
+                     ShowMessage("Error in macro " + MacroName + ": Label " + LbLName + " Redefined");
+               }
+            }
+
+            //Looking for Macro end tag ]
+            if (Line.SubString(1,1) == "]" ) {
+               FoundEnd = true;
+            } else
+               MacroLine->Add(Line);
+
+            //Line from Macro are removed from the main file, but kept in MacroLine for when it's called
+            pASMFile->Delete(i);
+         }
+
+         //if the end tag ] was not found
+         if (!FoundEnd)
+            ShowMessage("Error in macro " + MacroName + ": No End Tag");
+      }
+   }
+}
+//---------------------------------------------------------------------------
+
+void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList)
+{
+   String Line, MacroName, LineLbl, LbLName, LineData;
+   TStringList *MacroLine;  
+   TStringList *LocalLabelList;
+   bool FoundMatch = false;
+   int i, j, k;
+
+   for(i = 0; i<pASMFile->Count ; i++) {
+      Line = pASMFile->Strings[i];
+      Line = Line.TrimRight();
+
+      if (Line.SubString(1,1) == "%" ) {
+         Line = Line + " ";
+         MacroName = Line.SubString(2,Line.Pos(" ")-2);
+         MacroName = MacroName.UpperCase();
+            
+         j=0;
+         while ( j<pMacroList->Count && !FoundMatch) {
+            MacroLine = (TStringList*)pMacroList->Items[j];
+            FoundMatch = MacroLine->Strings[0] == MacroName;
+            j++;
+         }
+
+         if (FoundMatch) {
+            j=0;
+            FoundMatch = false;
+            while ( j<pMacroLabelList->Count && !FoundMatch) {
+               LocalLabelList = (TStringList*)pMacroLabelList->Items[j];
+               FoundMatch = LocalLabelList->Strings[0] == MacroName;
+               j++;
+            }
+
+            pASMFile->Delete(i);
+            for ( j=1 ; j < MacroLine->Count ; j++ ) {
+               Line = MacroLine->Strings[j];
+
+               //Extract Label
+               if (Line.Pos("/")) {
+                  LineLbl  = Line.SubString(1, Line.Pos("/")-1);
+                  LineData = Line.SubString(Line.Pos("/")+1,Line.Length()-Line.Pos("/"));
+               } else {
+                  LineLbl  = Line.SubString(1,24);
+                  LineData = Line.SubString(25,Line.Length()-24);
+               }
+               LineLbl  = LineLbl.Trim() + " ";
+               LineData = LineData.Trim();
+               LineLbl  = LineLbl.UpperCase();
+               LineData = LineData.UpperCase();
+               
+               for (k=1; k < LocalLabelList->Count; k++) {
+                  LineLbl = StringReplace(LineLbl, ":" + LocalLabelList->Strings[k] + " ",
+                                       ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
+                                       TReplaceFlags() << rfReplaceAll );
+                  LineData = StringReplace(LineData, ":" + LocalLabelList->Strings[k] + ":",
+                                       ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                                       TReplaceFlags() << rfReplaceAll );
+                  LineData = StringReplace(LineData, "::" + LocalLabelList->Strings[k] + ":",
+                                       "::" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                                       TReplaceFlags() << rfReplaceAll );
+                  LineData = StringReplace(LineData, ":*" + LocalLabelList->Strings[k] + ":",
+                                       ":*" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                                       TReplaceFlags() << rfReplaceAll );
+               }
+               Line = LineLbl.Trim() + "/" + LineData;
+
+               pASMFile->Insert(i+(j-1), Line);
+            }
+            i--;
+            pMacroUsageCmp->Values[MacroName] = IntToStr(StrToInt(pMacroUsageCmp->Values[MacroName])+1);
+         }
+      }
+   }
+}
+//---------------------------------------------------------------------------
+
+void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList)
+{
+   String Line, LineLbl, LbLName, LineData, LineComment;
+   int LineCount=1;
+
+   for(int i = 0; i<pASMFile->Count ; i++) {
+      Line = pASMFile->Strings[i];
+      LineComment = "";
+
+      //Extract Comment
+      if (Line.Pos(";") > 0) {
+        LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
+        LineData    = Line.SubString(1, Line.Pos(";")-1);
+
+        if (LineComment.Pos(";;") == 1)
+           LineData = " /NOP  ;" + LineComment;
+      } else
+         LineData = Line;
+      //Remove blank lines
+      if (LineData.Trim() == "") {
+         pASMFile->Delete(i);
+         i--;
+      } else {
+
+         //Extract Label
+         if (LineData.Pos("/")) {
+            LineLbl  = LineData.SubString(1, LineData.Pos("/")-1);
+            LineData = LineData.SubString(LineData.Pos("/")+1,LineData.Length()-LineData.Pos("/"));
+         } else {
+            LineLbl  = LineData.SubString(1,24);
+            LineData = LineData.SubString(25,LineData.Length()-24);
+         }
+         LineLbl  = LineLbl.Trim();
+         LineData = LineData.Trim();
+         Line     = LineData + "  ;";
+
+         //Process Label
+         if( LineLbl.SubString(1,1) == ":" ) {
+            LineLbl = LineLbl + " ";
+            LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
+            LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
+            LineLbl = LineLbl.Trim();
+            Line    = Line + ":" + LbLName + " ";
+
+            if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+               pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
+            else
+               ShowMessage("Error at line " + IntToStr(LineCount) + ": Label " + LbLName + " Redefined");
+
+            if(LineLbl.SubString(1,1) == ":" ) {
+               LbLName = LineLbl.SubString(2, LineLbl.Length());
+               Line    = Line + ":" + LbLName + " ";
+
+               if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+                  pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
+               else
+                  ShowMessage("Error at line " + IntToStr(LineCount) + ": Label " + LbLName + " Redefined");
+            }
+         }
+
+         Line = Line + LineComment;
+         pASMFile->Strings[i] = Line;
+         LineCount++;
+      }
+   }
+}
+//---------------------------------------------------------------------------
 
 void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 {
-   String Line, LineLbl, LineData, LineComment, LineOpCode;
-   String LineParam[3], LbLName;
+   String Line, LineData, LineComment, LineOpCode;
+   String LineParam[3];
    String InstrucText, InstrucCode, DataHex , DataLineText, DataLineCode;
    int ParamCount=0, CurrParam=0, LineCount=1;
    TInstruc* Instruc;
    TStringList *ASMFile   = new TStringList;
    TStringList *LabelList = new TStringList;
+   TList* MacroList       = new TList;
+   TStringList *MacroUsageCmp = new TStringList;
+   TList* MacroLabelList  = new TList;
+   //TStringList *MacroList = new TStringList;
    
    LabelList->NameValueSeparator = '=';
+   MacroUsageCmp->NameValueSeparator = '=';
 
    if (this->od_Assembler->Execute()) {
       //TTextReader * ASMFile = new TStreamReader(this->od_Assembler->FileName);   
@@ -915,61 +1180,14 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 
       ASMFile->LoadFromFile(this->od_Assembler->FileName);
 
-      //First pass, remove empty or blank lines, comment lines and list labels
-      for(int i = 0; i<ASMFile->Count ; i++) {
-         Line = ASMFile->Strings[i];
-         LineComment = "";
+      //First pass, process includes and list macros definitions
+      this->Parse4MacroDefineAndInclude(ASMFile, MacroList, MacroUsageCmp, MacroLabelList);
+      //Second pass, replace calls for macros, and rename labels inside macros
+      this->Parse4MacroUsage(ASMFile, MacroList, MacroUsageCmp, MacroLabelList);
+      //Third pass, remove empty or blank lines, comment lines and list labels
+      this->Parse4LabelAndBlank(ASMFile, LabelList);
 
-         //Extract Comment
-         if (Line.Pos(";") > 0) {
-           LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
-           LineData    = Line.SubString(1, Line.Pos(";")-1);
-         } else
-            LineData = Line;
-         //Remove blank lines
-         if (LineData.Trim() == "") {
-            ASMFile->Delete(i);
-            i--;
-         } else {
-
-            //Extract Label
-            LineLbl  = LineData.SubString(1,24);
-            LineLbl  = LineLbl.Trim();
-            LineData = LineData.SubString(25,LineData.Length()-24);
-            Line     = LineData + "  ;";
-
-            //Process Label
-            if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
-               LineLbl = LineLbl + " ";
-               LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
-               LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
-               LineLbl = LineLbl.Trim();
-               Line    = Line + ":" + LbLName + " ";
-
-               if (LabelList->IndexOfName(LbLName))
-                  LabelList->Add(LbLName + "=" + IntToStr(LineCount));
-               else
-                  LabelList->Values[LbLName] = IntToStr(LineCount);
-
-               if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
-                  LbLName = LineLbl.SubString(2, LineLbl.Length());
-                  Line    = Line + ":" + LbLName + " ";
-
-                  if (LabelList->IndexOfName(LbLName))
-                     LabelList->Add(LbLName + "=" + IntToStr(LineCount));
-                  else
-                     LabelList->Values[LineLbl] = IntToStr(LineCount);
-               }
-            }
-
-            Line = Line + LineComment;
-            ASMFile->Strings[i] = Line;
-            LineCount++;
-         }
-      }
-      
-      LineCount=1;
-      //Second pass, process instruction lines and any comments at the end of a line
+      //Fourth pass, process instruction lines and any comments at the end of a line
       for(int i = 0; i<ASMFile->Count ; i++) {
          Line = ASMFile->Strings[i];
          LineComment = "";
@@ -993,6 +1211,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
          LineData = StringReplace(LineData, "&",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "^",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "?",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "!",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "@",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "#",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "=",    " ", TReplaceFlags() << rfReplaceAll );
@@ -1052,15 +1271,6 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                   }
                }
             }
-         
-            //DataLineText = LineData;
-            //DataLineCode = LineData;
-         
-            
-            //InstrucText = Instruc->HeadMnemo + "  " ; // + LineData;
-            //InstrucText = StringReplace(InstrucText, "0X",   "0x", TReplaceFlags() << rfReplaceAll );
-            //InstrucText = StringReplace(InstrucText, "0B",   "0b", TReplaceFlags() << rfReplaceAll );
-            //InstrucText = Instruc->Name + Instruc->HeadSuffix;
             
             //Print readable line
             InstrucText = Instruc->HeadMnemo + Instruc->HeadSuffix;
@@ -1180,7 +1390,7 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
    
    if (pData.SubString(1,2) == "::") {
    //Absolute Addr (Higer bits)
-      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-2)];
+      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-3)];
       if (Addr == "") {
          ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
          Addr = "0";
@@ -1200,7 +1410,7 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
 
    }else if (pData.SubString(1,2) == ":*") {
    //Absolute Addr (Lower bits)
-      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-2)];
+      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-3)];
       if (Addr == "") {
          ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
          Addr = "0";
@@ -1221,11 +1431,11 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
    }else if (pData.SubString(1,1) == ":") {
    //Relative  Addr  
       //Lookup
-      if (pLabelList->Values[pData.SubString(2,pData.Length()-1)] == "") {
+      if (pLabelList->Values[pData.SubString(2,pData.Length()-2)] == "") {
          ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
          Delta = 0;
       } else     
-      Delta = StrToInt(pLabelList->Values[pData.SubString(2,pData.Length()-1)]) - pCurrLine;
+      Delta = StrToInt(pLabelList->Values[pData.SubString(2,pData.Length()-2)]) - pCurrLine;
 
 
       if (Delta < 128 && Delta > -128) {

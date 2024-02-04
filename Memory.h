@@ -118,6 +118,10 @@ private:	// Déclarations de l'utilisateur
     String DecToHex(String pDec, int pMax=4095);
     String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine);
 
+    void Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList);
+    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList);
+    void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList);
+
 public:		// Déclarations de l'utilisateur
     __fastcall Tf_Memory(TComponent* Owner);
     void MoveAddrByDelta(int Delta);

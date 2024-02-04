@@ -1294,19 +1294,24 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
     pX = (X - StartX) / GridSize;
     pY = (Y - StartY) / GridSize;
 
-    this->NodeMaxID++;
-    Name = "Node" + IntToStr(this->NodeMaxID);
-    while (NodeNameExists(Name)) {
-      this->NodeMaxID++;
-      Name = "Node" + IntToStr(this->NodeMaxID);
+    if(this->FlagNewNode)
+       ShowMessage("Double Node");
+    else {
+       this->NodeMaxID++;
+       Name = "Node" + IntToStr(this->NodeMaxID);
+       while (NodeNameExists(Name)) {
+         this->NodeMaxID++;
+         Name = "Node" + IntToStr(this->NodeMaxID);
+       }
+
+       NodeCurr = new TNode(this->NodeMaxID, pX, pY, NodeType, Name);
+       NodeCmp++;
+
+       this->NodeList->Add(NodeCurr);
+       this->FlagNewNode = false;
+       TagFollowList(this->NodeSelect, 10, false);
+       this->NodeSelect = NodeCurr;
     }
-
-    NodeCurr = new TNode(this->NodeMaxID, pX, pY, NodeType, Name);
-    NodeCmp++;
-
-    this->NodeList->Add(NodeCurr);
-    TagFollowList(this->NodeSelect, 10, false);
-    this->NodeSelect = NodeCurr;
 
     //Draw
     this->CallDrawArea();
@@ -1604,6 +1609,7 @@ void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
   this->GridSize = 18;
   this->tb_Size->Position = 3;
   this->tb_Speed->Position = 15;
+  this->FlagNewNode = false;
 }
 //---------------------------------------------------------------------------
 

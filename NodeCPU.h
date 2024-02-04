@@ -156,6 +156,7 @@ private:	// Déclarations de l'utilisateur
 
     _di_IXMLNode InstructionSetXML;
 
+    bool FlagNewNode;
     int NodeCmp, NodeMaxID;
     int NodeType;
 
