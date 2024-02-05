@@ -1,10 +1,10 @@
 ;TEST Demo Loading from ASM File, shows a file that can test every circuits of the CPU
 
 :START_OVER             SET   "0xFF", $0              ;Test if $0 stores a value and if SET instruction outputs on bus C correctly 
-						SEQ   $0,     $E              ;Test that $0 outputs correctly on Bus A, that $E outputs 0xFF on Bus B, and SkipEqual works
-						WJMP  #:*HALT_ON_ERR:         ;If Error
-						SEQ   $E,     $0              ;Test that $0 outputs correctly on Bus B, that $E outputs 0xFF on Bus A, and SkipEqual works
-						WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SEQ   $0,     $E              ;Test that $0 outputs correctly on Bus A, that $E outputs 0xFF on Bus B, and SkipEqual works
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SEQ   $E,     $0              ;Test that $0 outputs correctly on Bus B, that $E outputs 0xFF on Bus A, and SkipEqual works
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
                         
                         SET   "0x00", $0              ;
                         SEQ   $0,     $E              ;Test that SkipEqual works when not equal
@@ -18,16 +18,16 @@
                         
                         SET   "0xFF", $0              ;
                         SET   "0xFF", $1              ;Test if $1 stores a value
-						SEQ   $0,     $1              ;Test if $1 and $0 both output correctly on Bus A and B
-						WJMP  #:*HALT_ON_ERR:         ;If Error
-						SEQ   $1,     $0              ;Test if $1 and $0 both output correctly on Bus A and B
-						WJMP  #:*HALT_ON_ERR:         ;If Error
-						
+                        SEQ   $0,     $1              ;Test if $1 and $0 both output correctly on Bus A and B
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SEQ   $1,     $0              ;Test if $1 and $0 both output correctly on Bus A and B
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        
                         AND   $0,     $1,     $2      ;Test if AND works and if $2 stores a value
-						SEQ   $1,     $2              ;Test if $2 outputs correctly on Bus B
-						WJMP  #:*HALT_ON_ERR:         ;If Error
-						SEQ   $2,     $1              ;Test if $2 outputs correctly on Bus A
-						WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SEQ   $1,     $2              ;Test if $2 outputs correctly on Bus B
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SEQ   $2,     $1              ;Test if $2 outputs correctly on Bus A
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
                         JMPA  #:TEST_NO_6:            ;An other test that JumpAddr works
                         
 :TEST_NO_6              SIFZ  $C                      ;Test SkipIfZero on $C
