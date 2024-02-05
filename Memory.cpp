@@ -956,7 +956,7 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
                LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
                LineLbl = LineLbl.Trim();
 
-               //Test if already defined
+               //Test if already defined, keep the Label in a list for renaming later
                if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0)
                   LocalLabelList->Add(LbLName);
                else
@@ -966,7 +966,7 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
                if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
                   LbLName = LineLbl.SubString(2, LineLbl.Length());
 
-                  //Test if already defined
+                  //Test if already defined, keep the Label in a list for renaming later
                   if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0)
                      LocalLabelList->Add(LbLName.UpperCase());
                   else
@@ -974,7 +974,7 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
                }
             }
 
-            //Looking for Macro end tag ]
+            //Looking for Macro end tag ], otherwise, keep the line in memory for later when called
             if (Line.SubString(1,1) == "]" ) {
                FoundEnd = true;
             } else
@@ -1000,36 +1000,45 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
    bool FoundMatch = false;
    int i, j, k;
 
+   //Main loop, line Count will vary with Insert and Delete made here
    for(i = 0; i<pASMFile->Count ; i++) {
       Line = pASMFile->Strings[i];
       Line = Line.TrimRight();
 
+      //Looking for Macro call tag
       if (Line.SubString(1,1) == "%" ) {
          Line = Line + " ";
+         //Extract Macro name
          MacroName = Line.SubString(2,Line.Pos(" ")-2);
          MacroName = MacroName.UpperCase();
             
          j=0;
+         FoundMatch = false;
+         //Look for the code lines of the Macro 
          while ( j<pMacroList->Count && !FoundMatch) {
             MacroLine = (TStringList*)pMacroList->Items[j];
             FoundMatch = MacroLine->Strings[0] == MacroName;
             j++;
          }
 
+         //If that Macro was found on the first pass
          if (FoundMatch) {
             j=0;
             FoundMatch = false;
+            //Look for the list of Labels for that Macro 
             while ( j<pMacroLabelList->Count && !FoundMatch) {
                LocalLabelList = (TStringList*)pMacroLabelList->Items[j];
                FoundMatch = LocalLabelList->Strings[0] == MacroName;
                j++;
             }
 
+            //Remove the Macro Call line
             pASMFile->Delete(i);
+            //Loop for the number of lines contained in the macro
             for ( j=1 ; j < MacroLine->Count ; j++ ) {
                Line = MacroLine->Strings[j];
 
-               //Extract Label
+               //Extract Labels
                if (Line.Pos("/")) {
                   LineLbl  = Line.SubString(1, Line.Pos("/")-1);
                   LineData = Line.SubString(Line.Pos("/")+1,Line.Length()-Line.Pos("/"));
@@ -1041,28 +1050,38 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                LineData = LineData.Trim();
                LineLbl  = LineLbl.UpperCase();
                LineData = LineData.UpperCase();
-               
-               for (k=1; k < LocalLabelList->Count; k++) {
-                  LineLbl = StringReplace(LineLbl, ":" + LocalLabelList->Strings[k] + " ",
-                                       ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
-                                       TReplaceFlags() << rfReplaceAll );
-                  LineData = StringReplace(LineData, ":" + LocalLabelList->Strings[k] + ":",
-                                       ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
-                                       TReplaceFlags() << rfReplaceAll );
-                  LineData = StringReplace(LineData, "::" + LocalLabelList->Strings[k] + ":",
-                                       "::" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
-                                       TReplaceFlags() << rfReplaceAll );
-                  LineData = StringReplace(LineData, ":*" + LocalLabelList->Strings[k] + ":",
-                                       ":*" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
-                                       TReplaceFlags() << rfReplaceAll );
-               }
-               Line = LineLbl.Trim() + "/" + LineData;
 
+               //Skip Macro call lines
+               if (LineLbl.SubString(1,1) != "%" ) {
+                  //Loop to replace all Labels found in the Macro
+                  for (k=1; k < LocalLabelList->Count; k++) {
+                     //Rename by concatenting "_MACRO_[X]" to the name where X goes from 0 to the number of time the Macro is called
+                     //That insure every Macro call as a unique set of Labels
+                     LineLbl = StringReplace(LineLbl, ":" + LocalLabelList->Strings[k] + " ",
+                                          ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
+                                          TReplaceFlags() << rfReplaceAll );
+                     LineData = StringReplace(LineData, ":" + LocalLabelList->Strings[k] + ":",
+                                          ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                                          TReplaceFlags() << rfReplaceAll );
+                     LineData = StringReplace(LineData, "::" + LocalLabelList->Strings[k] + ":",
+                                          "::" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                                          TReplaceFlags() << rfReplaceAll );
+                     LineData = StringReplace(LineData, ":*" + LocalLabelList->Strings[k] + ":",
+                                          ":*" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                                          TReplaceFlags() << rfReplaceAll );
+                  }
+                  //Rewrite them with the / separator instead of the fix 24 char as renaming may have make them longer than 24 char
+                  Line = LineLbl.Trim() + "/" + LineData;
+               }
+               //Insert the line in place
                pASMFile->Insert(i+(j-1), Line);
             }
+            //As the Macro call line was removed (%) the line at i must be reprocessed
             i--;
+            //Macro call counter incremented so later calls will rename the Labels with a different number
             pMacroUsageCmp->Values[MacroName] = IntToStr(StrToInt(pMacroUsageCmp->Values[MacroName])+1);
-         }
+         } else
+            ShowMessage("Error: Call For Undefined Macro " + MacroName );
       }
    }
 }
@@ -1073,17 +1092,20 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
    String Line, LineLbl, LbLName, LineData, LineComment;
    int LineCount=1;
 
+   //Main loop
    for(int i = 0; i<pASMFile->Count ; i++) {
       Line = pASMFile->Strings[i];
       LineComment = "";
 
       //Extract Comment
       if (Line.Pos(";") > 0) {
-        LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
-        LineData    = Line.SubString(1, Line.Pos(";")-1);
+         LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
+         LineData    = Line.SubString(1, Line.Pos(";")-1);
 
-        if (LineComment.Pos(";;") == 1)
-           LineData = " /NOP  ;" + LineComment;
+         //If double semicolon, the comment line is kept with an NOP instruction placeholder
+         if (LineComment.Pos(";;") == 1)
+            LineData = " /NOP  ;" + LineComment;
+         Line = LineData;
       } else
          LineData = Line;
       //Remove blank lines
@@ -1106,28 +1128,32 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
 
          //Process Label
          if( LineLbl.SubString(1,1) == ":" ) {
+            //First Label
             LineLbl = LineLbl + " ";
             LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
             LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
             LineLbl = LineLbl.Trim();
             Line    = Line + ":" + LbLName + " ";
 
+            //Test if already defined
             if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0)
                pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
             else
                ShowMessage("Error at line " + IntToStr(LineCount) + ": Label " + LbLName + " Redefined");
 
+            //Second Label
             if(LineLbl.SubString(1,1) == ":" ) {
                LbLName = LineLbl.SubString(2, LineLbl.Length());
                Line    = Line + ":" + LbLName + " ";
 
+               //Test if already defined
                if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0)
                   pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
                else
                   ShowMessage("Error at line " + IntToStr(LineCount) + ": Label " + LbLName + " Redefined");
             }
          }
-
+         //Output instruction + comment
          Line = Line + LineComment;
          pASMFile->Strings[i] = Line;
          LineCount++;
@@ -1148,13 +1174,11 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    TList* MacroList       = new TList;
    TStringList *MacroUsageCmp = new TStringList;
    TList* MacroLabelList  = new TList;
-   //TStringList *MacroList = new TStringList;
    
    LabelList->NameValueSeparator = '=';
    MacroUsageCmp->NameValueSeparator = '=';
 
    if (this->od_Assembler->Execute()) {
-      //TTextReader * ASMFile = new TStreamReader(this->od_Assembler->FileName);   
 
       this->b_Clear->Click();
       this->b_Delete->Click();
@@ -1203,18 +1227,20 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 
          //Remove Special chars
          LineData = StringReplace(LineData, "GOTO", " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, ">",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "->",   ", ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "-",    ", ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, ">",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "<",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "-",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "+",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "|",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "&",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "^",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "_",    ", ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "+",    " ,", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "|",    ", ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "&",    ", ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "^",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "?",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "!",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "@",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "#",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "=",    " ", TReplaceFlags() << rfReplaceAll );
+         LineData = StringReplace(LineData, "=",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "(",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, ")",    " ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "\"",   " ", TReplaceFlags() << rfReplaceAll );
@@ -1311,9 +1337,6 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                }
             }
 
-
-            
-
             //Compute Machine Code
             InstrucCode = "";
             if (Instruc->BlockAFix)
@@ -1376,11 +1399,28 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
          }
       }
       ASMFile->Clear();
-      
-   } 
+   }
+
+   //Cleanup
    ASMFile->Free();
    LabelList->Free();
-   this->cds_Mem->First();  
+   MacroUsageCmp->Free();
+
+   for(int i = 0; i<MacroList->Count ; i++) {
+      ASMFile = (TStringList*)MacroList->Items[i];
+      ASMFile->Free();
+   }
+
+   for(int i = 0; i<MacroLabelList->Count ; i++) {
+      ASMFile = (TStringList*)MacroLabelList->Items[i];
+      ASMFile->Free();
+   }
+
+   MacroList->Free();
+   MacroLabelList->Free();
+
+   //First line of code
+   this->cds_Mem->First();
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine)
