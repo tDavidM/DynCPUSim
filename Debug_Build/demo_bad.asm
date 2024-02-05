@@ -13,9 +13,9 @@
                         ADD   $0,$1,   $2                  ;0b and 0x tags are required to indicate a binary or hexadecimal value
                         SUB   $0,   $1,$2                  ;
                         AND   $0,$1,$2                     ;Labels are always defined with a single : (left side) but when used (inside an instruction), a single : mean relative address
-                        OR    ($C,   $1), ->  $2           ;  as opposed to double :: and :* used for absolute address respectively
+                        OR    ($C,   $1), ->  $2           ;  as opposed to double :: and :* used for absolute address
                         XOR   $0, ^ $1,   $2               ;  where :: provide the 4 most significant bits and :* the 4 least significant bits of an 8bits addr
-                        WJMP  #::LBLTEST:                  ;WJMP is a special case as the data portion is 12 bits long, here :*LBLTEST outputs 0x002 as :LBLTEST is at 0x002A
+                        WJMP  #::LBLTEST:                  ;WJMP is a special case as the data portion is 12 bits long, here ::LBLTEST outputs 0x002 as :LBLTEST is at 0x002A
                         SETV  @$0,    (0xFF)               ;When used (inside an instruction), Labels are also terminated by a :
                         GRT   $0, ? $2,  $1                ;
                         WJMPV #$0,       :*LBLTEST:        ;Here :*LBLTEST outputs 0x2A

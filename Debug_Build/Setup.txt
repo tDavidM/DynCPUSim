@@ -60,7 +60,7 @@ Op-Codes (A [B [C]]):
 1111 1000 - SETR  - WriteReg(@$C)<-$D            //Write $D to RAM at address $C
 1111 1001 - SGRT  - SkipGreater($C>$D)       (??)//Skip the following instruction if $C > $D
 1111 1010 - IFZR  - IfZeroReg($C)goto#$D     (??)//Branches if $C == 0, Goto relative 8 bits address at $D
-1111 1011 - WJMPR - WideJumpReg()goto#$C$D  (???)//Goto absolute 16 bits address $C$D (full 64K range)
+1111 1011 - WJMPR - WideJumpReg()goto#$C+$D (???)//Goto absolute 16 bits address $C$D (full 64K range)
 1111 1100 - LROTC - LeftCrRot($C)->$D        (??)//through carry
 1111 1101 - RROTC - RightCrRot($C)->$D       (??)//through carry
 1111 1110 - RSHTA - RightArSht($C)->$D       (??)//arithmetic shift(insert one)

@@ -13,12 +13,12 @@
                         ADD   $0,  $1,  $2                 ;0b and 0x tags are required to indicate a binary or hexadecimal value
                         SUB   $0,  $1,  $2                 ;
                         AND   $0,  $1,  $2                 ;Labels are always defined with a single : (left side) but when used (inside an instruction), a single : mean relative address
-                        OR    $C,  $1,  $2                 ;  as opposed to double :: and :* used for absolute address respectively
+                        OR    $C,  $1,  $2                 ;  as opposed to double :: and :* used for absolute address
 :LABEL1 :LABEL2         XOR   $0,  $1,  $2                 ;  where :: provide the 4 most significant bits and :* the 4 least significant bits of an 8bits addr
-                        WJMP  #::LBLTEST:                  ;WJMP is a special case as the data portion is 12 bits long, here :*LBLTEST outputs 0x002 as :LBLTEST is at 0x002A
+                        WJMP  #::LBL_TEST:                 ;WJMP is a special case as the data portion is 12 bits long, here ::LBL_TEST outputs 0x002 as :LBL_TEST is at 0x002A
                         SETV  @$0, 0xFF                    ;When used (inside an instruction), Labels are also terminated by a :
                         GRT   $0,  $2,  $1                 ;
-                        WJMPV #$0, :*LBLTEST:              ;Here :*LBLTEST outputs 0x2A
+                        WJMPV #$0, :*LBL_TEST:             ;Here :*LBL_TEST outputs 0x2A
                         NOT   $F,  $1                      ;
                         LSHT  $A,  $1                      ;When Imported, the controls at the bottom of the ROM window are disabled
                         LROT  $0,  $1                      ;Editing can only be done by pressing Clear and reimport the file
@@ -28,15 +28,15 @@
                         JMPA  #:LABEL2:                    ;Included files are simply concatenated at that location, labels and Macro must not be redefined
                         GETR  @$0, $1                      ;
                         SETR  @$0, $1                      ;
-[TESTMACRO
+[TEST_MACRO
                         SGRT  $0,  $1                      ;The definition starts with [NAME and end with ]
                         IFZR  $0,  #$1                     ;Calling a different Macro within a definition is valid
-%DEMO_MACRO					
+%DEMO_MACRO
                         WJMPR #$0, #$e                     ;Labels inside a macro should not be called as they get renamed at import (for when the same macro is called multiple times)
-]TESTMACRO					
+]TEST_MACRO
                         LROTC $0,  $1                      ;
                         RROTC $0,  $1                      ;
-%TESTMACRO 				                                   ;Macro can only be called outside it's own definition (no recursion)
+%TEST_MACRO                                                ;Macro can only be called outside it's own definition (no recursion)
                         RSHTA $0,  $1                      ;Macro can be called before or after the definition
                         
                         JMPR  #$0                          ;
@@ -44,15 +44,15 @@
                         RSTC                               ;
 [DEMO_MACRO
                         SETC
-                        INC   $D                           
-                        DEC   $D   
-]                        
-                        SIFZ  $D                           
-                        RND   $D                           
-                        SIFNZ $D                           
-                        SIFNC $D                           
-                        DSINZ $D                           
+                        INC   $D
+                        DEC   $D
+]
+                        SIFZ  $D
+                        RND   $D
+                        SIFNZ $D
+                        SIFNC $D
+                        DSINZ $D
 
-:LBLTEST                NOP                                
+:LBL_TEST                NOP
 
 #INCLUDE "demo_bad.asm"
