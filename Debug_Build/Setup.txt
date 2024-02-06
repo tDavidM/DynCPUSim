@@ -72,9 +72,9 @@ Op-Codes (A [B [C]]):
 1111 1111 0100 - INC   - Increment($D)        (?)//Increment $D by 1 and stores the result in $D
 1111 1111 0101 - DEC   - Decrement($D)        (?)//Decrement $D by 1 and stores the result in $D
 1111 1111 0110 - SIFZ  - SkipZero($D)        (??)//Skip the following instruction if $D == 0
-1111 1111 0111 - RND   - Random()->$D          (??)
+1111 1111 0111 - RND   - Random()->$D        (??)
 1111 1111 1000 - SIFNZ - SkipNotZero($D)    (???)//Skip the following instruction if $D != 0
-1111 1111 1001 - SIFNC - SkipNotCarry($D)   (???)//Skip the following instruction if carry flag set
+1111 1111 1001 - SIFNC - SkipNotCarry()     (???)//Skip the following instruction if carry flag set
 1111 1111 1010 - DSINZ - DecSkipNotZero($D) (???)//Skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0
 1111 1111 1011 - PUSH  - Push($D)           (???)//Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped )
 1111 1111 1100 - POP   - Pop($D)            (???)//Pop the value from the top of the internal stack to $D  (it is 16 bytes deep, the overflow is dropped )
@@ -83,9 +83,9 @@ Op-Codes (A [B [C]]):
 1111 1111 1111 - NOP   - NOP()
 
 Alias
-Copy($B)->$D accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000
-Erase()->$D accomplished with AND($B,$C)->$D where $B and $C are the fixed value register 0x00000000 and 0x11111111
-Trigger a debug halt with Set() any value to register E
+Copy($B)->$D accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000 (Mnemonic CPY)
+Erase()->$D accomplished with AND($B,$C)->$D where $B and $C are the fixed value register 0x00000000 and 0x11111111 (Mnemonic RST)
+Trigger a debug halt with Set() any value to register E (Mnemonic HALT)
 Erase all registers with Set() any value to register F
 
 
