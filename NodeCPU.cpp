@@ -245,6 +245,8 @@ __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
 {
   this->NodeList = new TList;
   this->SelectList = new TList;
+  this->AnnotationList = new TList;
+  this->AnnotationSelect = new TStringList;
   this->NodeSelect = NULL;
   this->NodeType = 0;
   this->NodeCmp = 0;
@@ -252,67 +254,17 @@ __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 {
-  //ifstream FileId;
-  //bool LineOk;
   TNode* Node;
   TNode* NodeCible;
   int X, Y, Type;
   int ListNodeCount, LinkCount, NodeTypeCount;
   String Name, FileType;
-  //char Buffer[200];
-  //char *SubBuff;
-  //char NameBuffer[50];
+
   int ID, IDOutUp, IDOutDown;
   int PinInUp, PinInDown, PinOutUp, PinOutDown;
   String NameInUp, NameInDown, NameOutUp, NameOutDown;
 
   this->sb_Main->Panels->Items[0]->Text = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
-
-  /*FileId.open("NodeList.ndl");
-  LineOk = true;
-  while (!FileId.eof())
-  {
-     FileId.getline(Buffer,200);
-     if(LineOk)
-     {
-       //Chop line by ;
-       SubBuff = strtok (Buffer,";");
-       if (SubBuff != NULL){strncpy(NameBuffer,SubBuff,50); Name = NameBuffer; SubBuff = strtok (NULL, ";");}
-       else {LineOk = false;}
-       if (SubBuff != NULL){X          = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){Y          = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){Type       = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){PinInUp    = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){PinInDown  = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){PinOutUp   = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){PinOutDown = StrToInt(SubBuff); SubBuff = strtok (NULL, ";");} else {LineOk = false;}
-       if (SubBuff != NULL){strncpy(NameBuffer,SubBuff,50); NameOutUp   = NameBuffer; SubBuff = strtok (NULL, ";");}
-       else {NameOutUp="";}
-       if (SubBuff != NULL){strncpy(NameBuffer,SubBuff,50); NameOutDown = NameBuffer; SubBuff = strtok (NULL, ";");}
-       else {NameOutDown="";}
-
-       //Init each Node with all Info from File
-       if (LineOk)
-       {
-           Node = new TNode(NodeCmp, X, Y, Type, Name);
-           this->NodeList->Add(Node);
-           if (PinInUp != 0)    { Node->SetInUp(PinInUp); }
-           if (PinInDown != 0)  { Node->SetInDown(PinInDown); }
-           if (PinOutUp != 0)   { Node->SetOutUp(PinOutUp, NULL); }
-           if (PinOutDown != 0) { Node->SetOutDown(PinOutDown, NULL); }
-           if(NameOutUp != "")
-              Node->NameOutUp   = NameOutUp;
-           if(NameOutDown != "")
-              Node->NameOutDown = NameOutDown;
-           NodeCmp++; //0
-
-           NameOutUp = "";
-           NameOutDown = "";
-       }
-     }
-  }
-
-  FileId.close();*/
 
    if (this->NodeOpenDialog->Execute()) {
 
@@ -321,6 +273,12 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
         Node = (TNode*)this->NodeList->Items[i];
         delete Node;
      }
+     for(int i = 0; i<AnnotationList->Count ; i++) {
+        AnnotationSelect = (TStringList*)AnnotationList->Items[i];
+        AnnotationSelect->Free();
+     }
+
+
      this->NodeList->Clear();
 
      this->NodeSelect = NULL;
@@ -341,7 +299,11 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
             f_Memory->LoadInstructionSet(InstructionSet);
             this->InstructionSetXML = InstructionSet;
 
-            _di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[1];
+            _di_IXMLNode Annotation = XmlRoot->ChildNodes->Nodes[1];
+            this->LoadAnnotation(Annotation);
+            this->AnnotationXML = Annotation;
+
+            _di_IXMLNode Param = XmlRoot->ChildNodes->Nodes[2];
             LinkCount = Param->GetAttribute("LinkCount");
 
             /*_di_IXMLNode OrType = Param->ChildNodes->Nodes[0];
@@ -362,7 +324,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
               _di_IXMLNode NotType = Param->ChildNodes->Nodes[5];
               NodeTypeCount = NotType->GetAttribute("Count");*/
 
-            _di_IXMLNode NodeState = XmlRoot->ChildNodes->Nodes[2];
+            _di_IXMLNode NodeState = XmlRoot->ChildNodes->Nodes[3];
             ListNodeCount = StrToInt(NodeState->GetAttribute("NodeCount"));
             this->pgLoading->Max = ListNodeCount*2;
 
@@ -474,30 +436,6 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 		  Application->MessageBox( L"Invalid File", L"Loading Error", MB_OK | MB_ICONINFORMATION);
      }
 
-  //Look for each Node with a Output Name in Up or Down and Links it to the coresponding "Downstream" Node
-/*  for(int j = 0; j<NodeCmp; j++)
-  {
-    Node = (TNode*)this->NodeList->Items[j];
-    if (Node->NameOutUp != "") {
-       for(int i = 0; i<NodeCmp; i++){
-          NodeCible = (TNode*)this->NodeList->Items[i];
-          if(NodeCible->Name == Node->NameOutUp) {
-            Node->SetOutUp(0,NodeCible);
-            i = NodeCmp;
-          }
-       }
-    }
-    if (Node->NameOutDown != "") {
-       for (int i = 0; i<NodeCmp; i++)
-       {
-          NodeCible = (TNode*)this->NodeList->Items[i];
-          if(NodeCible->Name == Node->NameOutDown) {
-            Node->SetOutDown(0,NodeCible);
-            i = NodeCmp;
-          }
-       }
-    }
-  }*/
      //Update internal state for Not gates
      for (int i = 0; i<NodeCmp; i++) {
         Node = (TNode*)this->NodeList->Items[i];
@@ -542,30 +480,6 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 {
-/*  ofstream FileId;
-  String Buffer;
-  TNode* NodeCurr;
-
-  FileId.open("NodeList.ndl");
-
-  for (int i = 0; i<NodeCmp; i++)
-  {
-     NodeCurr = (TNode*)this->NodeList->Items[i];
-     if(! NodeCurr->DeleteFlag)
-     {
-         Buffer = NodeCurr->Name;
-         Buffer = Buffer + ';'
-                  + IntToStr(NodeCurr->X) + ';' + IntToStr(NodeCurr->Y)
-                  + ';' + IntToStr(NodeCurr->GetType())
-                  + ';' + IntToStr(NodeCurr->GetID_InUp())  + ';' + IntToStr(NodeCurr->GetID_InDown())
-                  + ';' + IntToStr(NodeCurr->GetID_OutUp()) + ';' + IntToStr(NodeCurr->GetID_OutDown())
-                  + ';' + NodeCurr->NameOutUp + ';' + NodeCurr->NameOutDown + ';';
-         FileId<< Buffer.c_str() << "\n";
-     }
-  }
-  FileId.close();
-  this->ItsUpdated = false;*/
-
    TNode* NodeCurr;
    int CountOr=0, CountAnd=0, CountNor=0, CountNand=0, CountXor=0, CountNot=0;
    int CountLink = 0, CountNode = 0;
@@ -584,6 +498,8 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 	  FileType->SetAttribute("Type", (String)"Dyn CPU Sim");
 
      FileType->ChildNodes->Add(this->InstructionSetXML);
+
+     FileType->ChildNodes->Add(this->AnnotationXML);
 
      for (int i = 0; i<this->NodeCmp; i++)
      {
@@ -699,6 +615,43 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
      this->ItsUpdated = false;
      XmlRoot->SaveToFile(this->NodeSaveDialog->FileName);
      this->pgLoading->Position = 0;
+   }
+}
+//---------------------------------------------------------------------------
+void Tf_CPUNode::LoadAnnotation(_di_IXMLNode pAnnotation)
+{
+   String ID, Name, Type;
+   TPoint PointA, PointB;
+   TStringList *AnnotationData;
+
+   _di_IXMLNodeList AllAnnotation = pAnnotation->ChildNodes;
+
+   for(int i = 0; i < AllAnnotation->Count; i++) {
+      ID           = AllAnnotation->Get(i)->GetAttribute("ID");
+      Name         = AllAnnotation->Get(i)->GetAttribute("Name");
+      Type         = AllAnnotation->Get(i)->GetAttribute("Type");
+
+      AnnotationData = new TStringList;
+      //AnnotationData->NameValueSeparator = '=';
+      this->AnnotationList->Add(AnnotationData);
+
+      AnnotationData->Add(Name);
+      AnnotationData->Add(Type);
+
+      _di_IXMLNode AnnotationPoint;
+      if (Type == "Rect") {
+         AnnotationPoint = AllAnnotation->Get(i)->ChildNodes->Nodes[0];
+         PointA.X = AnnotationPoint->GetAttribute("X");
+         PointA.Y = AnnotationPoint->GetAttribute("Y");
+
+         AnnotationPoint = AllAnnotation->Get(i)->ChildNodes->Nodes[1];
+         PointB.X = AnnotationPoint->GetAttribute("X");
+         PointB.Y = AnnotationPoint->GetAttribute("Y");
+
+         AnnotationData->Add("X=" + IntToStr((int)PointA.X) + ",Y=" + IntToStr((int)PointA.Y));
+         AnnotationData->Add("X=" + IntToStr((int)PointB.X) + ",Y=" + IntToStr((int)PointB.Y));
+      }
+
    }
 }
 //---------------------------------------------------------------------------
@@ -858,6 +811,7 @@ void __fastcall Tf_CPUNode::t_DrawMulti2Timer(TObject *Sender)
 void __fastcall Tf_CPUNode::t_DrawMulti3Timer(TObject *Sender)
 {
   this->DrawArea(3);
+  HeaderControl->Repaint();
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::DrawArea(int NbDraw)
@@ -1617,6 +1571,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       int X, int Y)
 {
   TNode* NodeCurr;
+  TRect SelectRect;
   String Name;
   int Type;
 
@@ -1627,6 +1582,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 
   //Catch cursor mouvment when "drag & drop" of the Canvas
   if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift))
+  //Move view
      && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) ) {
       this->OffSetX += X - this->MouseDownX;
       this->OffSetY += Y - this->MouseDownY;
@@ -1641,6 +1597,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 
       this->sb_Main->Panels->Items[0]->Text = "Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
   } else if (Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
+  //Select (Shift)
 	  this->SelectList->Clear();
       for (int i = 0; i<NodeCmp; i++) {
           NodeCurr = (TNode*)this->NodeList->Items[i];
@@ -1656,13 +1613,17 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       //this->Invalidate();
       this->Canvas->Brush->Color = clBtnFace;
       this->Canvas->Pen->Color = clGreen;
+      this->Canvas->Pen->Width = 2;
       this->Canvas->FillRect(ClientRect);
       this->Canvas->Rectangle(this->MouseDownX, this->MouseDownY, X, Y);
+      this->Canvas->Pen->Width = 1;
+
       this->CallDrawArea();
   }
   else if(Shift.Contains(ssLeft) && !Shift.Contains(ssShift) && Shift.Contains(ssCtrl)
           && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize))
   {
+  //Move Selection (Ctrl)
       UpdateOffSetX = (X - this->MouseDownX) / GridSize ;
       UpdateOffSetY = (Y - this->MouseDownY) / GridSize ;
       this->MouseDownX = X;

@@ -98,22 +98,7 @@ __published:	// Composants gérés par l'EDI
 	TTimer *t_DrawMulti2;
 	TTimer *t_DrawMulti3;
    TStatusBar *sb_Main;
-   THeaderControl *HeaderControl1;
-   TButton *b_Or;
-   TButton *b_And;
-   TButton *b_NOr;
-   TButton *b_NAnd;
-   TButton *b_XOr;
-   TButton *b_Not;
-   TPanel *p_DrawCmp;
-   TButton *b_Init;
-   TButton *b_Start;
-   TButton *b_Step;
-   TButton *b_Save;
-   TButton *b_Reset;
-   TCheckBox *cb_ActiveDraw;
-   TCheckBox *cb_QuickEdit;
-   TCheckBox *cb_ColorLine;
+   THeaderControl *HeaderControl;
    TPanel *Panel1;
    TLabel *l_Speed;
    TTrackBar *tb_Speed;
@@ -121,6 +106,21 @@ __published:	// Composants gérés par l'EDI
    TOpenDialog *NodeOpenDialog;
    TXMLDocument *XMLDoc;
    TProgressBar *pgLoading;
+   TButton *b_Init;
+   TButton *b_Start;
+   TButton *b_Step;
+   TButton *b_Reset;
+   TCheckBox *cb_ActiveDraw;
+   TCheckBox *cb_ColorLine;
+   TButton *b_Save;
+   TPanel *p_DrawCmp;
+   TCheckBox *cb_QuickEdit;
+   TButton *b_Or;
+   TButton *b_And;
+   TButton *b_NOr;
+   TButton *b_NAnd;
+   TButton *b_XOr;
+   TButton *b_Not;
     void __fastcall b_InitClick(TObject *Sender);
     void __fastcall b_StartClick(TObject *Sender);
     void __fastcall t_WorkTimer(TObject *Sender);
@@ -154,7 +154,11 @@ private:	// Déclarations de l'utilisateur
     //TList* FollowList;
     TNode *NodeSelect;
 
+    TList* AnnotationList;
+    TStringList *AnnotationSelect;
+
     _di_IXMLNode InstructionSetXML;
+    _di_IXMLNode AnnotationXML;
 
     bool FlagNewNode;
     int NodeCmp, NodeMaxID;
@@ -174,6 +178,7 @@ private:	// Déclarations de l'utilisateur
 	void CallDrawArea(void);
 	void DrawArea(int NbDraw);
 	void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
+   void LoadAnnotation(_di_IXMLNode pAnnotation);
 
 public:		// Déclarations de l'utilisateur
     __fastcall Tf_CPUNode(TComponent* Owner);

@@ -1231,7 +1231,6 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
          LineData = StringReplace(LineData, "-",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, ">",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "<",    " ", TReplaceFlags() << rfReplaceAll );
-         LineData = StringReplace(LineData, "_",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "+",    " ,", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "|",    ", ", TReplaceFlags() << rfReplaceAll );
          LineData = StringReplace(LineData, "&",    ", ", TReplaceFlags() << rfReplaceAll );
@@ -1465,7 +1464,7 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
       //Left Padding
       while(Addr.Length() < 4)
          Addr = "0" + Addr;   
-      for (int i=4; i>pSize/4; i--)
+      for (int i=4; i>4-(pSize/4); i--)
          DataOut = HexToBin(Addr.SubString(i,1)) + DataOut;
                                                             
    }else if (pData.SubString(1,1) == ":") {

@@ -2,8 +2,8 @@ object f_CPUNode: Tf_CPUNode
   Left = 0
   Top = 0
   Caption = 'Dynamic CPU Simulation'
-  ClientHeight = 615
-  ClientWidth = 1071
+  ClientHeight = 632
+  ClientWidth = 1102
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,7 +12,6 @@ object f_CPUNode: Tf_CPUNode
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
-  ShowHint = False
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
@@ -21,27 +20,31 @@ object f_CPUNode: Tf_CPUNode
   OnMouseWheel = FormMouseWheel
   OnPaint = FormPaint
   DesignSize = (
-    1071
-    615)
+    1102
+    632)
   PixelsPerInch = 96
   TextHeight = 13
   object p_Area: TPanel
     Left = 8
     Top = 47
-    Width = 1055
-    Height = 543
+    Width = 1086
+    Height = 560
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     Visible = False
+    ExplicitWidth = 1055
+    ExplicitHeight = 543
   end
   object p_zoom: TPanel
-    Left = 1031
-    Top = 396
+    Left = 1062
+    Top = 413
     Width = 40
     Height = 199
     Anchors = [akRight, akBottom]
     ParentBackground = False
     TabOrder = 0
+    ExplicitLeft = 1031
+    ExplicitTop = 396
     object l_gridZoom: TLabel
       Left = 5
       Top = 6
@@ -65,8 +68,8 @@ object f_CPUNode: Tf_CPUNode
   end
   object sb_Main: TStatusBar
     Left = 0
-    Top = 596
-    Width = 1071
+    Top = 613
+    Width = 1102
     Height = 19
     Panels = <
       item
@@ -75,180 +78,26 @@ object f_CPUNode: Tf_CPUNode
     SimpleText = 
       #9#9#9#9#9#9#9#9'Mouse: Left=Select, Right=Move, Middle=Create, Shift+Lef' +
       't=Link(1), Ctrl+Left=Link(2)'
+    ExplicitTop = 596
+    ExplicitWidth = 1071
   end
-  object HeaderControl1: THeaderControl
+  object HeaderControl: THeaderControl
     Left = 0
     Top = 0
-    Width = 1071
+    Width = 1102
     Height = 21
     Sections = <>
-  end
-  object b_Or: TButton
-    Left = 807
-    Top = 0
-    Width = 38
-    Height = 21
-    Hint = 'Shortcut: 1 (Quick Edit: O)'
-    Anchors = [akTop, akRight]
-    Caption = 'OR'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = [fsBold]
-    ParentFont = False
-    TabOrder = 4
-    OnClick = b_OrClick
-  end
-  object b_And: TButton
-    Tag = 1
-    Left = 851
-    Top = 0
-    Width = 38
-    Height = 21
-    Hint = 'Shortcut: 2 (Quick Edit: A)'
-    Anchors = [akTop, akRight]
-    Caption = 'AND'
-    TabOrder = 5
-    OnClick = b_OrClick
-  end
-  object b_NOr: TButton
-    Tag = 2
-    Left = 895
-    Top = 0
-    Width = 38
-    Height = 21
-    Hint = 'Shortcut: 3 (Quick Edit: R)'
-    Anchors = [akTop, akRight]
-    Caption = 'NOR'
-    TabOrder = 6
-    OnClick = b_OrClick
-  end
-  object b_NAnd: TButton
-    Tag = 3
-    Left = 939
-    Top = 0
-    Width = 38
-    Height = 21
-    Hint = 'Shortcut: 4 (Quick Edit: D)'
-    Anchors = [akTop, akRight]
-    Caption = 'NAND'
-    TabOrder = 7
-    OnClick = b_OrClick
-  end
-  object b_XOr: TButton
-    Tag = 4
-    Left = 983
-    Top = 0
-    Width = 38
-    Height = 21
-    Hint = 'Shortcut: 5 (Quick Edit: X)'
-    Anchors = [akTop, akRight]
-    Caption = 'XOR'
-    TabOrder = 8
-    OnClick = b_OrClick
-  end
-  object b_Not: TButton
-    Tag = 5
-    Left = 1027
-    Top = 0
-    Width = 38
-    Height = 21
-    Hint = 'Shortcut: 6 (Quick Edit: N)'
-    Anchors = [akTop, akRight]
-    Caption = 'NOT'
-    TabOrder = 9
-    OnClick = b_OrClick
-  end
-  object p_DrawCmp: TPanel
-    Left = 570
-    Top = 1
-    Width = 145
-    Height = 18
-    Caption = 'Draw: 0 - 0'
-    ParentBackground = False
-    TabOrder = 10
-  end
-  object b_Init: TButton
-    Left = 8
-    Top = 0
-    Width = 59
-    Height = 21
-    Caption = 'Init'
-    TabOrder = 11
-    OnClick = b_InitClick
-  end
-  object b_Start: TButton
-    Left = 81
-    Top = 0
-    Width = 59
-    Height = 21
-    Caption = 'Start'
-    TabOrder = 12
-    OnClick = b_StartClick
-  end
-  object b_Step: TButton
-    Left = 153
-    Top = 0
-    Width = 59
-    Height = 21
-    Caption = 'Step'
-    TabOrder = 13
-    OnClick = b_StepClick
-  end
-  object b_Save: TButton
-    Left = 497
-    Top = 0
-    Width = 59
-    Height = 21
-    Caption = 'Save'
-    TabOrder = 14
-    OnClick = b_SaveClick
-  end
-  object b_Reset: TButton
-    Left = 225
-    Top = 0
-    Width = 59
-    Height = 21
-    Caption = 'Reset'
-    TabOrder = 15
-    OnClick = b_ResetClick
-  end
-  object cb_ActiveDraw: TCheckBox
-    Left = 298
-    Top = 2
-    Width = 80
-    Height = 17
-    Caption = 'Active Draw'
-    Checked = True
-    State = cbChecked
-    TabOrder = 16
-  end
-  object cb_QuickEdit: TCheckBox
-    Left = 728
-    Top = 2
-    Width = 73
-    Height = 17
-    Caption = 'Quick Edit'
-    TabOrder = 17
-  end
-  object cb_ColorLine: TCheckBox
-    Left = 384
-    Top = 2
-    Width = 89
-    Height = 17
-    Caption = 'Color Line (10)'
-    TabOrder = 18
-    OnClick = cb_ColorLineClick
+    ExplicitWidth = 1071
   end
   object Panel1: TPanel
-    Left = 1031
+    Left = 1062
     Top = 27
     Width = 40
     Height = 246
     Anchors = [akTop, akRight]
     ParentBackground = False
-    TabOrder = 19
+    TabOrder = 4
+    ExplicitLeft = 1031
     object l_Speed: TLabel
       Left = 4
       Top = 6
@@ -272,12 +121,172 @@ object f_CPUNode: Tf_CPUNode
     end
   end
   object pgLoading: TProgressBar
-    Left = 857
-    Top = 598
+    Left = 888
+    Top = 615
     Width = 198
     Height = 16
     Anchors = [akRight, akBottom]
+    TabOrder = 5
+    ExplicitLeft = 857
+    ExplicitTop = 598
+  end
+  object b_Init: TButton
+    Left = 8
+    Top = 0
+    Width = 59
+    Height = 21
+    Caption = 'Init'
+    TabOrder = 6
+    OnClick = b_InitClick
+  end
+  object b_Start: TButton
+    Left = 81
+    Top = 0
+    Width = 59
+    Height = 21
+    Caption = 'Start'
+    TabOrder = 7
+    OnClick = b_StartClick
+  end
+  object b_Step: TButton
+    Left = 153
+    Top = 0
+    Width = 59
+    Height = 21
+    Caption = 'Step'
+    TabOrder = 8
+    OnClick = b_StepClick
+  end
+  object b_Reset: TButton
+    Left = 225
+    Top = 0
+    Width = 59
+    Height = 21
+    Caption = 'Reset'
+    TabOrder = 9
+    OnClick = b_ResetClick
+  end
+  object cb_ActiveDraw: TCheckBox
+    Left = 298
+    Top = 2
+    Width = 80
+    Height = 17
+    Caption = 'Active Draw'
+    Checked = True
+    State = cbChecked
+    TabOrder = 10
+  end
+  object cb_ColorLine: TCheckBox
+    Left = 384
+    Top = 2
+    Width = 89
+    Height = 17
+    Caption = 'Color Line (10)'
+    TabOrder = 11
+    OnClick = cb_ColorLineClick
+  end
+  object b_Save: TButton
+    Left = 497
+    Top = 0
+    Width = 59
+    Height = 21
+    Caption = 'Save'
+    TabOrder = 12
+    OnClick = b_SaveClick
+  end
+  object p_DrawCmp: TPanel
+    Left = 570
+    Top = 1
+    Width = 145
+    Height = 18
+    Caption = 'Draw: 0 - 0'
+    ParentBackground = False
+    TabOrder = 13
+  end
+  object cb_QuickEdit: TCheckBox
+    Left = 728
+    Top = 2
+    Width = 73
+    Height = 17
+    Caption = 'Quick Edit'
+    TabOrder = 14
+  end
+  object b_Or: TButton
+    Left = 838
+    Top = 0
+    Width = 38
+    Height = 21
+    Hint = 'Shortcut: 1 (Quick Edit: O)'
+    Anchors = [akTop, akRight]
+    Caption = 'OR'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 15
+    OnClick = b_OrClick
+  end
+  object b_And: TButton
+    Tag = 1
+    Left = 882
+    Top = 0
+    Width = 38
+    Height = 21
+    Hint = 'Shortcut: 2 (Quick Edit: A)'
+    Anchors = [akTop, akRight]
+    Caption = 'AND'
+    TabOrder = 16
+    OnClick = b_OrClick
+  end
+  object b_NOr: TButton
+    Tag = 2
+    Left = 926
+    Top = 0
+    Width = 38
+    Height = 21
+    Hint = 'Shortcut: 3 (Quick Edit: R)'
+    Anchors = [akTop, akRight]
+    Caption = 'NOR'
+    TabOrder = 17
+    OnClick = b_OrClick
+  end
+  object b_NAnd: TButton
+    Tag = 3
+    Left = 970
+    Top = 0
+    Width = 38
+    Height = 21
+    Hint = 'Shortcut: 4 (Quick Edit: D)'
+    Anchors = [akTop, akRight]
+    Caption = 'NAND'
+    TabOrder = 18
+    OnClick = b_OrClick
+  end
+  object b_XOr: TButton
+    Tag = 4
+    Left = 1014
+    Top = 0
+    Width = 38
+    Height = 21
+    Hint = 'Shortcut: 5 (Quick Edit: X)'
+    Anchors = [akTop, akRight]
+    Caption = 'XOR'
+    TabOrder = 19
+    OnClick = b_OrClick
+  end
+  object b_Not: TButton
+    Tag = 5
+    Left = 1058
+    Top = 0
+    Width = 38
+    Height = 21
+    Hint = 'Shortcut: 6 (Quick Edit: N)'
+    Anchors = [akTop, akRight]
+    Caption = 'NOT'
     TabOrder = 20
+    OnClick = b_OrClick
   end
   object t_Work: TTimer
     Enabled = False
