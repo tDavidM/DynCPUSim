@@ -351,15 +351,27 @@
 ;Test 20, All other Registers beyond the main 3 used so far
                         CPY   $E,     $3              ;Set $3 to 0xFF, testing writing to it
                         AND   $3,     $3,     $4      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $4,     $4,     $5      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $5,     $5,     $6      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $6,     $6,     $7      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $7,     $7,     $8      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $8,     $8,     $9      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $9,     $9,     $A      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $A,     $A,     $B      ;Test that $3 outputs to Bus A and B and testing writing to $4
-                        AND   $B,     $B,     $0      ;Test that $3 outputs to Bus A and B and testing writing to $4
+                        AND   $4,     $4,     $5      ;Test that $4 outputs to Bus A and B and testing writing to $5
+                        AND   $5,     $5,     $6      ;Test that $5 outputs to Bus A and B and testing writing to $6
+                        AND   $6,     $6,     $7      ;Test that $6 outputs to Bus A and B and testing writing to $7
+                        AND   $7,     $7,     $8      ;Test that $7 outputs to Bus A and B and testing writing to $8
+                        AND   $8,     $8,     $9      ;Test that $8 outputs to Bus A and B and testing writing to $9
+                        AND   $9,     $9,     $A      ;Test that $9 outputs to Bus A and B and testing writing to $A
+                        AND   $A,     $A,     $B      ;Test that $A outputs to Bus A and B and testing writing to $B
+                        AND   $B,     $B,     $0      ;Test that $B outputs to Bus A and B
                         SIF   $0,     0xFF            ;Check that $0 is == 0xFF
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        CPY   $C,     $3              ;Set $3 to 0x00, testing writing to it
+                        OR    $3,     $3,     $4      ;Test that $3 outputs to Bus A or B and testing writing to $4
+                        OR    $4,     $4,     $5      ;Test that $4 outputs to Bus A or B and testing writing to $5
+                        OR    $5,     $5,     $6      ;Test that $5 outputs to Bus A or B and testing writing to $6
+                        OR    $6,     $6,     $7      ;Test that $6 outputs to Bus A or B and testing writing to $7
+                        OR    $7,     $7,     $8      ;Test that $7 outputs to Bus A or B and testing writing to $8
+                        OR    $8,     $8,     $9      ;Test that $8 outputs to Bus A or B and testing writing to $9
+                        OR    $9,     $9,     $A      ;Test that $9 outputs to Bus A or B and testing writing to $A
+                        OR    $A,     $A,     $B      ;Test that $A outputs to Bus A or B and testing writing to $B
+                        OR    $B,     $B,     $0      ;Test that $B outputs to Bus A or B
+                        SIFZ  $0,                     ;Check that $0 is == 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
 ;Test 21, Random number
                         SET   "0x24", $3              ;Keep track of where it halts, if it does
@@ -390,7 +402,37 @@
                         SIFZ  $0                      ;Check that $0 is == 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
                         
+                        PUSH  $E
+                        SET   0x55,   $1              ;
+                        SET   0xAA,   $2              ;
+                        SET   0x07,   $0              ;Set for 7 iterations
+:TEST_NO_22B_PUSH       DSINZ $0                      ;Decrement $0 until zero
+                        JMPA  #:TEST_NO_22B_END:      ;If End of Loop at Zero
+                        PUSH  $1
+                        PUSH  $2
+                        JMPA  #:TEST_NO_22B_PUSH:     ;Loop back
+:TEST_NO_22B_END        PUSH  $E
                         SET   "0x28", $3              ;Keep track of where it halts, if it does
+                        POP   $0
+                        SET   0x07,   $0              ;Set for 7 iterations
+:TEST_NO_22C_POP        DSINZ $0                      ;Decrement $0 until zero
+                        JMPA  #:TEST_NO_22C_END:      ;If End of Loop at Zero
+                        POP   $2
+                        POP   $1
+                        SIF   $2,     0xAA            ;Check that 0xAA was poped out of the stack
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SIF   $1,     0x55            ;Check that 0x55 was poped out of the stack
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        JMPA  #:TEST_NO_22C_POP:      ;Loop back
+:TEST_NO_22C_END        SET   "0x29", $3              ;Keep track of where it halts, if it does
+                        POP   $0
+                        SIF   $0,     0xFF            ;Check that 0xFF was poped out of the stack
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        POP   $0
+                        SIFZ  $0                      ;Check that $0 is == 0x00
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        
+                        SET   "0x30", $3              ;Keep track of where it halts, if it does
                         WJMP  #:*START_OVER:
 :HALT_ON_ERR            HALT
 

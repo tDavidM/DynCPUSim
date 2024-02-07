@@ -12,11 +12,11 @@
   1 pin for Ready Next (CPU output pins 50)
   128 foward and 128 backward (ex.: 10000000 = next, 00000000 = 128 backward, 11111111 = 128 foward, no address for current line )
   Circular Memory (wrapped around at begin and end)
-  Trigered by rising edge of Ready Next Flag with No delay
+  Trigered by rising edge of Ready Next Flag, returns value immediately
  *Adbsolute address
   16 bits/pins adresses (CPU output pins 51-58 (low) + 71-78 (high))
   1 pin for Ready Next (CPU output pins 60)
-  Trigered by rising edge of Ready Next Flag with No delay
+  Trigered by rising edge of Ready Next Flag, returns value immediately
 
 -RAM
  256 pages of 256 values (not yet implemented)
@@ -24,7 +24,7 @@
  2 pin for Read or Write Flags (CPU output pins 40 and 30 respectively)
  8 bits/pins input paired with 8 bits/pins address output (CPU output pins 21-28) (CPU input pins 41-48)
  8 bits/pins output paired with 8 bits/pins address output (CPU output pins 21-28) (CPU output pins 31-38)
- Trigered by Read or Write Flags with No delay
+ Trigered by Read or Write Flags, returns value immediately
  Current page set by the value of register B
  
 Instruction word format: AAAABBBBCCCCDDDD
@@ -46,7 +46,7 @@ Op-Codes (A [B [C]]):
 1010 - XOR   - Xor($B^$C)->$D
 1011 - WJMP  - WideJump()goto#0000+BCD      (???)//Goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
 1100 - SETV  - WriteVal(@$B)<-CD            (???)//Write CD to RAM at address $B
-1101 - GRT   - Greatest($B_$C)->$D          (???)//Set $D to the greatest value betweem $B and $C
+1101 - GRT   - Greatest($B?$C)->$D          (???)//Set $D to the greatest value betweem $B and $C
 1110 - WJMPV - WideJumpVal()goto#$B+CD      (???)//Goto absolute 16 bits address $B+CD (full 64K range)
 
 1111 0000 - NOT   - Not($C)->$D
@@ -90,56 +90,7 @@ Erase all registers with Set() any value to register F
 
 
 ToDo/Idea:
+Improve error detection in Import, (Param counter, line counter)
 Add TagNode/Hint in Simulation
 Erase all registers with Set() any value to register F
 improve carryflag on substraction 
-
-
-
-Paterns
--End program to avoid program starting back at the first location 
- With:
- SET(0)->$0           //Value to test
- NOP()                //Optional
- IFZERO($0)#b_01111111 //Last location
- 
--Emulate RightArithSh($1)->$2
- With:               //Note, $1 original value is conserved
- SET(b_10000000)->$3 //MSB mask
- AND($1,$3)->$3      //Copy value of MSB
- RIGHTSH($1)->$2     //RShift MSB become 0
- OR($2,$3)->$2       //MSB injected
-
--Emulate Greater($1,$2)->#X
- With:
- AND($1,$2)->$3 //Next 3 lines detect for each bit of $1 = 1 where $2 = 0
- XOR($1,$3)->$3
- NOT($2)->$4
- AND($3,$4)->$3 //Now $3 = 0 if least or = 255 if equal or any other value for greater
- AND($3,$3)->$4 //Copy $3 in $4
- LEFTSH($4)->$4 //Next 3 lines detect case where $3 = 255
- NOT($4)->$4
- AND($3,$4)->$3
- IFZERO($3)#NOTGREATER
- JUMP()#GREATER 
- 
--Emulate Greater($1,$2)->#X GreaterEqual($1,$2)->#X Least($1,$2)->#X LeastEqual($1,$2)->#X
- With:                //Warning, $1 and $2 original values aren't conserved, store elsewhere if needed
- SUBTRACT($1-$2)->$3  //
- IFZERO($3)#EQUAL   //If $1 = $2, $1-$2 = 0
- IFZERO($1)#LEAST   //If $1 = 0, $1 is not greater
- DEC($1)->$1          //decrement both values
- DEC($2)->$2          //To see which one reach zero first
- IFZERO($2)#GREATER //If $2 = 0, $1 is greater
- JUMP()#b_01111011  // = 4 backward, complementary of 10000100 = 4 foward
- 
--Emulate Multiply($1*$2)->$3
- With:               //Note, $1 and $2 original value are conserved
- SET(0)->$3          //Just in case any factor is 0
- IFZERO($1)#END    //Multiplication by 0, nothing to do
- IFZERO($2)#END    //Multiplication by 0, nothing to do
- AND($1,$1)->$4      //Copy factor $1 in loop counter $4 
- ADD($2,$3)->$3      //Add $2 to total
- DEC($4)->$4         //Reduce counter $4 until done
- IFZERO($4)#END    //Loop $1 time
- JUMP()#b_01111101 // = 3 backward, complementary of 10000010 = 3 foward
