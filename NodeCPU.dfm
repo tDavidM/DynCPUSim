@@ -25,15 +25,13 @@ object f_CPUNode: Tf_CPUNode
   PixelsPerInch = 96
   TextHeight = 13
   object p_Area: TPanel
-    Left = 8
-    Top = 47
-    Width = 1086
-    Height = 560
+    Left = 0
+    Top = 22
+    Width = 1102
+    Height = 589
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     Visible = False
-    ExplicitWidth = 1055
-    ExplicitHeight = 543
   end
   object p_zoom: TPanel
     Left = 1062
@@ -43,8 +41,6 @@ object f_CPUNode: Tf_CPUNode
     Anchors = [akRight, akBottom]
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 1031
-    ExplicitTop = 396
     object l_gridZoom: TLabel
       Left = 5
       Top = 6
@@ -59,8 +55,9 @@ object f_CPUNode: Tf_CPUNode
       Height = 178
       Hint = 'Shortcut: MouseWheel'
       Max = 9
+      Min = 3
       Orientation = trVertical
-      Position = 3
+      Position = 7
       TabOrder = 0
       TickMarks = tmTopLeft
       OnChange = tb_SizeChange
@@ -78,8 +75,6 @@ object f_CPUNode: Tf_CPUNode
     SimpleText = 
       #9#9#9#9#9#9#9#9'Mouse: Left=Select, Right=Move, Middle=Create, Shift+Lef' +
       't=Link(1), Ctrl+Left=Link(2)'
-    ExplicitTop = 596
-    ExplicitWidth = 1071
   end
   object HeaderControl: THeaderControl
     Left = 0
@@ -87,9 +82,8 @@ object f_CPUNode: Tf_CPUNode
     Width = 1102
     Height = 21
     Sections = <>
-    ExplicitWidth = 1071
   end
-  object Panel1: TPanel
+  object p_Speed: TPanel
     Left = 1062
     Top = 27
     Width = 40
@@ -97,10 +91,9 @@ object f_CPUNode: Tf_CPUNode
     Anchors = [akTop, akRight]
     ParentBackground = False
     TabOrder = 4
-    ExplicitLeft = 1031
     object l_Speed: TLabel
       Left = 4
-      Top = 6
+      Top = 5
       Width = 34
       Height = 13
       Caption = 'Speed:'
@@ -127,15 +120,13 @@ object f_CPUNode: Tf_CPUNode
     Height = 16
     Anchors = [akRight, akBottom]
     TabOrder = 5
-    ExplicitLeft = 857
-    ExplicitTop = 598
   end
   object b_Init: TButton
     Left = 8
     Top = 0
     Width = 59
     Height = 21
-    Caption = 'Init'
+    Caption = 'Load'
     TabOrder = 6
     OnClick = b_InitClick
   end
@@ -177,7 +168,7 @@ object f_CPUNode: Tf_CPUNode
     TabOrder = 10
   end
   object cb_ColorLine: TCheckBox
-    Left = 384
+    Left = 380
     Top = 2
     Width = 89
     Height = 17
@@ -186,7 +177,7 @@ object f_CPUNode: Tf_CPUNode
     OnClick = cb_ColorLineClick
   end
   object b_Save: TButton
-    Left = 497
+    Left = 551
     Top = 0
     Width = 59
     Height = 21
@@ -195,21 +186,24 @@ object f_CPUNode: Tf_CPUNode
     OnClick = b_SaveClick
   end
   object p_DrawCmp: TPanel
-    Left = 570
+    Left = 616
     Top = 1
     Width = 145
     Height = 18
     Caption = 'Draw: 0 - 0'
     ParentBackground = False
     TabOrder = 13
+    Visible = False
   end
   object cb_QuickEdit: TCheckBox
-    Left = 728
+    Left = 767
     Top = 2
-    Width = 73
+    Width = 68
     Height = 17
+    Anchors = [akTop, akRight]
     Caption = 'Quick Edit'
     TabOrder = 14
+    OnMouseMove = cb_QuickEditMouseMove
   end
   object b_Or: TButton
     Left = 838
@@ -287,6 +281,14 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NOT'
     TabOrder = 20
     OnClick = b_OrClick
+  end
+  object cb_Annotation: TCheckBox
+    Left = 475
+    Top = 2
+    Width = 75
+    Height = 17
+    Caption = 'Annotation'
+    TabOrder = 21
   end
   object t_Work: TTimer
     Enabled = False

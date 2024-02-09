@@ -99,7 +99,7 @@ __published:	// Composants gérés par l'EDI
 	TTimer *t_DrawMulti3;
    TStatusBar *sb_Main;
    THeaderControl *HeaderControl;
-   TPanel *Panel1;
+   TPanel *p_Speed;
    TLabel *l_Speed;
    TTrackBar *tb_Speed;
    TSaveDialog *NodeSaveDialog;
@@ -121,6 +121,7 @@ __published:	// Composants gérés par l'EDI
    TButton *b_NAnd;
    TButton *b_XOr;
    TButton *b_Not;
+   TCheckBox *cb_Annotation;
     void __fastcall b_InitClick(TObject *Sender);
     void __fastcall b_StartClick(TObject *Sender);
     void __fastcall t_WorkTimer(TObject *Sender);
@@ -145,9 +146,13 @@ __published:	// Composants gérés par l'EDI
    void __fastcall b_ResetClick(TObject *Sender);
    void __fastcall cb_ColorLineClick(TObject *Sender);
    void __fastcall tb_SpeedChange(TObject *Sender);
+   void __fastcall cb_QuickEditMouseMove(TObject *Sender, TShiftState Shift, int X,
+          int Y);
 
 private:	// Déclarations de l'utilisateur
     void __fastcall AppMessage(TMsg& PassedMsg, bool& Handled);
+
+    TBitmap* MainCanvas;
 
     TList* NodeList;
     TList* SelectList;
@@ -155,7 +160,7 @@ private:	// Déclarations de l'utilisateur
     TNode *NodeSelect;
 
     TList* AnnotationList;
-    TStringList *AnnotationSelect;
+    bool AnnotationDrawn;
 
     _di_IXMLNode InstructionSetXML;
     _di_IXMLNode AnnotationXML;
@@ -175,7 +180,8 @@ private:	// Déclarations de l'utilisateur
 
 	void ReadInput(void);
 	void WriteOutput(void);
-	void CallDrawArea(void);
+	void CallDrawArea(int pMode=0);
+   void DrawBuffer(int NbDraw);
 	void DrawArea(int NbDraw);
 	void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
    void LoadAnnotation(_di_IXMLNode pAnnotation);
