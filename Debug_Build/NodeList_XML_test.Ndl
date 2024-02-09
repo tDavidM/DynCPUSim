@@ -709,13 +709,15 @@
 		</Instruction>
 	</InstructionSet>
   <Annotation>
-		<Shape ID="0" Name="Test" Type="Rect">
+		<Shape ID="0" Name="Test1" Type="Rect">
+            <Hue R="0" G="10" B="10"/>
 			<Point X="10" Y="10"/>
 			<Point X="50" Y="50"/>
 		</Shape>
-		<Shape ID="1" Name="Test" Type="Rect">
-			<Point X="500" Y="10"/>
-			<Point X="550" Y="50"/>
+		<Shape ID="1" Name="Test2" Type="Rect">
+            <Hue R="10" G="0" B="0"/>
+			<Point X="25" Y="30"/>
+			<Point X="150" Y="250"/>
 		</Shape>
 	</Annotation>
   <Param LinkCount="14429">
