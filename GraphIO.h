@@ -12,6 +12,7 @@
 #include "NodeCPU.h"
 #include "Memory.h"
 #include "Ram.h"
+#include <Vcl.ComCtrls.hpp>
 //---------------------------------------------------------------------------
 class Tf_GraphIO : public TForm
 {
@@ -132,6 +133,7 @@ __published:	// Composants gérés par l'EDI
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall Pin39Click(TObject *Sender);
 	void __fastcall Line6Click(TObject *Sender);
+   void __fastcall Pin60Click(TObject *Sender);
 private:	// Déclarations de l'utilisateur
 	char BinToHex(bool p1, bool p2, bool p3, bool p4 );
 

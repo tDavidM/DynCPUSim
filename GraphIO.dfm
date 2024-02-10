@@ -838,7 +838,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '60 (ROM Absolute Out)'
       TabOrder = 6
-      OnClick = Pin50Click
+      OnClick = Pin60Click
     end
   end
   object p_Unused: TPanel

@@ -259,7 +259,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
   int X, Y, Type;
   int ListNodeCount, LinkCount, NodeTypeCount;
   String Name, FileType;
-  TStringList StrDelete;
+  TStringList* StrDelete;
 
   int ID, IDOutUp, IDOutDown;
   int PinInUp, PinInDown, PinOutUp, PinOutDown;
@@ -279,7 +279,6 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
         StrDelete = (TStringList*)this->AnnotationList->Items[i];
         delete StrDelete;
      }
-
 
      this->NodeList->Clear();
 
@@ -2056,15 +2055,35 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                }
             } else {
                AnnotationSelect->Strings[5] = "Draw=False";
+
+               AnnotationCanvas = new TBitmap;
+
+               UpLX   = UpLX   -this->p_Area->Left;
+               UpLY   = UpLY   -this->p_Area->Top;
+               DownRX = DownRX -this->p_Area->Left;
+               DownRY = DownRY -this->p_Area->Top;
+
+               Height=DownRY-UpLY;
+               Width=DownRX-UpLX;
+               SrcRect.init(UpLX+OffSetX, UpLY+OffSetY, DownRX+OffSetX, DownRY+OffSetY);
+               DestRect.init(0, 0, Width, Height);
+
+               AnnotationCanvas->Height = abs(Height);
+               AnnotationCanvas->Width  = abs(Width) ;
+               AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+               AnnotationCanvas->PixelFormat = pf24bit;
+               AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+
                //this->CallDrawArea(0);
-               //AnnotationSelect->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
-               //this->Canvas->Draw(this->p_Area->Left, this->p_Area->Top, AnnotationSelect);
+               AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+               this->Canvas->Draw(UpLX+this->p_Area->Left, UpLY+this->p_Area->Top, AnnotationCanvas);
+               AnnotationCanvas->Free();
             }
          }
          if (!AnnotationFound && this->AnnotationDrawn) {
             this->AnnotationDrawn = false;
-            this->Invalidate();
-            this->CallDrawArea(0);
+            //this->Invalidate();
+            //this->CallDrawArea(0);
          }
 
       }

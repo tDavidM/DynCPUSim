@@ -26,7 +26,7 @@ object f_CPUNode: Tf_CPUNode
   TextHeight = 13
   object p_Area: TPanel
     Left = 0
-    Top = 22
+    Top = 20
     Width = 1102
     Height = 589
     Anchors = [akLeft, akTop, akRight, akBottom]
