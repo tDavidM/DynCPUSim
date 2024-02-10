@@ -259,6 +259,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
   int X, Y, Type;
   int ListNodeCount, LinkCount, NodeTypeCount;
   String Name, FileType;
+  TStringList StrDelete;
 
   int ID, IDOutUp, IDOutDown;
   int PinInUp, PinInDown, PinOutUp, PinOutDown;
@@ -273,6 +274,12 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
         Node = (TNode*)this->NodeList->Items[i];
         delete Node;
      }
+     //Flush all nodes...if any
+     for (int i = 0; i<this->AnnotationList->Count; i++) {
+        StrDelete = (TStringList*)this->AnnotationList->Items[i];
+        delete StrDelete;
+     }
+
 
      this->NodeList->Clear();
 
@@ -1773,6 +1780,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
   TRect  SrcRect, DestRect;
   String PointA, PointB, DrawFlag, Hue;
   int UpLX, UpLY, DownRX, DownRY;
+  int Height, Width;
   bool AnnotationFound = false;
   TBitmap* AnnotationCanvas;
   TColor SelectPixel;
@@ -1785,7 +1793,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
   int UpdateOffSetY;
 
   //Catch cursor mouvment when "drag & drop" of the Canvas
-  if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift))
+  if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift || Shift.Contains(ssAlt)))
      && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) )
    {
    //Move view
@@ -1837,6 +1845,25 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->Canvas->LineTo(this->MouseDownX, this->MouseDownY);
       this->Canvas->Pen->Width = 1;
 
+  } else if (Shift.Contains(ssLeft) && Shift.Contains(ssAlt) && !Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
+  //Make Annotation
+      this->CallDrawArea(0);
+
+      this->Canvas->Brush->Color = clBtnFace;
+      this->Canvas->Pen->Color = clGreen;
+      this->Canvas->Pen->Width = 2;
+      this->Canvas->MoveTo(this->MouseDownX, this->MouseDownY);
+      this->Canvas->LineTo(X,this->MouseDownY);
+      this->Canvas->LineTo(X, Y);
+      this->Canvas->LineTo(this->MouseDownX, Y);
+      this->Canvas->LineTo(this->MouseDownX, this->MouseDownY);
+      this->Canvas->Pen->Width = 1;
+      this->Canvas->TextOutA(this->MouseDownX+5, this->MouseDownY+5,
+                             "X:"  + IntToStr((((this->MouseDownX-this->p_Area->Left)+this->OffSetX)+(ObjSize/2)) / GridSize) +
+                             ",Y:" + IntToStr((((this->MouseDownY-this->p_Area->Top)+this->OffSetY)+(ObjSize)) / GridSize));
+      this->Canvas->TextOutA(X-25, Y-15,
+                             "X:"  + IntToStr((((X)+this->OffSetX-this->p_Area->Left)-ObjSize) / GridSize) +
+                             ",Y:" + IntToStr((((Y)+this->OffSetY-this->p_Area->Top) -(ObjSize/2)) / GridSize));
   } else if(Shift.Contains(ssLeft) && !Shift.Contains(ssShift) && Shift.Contains(ssCtrl)
             && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize))
   {
@@ -1872,7 +1899,8 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                 Name = NodeCurr->Name;
                 Type = NodeCurr->GetType();
 
-                this->sb_Main->Panels->Items[0]->Text = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[Type] + "]";
+                this->sb_Main->Panels->Items[0]->Text = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[Type] +
+                                                        "] -> X:" + IntToStr(NodeCurr->X) + " Y:" + IntToStr(NodeCurr->Y);
                 //this->Hint = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[Type] + "]";
                 //f_CPUNode->Hint
 
@@ -1893,10 +1921,10 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
                DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
 
-               UpLX   = ( UpLX * GridSize) - OffSetX;
-               UpLY   = ( UpLY * GridSize) - OffSetY;
-               DownRX = ((DownRX + ObjSize) * GridSize) - OffSetX;
-               DownRY = ((DownRY + ObjSize) * GridSize) - OffSetY;
+               UpLX   = ((( UpLX * GridSize)            ) + OffSetX)+this->p_Area->Left;
+               UpLY   = ((( UpLY * GridSize)            ) + OffSetY)+this->p_Area->Top;
+               DownRX = (((DownRX * GridSize ) + ObjSize) + OffSetX)+this->p_Area->Left;
+               DownRY = (((DownRY * GridSize ) + ObjSize) + OffSetY)+this->p_Area->Top;
 
                if(!(   X >= UpLX
                     && X <  DownRX
@@ -1907,12 +1935,13 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 
                   AnnotationCanvas = new TBitmap;
 
-                  UpLX   = UpLX   ;
-                  UpLY   = UpLY   ;
-                  DownRX = DownRX ;
-                  DownRY = DownRY ;
+                  UpLX   = UpLX   -this->p_Area->Left;
+                  UpLY   = UpLY   -this->p_Area->Top;
+                  DownRX = DownRX -this->p_Area->Left;
+                  DownRY = DownRY -this->p_Area->Top;
 
-                  int Height=DownRY-UpLY ,Width=DownRX-UpLX;
+                  Height=DownRY-UpLY;
+                  Width=DownRX-UpLX;
                   SrcRect.init(UpLX+OffSetX, UpLY+OffSetY, DownRX+OffSetX, DownRY+OffSetY);
                   DestRect.init(0, 0, Width, Height);
 
@@ -1940,10 +1969,10 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
             DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
             DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
 
-            UpLX   = ( UpLX * GridSize) - OffSetX;
-            UpLY   = ( UpLY * GridSize) - OffSetY;
-            DownRX = ((DownRX + ObjSize) * GridSize) - OffSetX;
-            DownRY = ((DownRY + ObjSize) * GridSize) - OffSetY;
+            UpLX   = ((( UpLX * GridSize)           ) - OffSetX)+this->p_Area->Left;
+            UpLY   = ((( UpLY * GridSize)           ) - OffSetY)+this->p_Area->Top;
+            DownRX = (((DownRX * GridSize) + ObjSize) - OffSetX)+this->p_Area->Left;
+            DownRY = (((DownRY * GridSize) + ObjSize) - OffSetY)+this->p_Area->Top;
 
             if(   X >= UpLX
                && X <  DownRX
@@ -1958,13 +1987,13 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 
                   AnnotationCanvas = new TBitmap;
 
-                  UpLX   = UpLX   ;
-                  UpLY   = UpLY   ;
-                  DownRX = DownRX ;
-                  DownRY = DownRY ;
+                  UpLX   = UpLX   -this->p_Area->Left;
+                  UpLY   = UpLY   -this->p_Area->Top;
+                  DownRX = DownRX -this->p_Area->Left;
+                  DownRY = DownRY -this->p_Area->Top;
 
-
-                  int Height=DownRY-UpLY ,Width=DownRX-UpLX;
+                  Height=DownRY-UpLY;
+                  Width=DownRX-UpLX;
                   SrcRect.init(UpLX+OffSetX, UpLY+OffSetY, DownRX+OffSetX, DownRY+OffSetY);
                   DestRect.init(0, 0, Width, Height);
 
