@@ -44,7 +44,7 @@ Op-Codes (A [B [C]]):
 1000 - AND   - And($B&$C)->$D
 1001 - OR    - Or($B|$C)->$D
 1010 - XOR   - Xor($B^$C)->$D
-1011 - WJMP  - WideJump()goto#0000+BCD      (???)//Goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
+1011 - WJMP  - WideJump()goto#0000+BCD       (??)//Goto absolute 16 bits address 0000+BCD (limited range, first 4K of ROM)
 1100 - SETV  - WriteVal(@$B)<-CD            (???)//Write CD to RAM at address $B
 1101 - GRT   - Greatest($B?$C)->$D          (???)//Set $D to the greatest value betweem $B and $C
 1110 - WJMPV - WideJumpVal()goto#$B+CD      (???)//Goto absolute 16 bits address $B+CD (full 64K range)
@@ -67,20 +67,26 @@ Op-Codes (A [B [C]]):
 
 1111 1111 0000 - JMPR  - JumpReg()goto#$D     (?)//Goto relative address at $D
 1111 1111 0001 - CFLG  - CarryFlg()->$D       (?)//Output the value of the carry flag on a register
-1111 1111 0010 - RSTC  - ResetCarry()        (??)
-1111 1111 0011 - SETC  - SetCarry()          (??)
+1111 1111 0010 - Unused
+1111 1111 0011 - Unused
 1111 1111 0100 - INC   - Increment($D)        (?)//Increment $D by 1 and stores the result in $D
 1111 1111 0101 - DEC   - Decrement($D)        (?)//Decrement $D by 1 and stores the result in $D
 1111 1111 0110 - SIFZ  - SkipZero($D)        (??)//Skip the following instruction if $D == 0
 1111 1111 0111 - RND   - Random()->$D        (??)
 1111 1111 1000 - SIFNZ - SkipNotZero($D)    (???)//Skip the following instruction if $D != 0
-1111 1111 1001 - SIFNC - SkipNotCarry()     (???)//Skip the following instruction if carry flag set
-1111 1111 1010 - DSINZ - DecSkipNotZero($D) (???)//Skip the following instruction if $D == 0, otherwise decrement $D by 1 if != 0
+1111 1111 1001 - DSIZ  - DecSkipZero($D)    (???)//Decrement $D by 1 if != 0, otherwise skip the following instruction if $D == 0
+1111 1111 1010 - DSINZ - DecSkipNotZero($D) (???)//Decrement $D by 1 if != 0 and then skip the following instruction
 1111 1111 1011 - PUSH  - Push($D)           (???)//Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped )
 1111 1111 1100 - POP   - Pop($D)            (???)//Pop the value from the top of the internal stack to $D  (it is 16 bytes deep, the overflow is dropped )
 1111 1111 1101 - Unused
 1111 1111 1110 - Unused
-1111 1111 1111 - NOP   - NOP()
+
+1111 1111 1111 0000 - RSTC  - ResetCarry()   (??)
+1111 1111 1111 0001 - SETC  - SetCarry()     (??)
+1111 1111 1111 0010 - SIFNC - SkipNotCarry()(???)//Skip the following instruction if carry flag set
+1111 1111 1111 1111 - NOP   - NOP()
+
+
 
 Alias
 Copy($B)->$D accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000 (Mnemonic CPY)
@@ -91,6 +97,5 @@ Erase all registers with Set() any value to register F
 
 ToDo/Idea:
 Improve error detection in Import, (Param counter, line counter)
-Add TagNode/Hint in Simulation
 Erase all registers with Set() any value to register F
 improve carryflag on substraction 

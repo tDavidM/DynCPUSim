@@ -48168,9 +48168,9 @@
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
-    <Node ID="6975" Name="Signa_x">
+    <Node ID="6975" Name="SignalTestIfNotZeroDECskip_and_DEC">
       <Type Code="1" Name="AND"/>
-      <Position X="263" Y="133"/>
+      <Position X="296" Y="28"/>
       <Output IDUp="-1" IDDown="-1" NameUp="" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
@@ -74127,14 +74127,14 @@
     <Node ID="10708" Name="Node10708">
       <Type Code="5" Name="NOT"/>
       <Position X="272" Y="131"/>
-      <Output IDUp="10716" IDDown="-1" NameUp="Node10716" NameDown="">True</Output>
+      <Output IDUp="10716" IDDown="-1" NameUp="Node10716" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
     <Node ID="10709" Name="Node10709">
       <Type Code="5" Name="NOT"/>
       <Position X="271" Y="131"/>
-      <Output IDUp="10716" IDDown="-1" NameUp="Node10716" NameDown="">True</Output>
+      <Output IDUp="10716" IDDown="-1" NameUp="Node10716" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
@@ -74162,21 +74162,21 @@
     <Node ID="10713" Name="Node10713">
       <Type Code="5" Name="NOT"/>
       <Position X="265" Y="131"/>
-      <Output IDUp="10720" IDDown="-1" NameUp="Node10720" NameDown="">True</Output>
+      <Output IDUp="10720" IDDown="-1" NameUp="Node10720" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
     <Node ID="10714" Name="Node10714">
       <Type Code="5" Name="NOT"/>
       <Position X="267" Y="131"/>
-      <Output IDUp="10721" IDDown="-1" NameUp="Node10721" NameDown="">True</Output>
+      <Output IDUp="10721" IDDown="-1" NameUp="Node10721" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
     <Node ID="10715" Name="Node10715">
       <Type Code="5" Name="NOT"/>
       <Position X="268" Y="131"/>
-      <Output IDUp="10721" IDDown="-1" NameUp="Node10721" NameDown="">True</Output>
+      <Output IDUp="10721" IDDown="-1" NameUp="Node10721" NameDown="">False</Output>
       <PinIn NbUp="0" NbDown="0">False</PinIn>
       <PinOut NbUp="0" NbDown="0">False</PinOut>
     </Node>
