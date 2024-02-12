@@ -180,7 +180,6 @@ private:	// Déclarations de l'utilisateur
 
 	void ReadInput(void);
 	void WriteOutput(void);
-	void CallDrawArea(int pMode=0);
    void DrawBuffer(int NbDraw);
 	void DrawArea(int NbDraw);
 	void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
@@ -190,6 +189,7 @@ public:		// Déclarations de l'utilisateur
     __fastcall Tf_CPUNode(TComponent* Owner);
     void UpdateNode(void);
     void ResetAllNode(void);
+    void CallDrawArea(int pMode=0);
 	bool NodeNameExists(String pName);
 	void EmptyFollowList(void);
 };

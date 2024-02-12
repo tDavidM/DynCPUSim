@@ -1750,13 +1750,13 @@ void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
 
   this->ItsUpdated = false;
 
-  this->DrawTimerSpeed = 150;
+  this->DrawTimerSpeed = 100;
   this->OffSetX = -22;
   this->OffSetY = -22;
   this->ObjSize = 4;
   this->GridSize = 5;
   this->tb_Size->Position = 7;
-  this->tb_Speed->Position = 15;
+  this->tb_Speed->Position = 16;
   this->FlagNewNode = false;
   this->AnnotationDrawn = false;
 
@@ -2138,34 +2138,34 @@ void __fastcall Tf_CPUNode::cb_ColorLineClick(TObject *Sender)
 void __fastcall Tf_CPUNode::tb_SpeedChange(TObject *Sender)
 {
   switch (tb_Speed->Position) {
-    case 1:  { this->DrawTimerSpeed = 1;     break;}
-    case 2:  { this->DrawTimerSpeed = 2;     break;}
-    case 3:  { this->DrawTimerSpeed = 3;     break;}
-    case 4:  { this->DrawTimerSpeed = 5;     break;}
-    case 5:  { this->DrawTimerSpeed = 7;     break;}
-    case 6:  { this->DrawTimerSpeed = 10;    break;}
-    case 7:  { this->DrawTimerSpeed = 15;    break;}
-    case 8:  { this->DrawTimerSpeed = 20;    break;}
-    case 9:  { this->DrawTimerSpeed = 25;    break;}
-    case 10: { this->DrawTimerSpeed = 30;    break;}
-    case 11: { this->DrawTimerSpeed = 40;    break;}
-    case 12: { this->DrawTimerSpeed = 50;    break;}
-    case 13: { this->DrawTimerSpeed = 75;    break;}
-    case 14: { this->DrawTimerSpeed = 100;   break;}
-    case 15: { this->DrawTimerSpeed = 150;   break;} //Default
-    case 16: { this->DrawTimerSpeed = 200;   break;}
-    case 17: { this->DrawTimerSpeed = 300;   break;}
-    case 18: { this->DrawTimerSpeed = 500;   break;}
-    case 19: { this->DrawTimerSpeed = 700;   break;}
-    case 20: { this->DrawTimerSpeed = 1000;  break;}
-    case 21: { this->DrawTimerSpeed = 1500;  break;}
-    case 22: { this->DrawTimerSpeed = 2000;  break;}
-    case 23: { this->DrawTimerSpeed = 2500;  break;}
-    case 24: { this->DrawTimerSpeed = 3000;  break;}
-    case 25: { this->DrawTimerSpeed = 4000;  break;}
-    case 26: { this->DrawTimerSpeed = 5000;  break;}
-    case 27: { this->DrawTimerSpeed = 7500;  break;}
-    case 28: { this->DrawTimerSpeed = 10000; break;}
+    case 1:  { this->DrawTimerSpeed = 1;    break;}
+    case 2:  { this->DrawTimerSpeed = 2;    break;}
+    case 3:  { this->DrawTimerSpeed = 3;    break;}
+    case 4:  { this->DrawTimerSpeed = 5;    break;}
+    case 5:  { this->DrawTimerSpeed = 6;    break;}
+    case 6:  { this->DrawTimerSpeed = 8;    break;}
+    case 7:  { this->DrawTimerSpeed = 10;   break;}
+    case 8:  { this->DrawTimerSpeed = 15;   break;}
+    case 9:  { this->DrawTimerSpeed = 20;   break;}
+    case 10: { this->DrawTimerSpeed = 25;   break;}
+    case 11: { this->DrawTimerSpeed = 30;   break;}
+    case 12: { this->DrawTimerSpeed = 40;   break;}
+    case 13: { this->DrawTimerSpeed = 50;   break;}
+    case 14: { this->DrawTimerSpeed = 60;   break;}
+    case 15: { this->DrawTimerSpeed = 80;   break;}
+    case 16: { this->DrawTimerSpeed = 100;  break;} //Default
+    case 17: { this->DrawTimerSpeed = 150;  break;}
+    case 18: { this->DrawTimerSpeed = 200;  break;}
+    case 19: { this->DrawTimerSpeed = 250;  break;}
+    case 20: { this->DrawTimerSpeed = 300;  break;}
+    case 21: { this->DrawTimerSpeed = 400;  break;}
+    case 22: { this->DrawTimerSpeed = 500;  break;}
+    case 23: { this->DrawTimerSpeed = 600;  break;}
+    case 24: { this->DrawTimerSpeed = 800;  break;}
+    case 25: { this->DrawTimerSpeed = 1000; break;}
+    case 26: { this->DrawTimerSpeed = 1500; break;}
+    case 27: { this->DrawTimerSpeed = 2000; break;}
+    case 28: { this->DrawTimerSpeed = 3000; break;}
   }
 
   this->t_Work->Interval = this->DrawTimerSpeed;

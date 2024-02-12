@@ -289,6 +289,7 @@ void Tf_Memory::CreateLine(void)
   this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
   this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
   this->cds_MemDataType->AsInteger = BaseId;
+  this->cds_MemBreakPoint->AsBoolean = false;
 
   InstrucText = Instruc->Name + Instruc->HeadSuffix;
   if (Instruc->NbParam > 0) {
@@ -604,6 +605,7 @@ void __fastcall Tf_Memory::rb_HexClick(TObject *Sender)
 
 void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
 {
+  char Instruction[17];
   int Delta = this->cds_Mem->RecNo - this->LastSelLine;
 
   if (Delta < 128 && Delta > -128) {
@@ -618,6 +620,27 @@ void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
     this->l_AddrVal->Caption = "0x____";
   }
   this->LastSelLine = this->cds_Mem->RecNo;
+
+  strncpy(Instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
+  Instruction[16] = '\0';
+
+  f_GraphIO->Pin1->Checked  = Instruction[0]  != '0';
+  f_GraphIO->Pin2->Checked  = Instruction[1]  != '0';
+  f_GraphIO->Pin3->Checked  = Instruction[2]  != '0';
+  f_GraphIO->Pin4->Checked  = Instruction[3]  != '0';
+  f_GraphIO->Pin5->Checked  = Instruction[4]  != '0';
+  f_GraphIO->Pin6->Checked  = Instruction[5]  != '0';
+  f_GraphIO->Pin7->Checked  = Instruction[6]  != '0';
+  f_GraphIO->Pin8->Checked  = Instruction[7]  != '0';
+  f_GraphIO->Pin9->Checked  = Instruction[8]  != '0';
+  f_GraphIO->Pin10->Checked = Instruction[9]  != '0';
+  f_GraphIO->Pin11->Checked = Instruction[10] != '0';
+  f_GraphIO->Pin12->Checked = Instruction[11] != '0';
+  f_GraphIO->Pin13->Checked = Instruction[12] != '0';
+  f_GraphIO->Pin14->Checked = Instruction[13] != '0';
+  f_GraphIO->Pin15->Checked = Instruction[14] != '0';
+  f_GraphIO->Pin16->Checked = Instruction[15] != '0';
+
 }
 //---------------------------------------------------------------------------
 int Tf_Memory::DeltaToAddr(int Delta)
@@ -650,10 +673,47 @@ void Tf_Memory::MoveAddrByDelta(int Delta)
        while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target)
            this->cds_Mem->Next();
    }
+
+   TByteDynArray Location = cds_Mem->GetBookmark();
+   if (cds_Mem->BookmarkValid(Location))
+      cds_Mem->GotoBookmark(Location);
+   cds_Mem->FreeBookmark(Location);
+
    this->cds_Mem->EnableControls();
+
+   if (this->cds_MemBreakPoint->AsBoolean) {
+     f_GraphIO->Pin29->Checked = true;
+     if (!f_CPUNode->cb_ActiveDraw->Checked) {
+        f_CPUNode->CallDrawArea(1);
+     }
+   }
 }
 //---------------------------------------------------------------------------
+void Tf_Memory::MoveAddrByAbsolute(int Addr)
+{
+   this->cds_Mem->DisableControls();
+   this->cds_Mem->First();
 
+   if (this->cds_Mem->RecordCount > 1 ) {
+       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr)
+           this->cds_Mem->Next();
+   }
+
+   TByteDynArray Location = cds_Mem->GetBookmark();
+   if (cds_Mem->BookmarkValid(Location))
+      cds_Mem->GotoBookmark(Location);
+   cds_Mem->FreeBookmark(Location);
+
+   this->cds_Mem->EnableControls();
+
+   if (this->cds_MemBreakPoint->AsBoolean) {
+     f_GraphIO->Pin29->Checked = true;
+     if (!f_CPUNode->cb_ActiveDraw->Checked) {
+        f_CPUNode->CallDrawArea(1);
+     }
+   }
+}
+//---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_SaveClick(TObject *Sender)
 {
   if (this->sd_Mem->Execute()) {
@@ -850,6 +910,13 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
       Instruc = (TInstruc*)this->InstrucList->Items[i];
       this->cb_OpCode->Items->Add(Instruc->Descr);
    }
+
+   this->b_Import->Enabled     = true;
+   this->b_Load->Enabled       = true;
+   this->b_Add->Enabled        = true;
+   this->b_Insert->Enabled     = true;
+   this->b_Edit->Enabled       = true;
+   this->b_BreakPoint->Enabled = true;
 
    this->rb_Hex->Checked = true;
    this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP ()");
@@ -1388,6 +1455,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
             //this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
             //this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
             //this->cds_MemDataType->AsInteger = BaseId;
+            this->cds_MemBreakPoint->AsBoolean = false;
             this->cds_MemHumData->AsString   = InstrucText;
             this->cds_MemCode->AsString      = InstrucCode;
             this->cds_MemCodeHex->AsString   = BinToHex(InstrucCode.SubString(1,4)) + BinToHex(InstrucCode.SubString(5,4)) +
@@ -1526,3 +1594,37 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
    return DataOut;
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_Memory::cb_StepByStepClick(TObject *Sender)
+{
+   b_Next->Enabled = cb_StepByStep->Checked;
+   if (f_GraphIO->Pin39->Checked == true)
+      b_Next->Click();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Memory::b_NextClick(TObject *Sender)
+{
+   f_GraphIO->Pin39->Checked = false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Memory::dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect,
+          TField *Field, TGridDrawState State)
+{
+   if (Field->Name == "cds_MemAddress" || Field->Name == "cds_MemAddrHex" ) {
+      if (this->cds_MemBreakPoint->AsBoolean) {
+         //dbg_Mem->Canvas->Font->Style = dbg_Mem->Canvas->Font->Style << fsBold;
+         dbg_Mem->Canvas->Brush->Color = clRed;
+      }
+   }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Memory::b_BreakPointClick(TObject *Sender)
+{
+   this->cds_Mem->Edit();
+   this->cds_MemBreakPoint->AsBoolean = !this->cds_MemBreakPoint->AsBoolean;
+   this->cds_Mem->Post();
+}
+//---------------------------------------------------------------------------
+

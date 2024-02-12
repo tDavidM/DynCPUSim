@@ -2,11 +2,11 @@ object f_Memory: Tf_Memory
   Left = 0
   Top = 0
   Caption = 'Program Memory'
-  ClientHeight = 499
+  ClientHeight = 461
   ClientWidth = 685
   Color = clBtnFace
   Constraints.MaxWidth = 701
-  Constraints.MinHeight = 169
+  Constraints.MinHeight = 250
   Constraints.MinWidth = 701
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,53 +19,58 @@ object f_Memory: Tf_Memory
   OnCreate = FormCreate
   DesignSize = (
     685
-    499)
+    461)
   PixelsPerInch = 96
   TextHeight = 13
   object l_Data: TLabel
     Left = 205
-    Top = 425
+    Top = 387
     Width = 27
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Data:'
+    ExplicitTop = 425
   end
   object l_AddrTx: TLabel
     Left = 8
-    Top = 475
+    Top = 437
     Width = 71
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Address Delta:'
+    ExplicitTop = 475
   end
   object l_AddrVal: TLabel
     Left = 85
-    Top = 475
+    Top = 437
     Width = 36
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = '0x0000'
+    ExplicitTop = 475
   end
   object l_Sort: TLabel
     Left = 136
-    Top = 475
+    Top = 437
     Width = 24
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Sort:'
     Visible = False
+    ExplicitTop = 475
   end
   object l_Width: TLabel
     Left = 336
-    Top = 425
+    Top = 387
     Width = 76
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'MaxData: 8 bits'
+    ExplicitTop = 425
   end
   object cb_OpCode: TComboBox
     Left = 8
-    Top = 422
+    Top = 384
     Width = 185
     Height = 21
     Anchors = [akLeft, akBottom]
@@ -78,7 +83,7 @@ object f_Memory: Tf_Memory
   end
   object cb_D: TComboBox
     Left = 607
-    Top = 422
+    Top = 384
     Width = 70
     Height = 21
     Style = csDropDownList
@@ -107,7 +112,7 @@ object f_Memory: Tf_Memory
   end
   object cb_C: TComboBox
     Left = 519
-    Top = 422
+    Top = 384
     Width = 70
     Height = 21
     Style = csDropDownList
@@ -137,7 +142,7 @@ object f_Memory: Tf_Memory
   end
   object cb_B: TComboBox
     Left = 431
-    Top = 422
+    Top = 384
     Width = 70
     Height = 21
     Style = csDropDownList
@@ -167,7 +172,7 @@ object f_Memory: Tf_Memory
   end
   object e_Data: TEdit
     Left = 237
-    Top = 422
+    Top = 384
     Width = 94
     Height = 21
     Anchors = [akLeft, akBottom]
@@ -178,7 +183,7 @@ object f_Memory: Tf_Memory
   end
   object rb_Bin: TRadioButton
     Left = 237
-    Top = 444
+    Top = 406
     Width = 93
     Height = 17
     Anchors = [akLeft, akBottom]
@@ -188,7 +193,7 @@ object f_Memory: Tf_Memory
   end
   object rb_Dec: TRadioButton
     Left = 237
-    Top = 461
+    Top = 423
     Width = 93
     Height = 17
     Anchors = [akLeft, akBottom]
@@ -198,7 +203,7 @@ object f_Memory: Tf_Memory
   end
   object rb_Hex: TRadioButton
     Left = 237
-    Top = 478
+    Top = 440
     Width = 93
     Height = 17
     Anchors = [akLeft, akBottom]
@@ -210,7 +215,7 @@ object f_Memory: Tf_Memory
   end
   object b_Delete: TButton
     Left = 617
-    Top = 466
+    Top = 428
     Width = 60
     Height = 25
     Anchors = [akRight, akBottom]
@@ -219,22 +224,24 @@ object f_Memory: Tf_Memory
     OnClick = b_DeleteClick
   end
   object b_Edit: TButton
-    Left = 529
-    Top = 466
+    Left = 468
+    Top = 428
     Width = 60
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Edit'
+    Enabled = False
     TabOrder = 9
     OnClick = b_EditClick
   end
   object b_Add: TButton
-    Left = 352
-    Top = 466
+    Left = 336
+    Top = 428
     Width = 60
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Add'
+    Enabled = False
     TabOrder = 10
     OnClick = b_AddClick
   end
@@ -242,7 +249,7 @@ object f_Memory: Tf_Memory
     Left = 8
     Top = 32
     Width = 669
-    Height = 384
+    Height = 346
     Anchors = [akLeft, akTop, akRight, akBottom]
     DataSource = ds_Mem
     Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
@@ -252,13 +259,14 @@ object f_Memory: Tf_Memory
     TitleFont.Height = -11
     TitleFont.Name = 'Tahoma'
     TitleFont.Style = []
+    OnDrawDataCell = dbg_MemDrawDataCell
     OnDblClick = dbg_MemDblClick
   end
   object e_Sort: TEdit
     Left = 161
-    Top = 472
+    Top = 434
     Width = 65
-    Height = 19
+    Height = 21
     Anchors = [akLeft, akBottom]
     Enabled = False
     TabOrder = 12
@@ -266,12 +274,13 @@ object f_Memory: Tf_Memory
     Visible = False
   end
   object b_Insert: TButton
-    Left = 441
-    Top = 466
+    Left = 402
+    Top = 428
     Width = 60
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Insert ^'
+    Enabled = False
     TabOrder = 13
     OnClick = b_InsertClick
   end
@@ -290,6 +299,7 @@ object f_Memory: Tf_Memory
     Width = 75
     Height = 18
     Caption = 'Load'
+    Enabled = False
     TabOrder = 15
     OnClick = b_LoadClick
   end
@@ -299,12 +309,13 @@ object f_Memory: Tf_Memory
     Width = 75
     Height = 18
     Caption = 'Import'
+    Enabled = False
     TabOrder = 16
     OnClick = b_ImportClick
   end
   object e_Comment: TEdit
     Left = 8
-    Top = 449
+    Top = 411
     Width = 185
     Height = 21
     Anchors = [akLeft, akBottom]
@@ -318,6 +329,36 @@ object f_Memory: Tf_Memory
     Caption = 'Clear'
     TabOrder = 18
     OnClick = b_ClearClick
+  end
+  object cb_StepByStep: TCheckBox
+    Left = 265
+    Top = 8
+    Width = 82
+    Height = 17
+    Caption = 'StepByStep'
+    TabOrder = 19
+    OnClick = cb_StepByStepClick
+  end
+  object b_Next: TButton
+    Left = 349
+    Top = 8
+    Width = 75
+    Height = 18
+    Caption = 'Next'
+    Enabled = False
+    TabOrder = 20
+    OnClick = b_NextClick
+  end
+  object b_BreakPoint: TButton
+    Left = 542
+    Top = 428
+    Width = 60
+    Height = 25
+    Anchors = [akRight, akBottom]
+    Caption = 'Breakpoint'
+    Enabled = False
+    TabOrder = 21
+    OnClick = b_BreakPointClick
   end
   object cds_Mem: TClientDataSet
     Aggregates = <>
@@ -399,6 +440,9 @@ object f_Memory: Tf_Memory
     object cds_MemSort: TIntegerField
       FieldName = 'Sort'
       Visible = False
+    end
+    object cds_MemBreakPoint: TBooleanField
+      FieldName = 'BreakPoint'
     end
   end
   object ds_Mem: TDataSource

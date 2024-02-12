@@ -114,7 +114,7 @@ void __fastcall Tf_GraphIO::Pin50Click(TObject *Sender)
 
       Delta = StrToInt("0x" + c2 + c1);
 
-	  f_Memory->MoveAddrByDelta(Delta);
+      f_Memory->MoveAddrByDelta(Delta);
 
       strncpy(Instruction, AnsiString(f_Memory->cds_MemCode->AsString).c_str(),17);
       Instruction[16] = '\0';
@@ -135,6 +135,60 @@ void __fastcall Tf_GraphIO::Pin50Click(TObject *Sender)
       this->Pin14->Checked = Instruction[13] != '0';
       this->Pin15->Checked = Instruction[14] != '0';
       this->Pin16->Checked = Instruction[15] != '0';
+  }
+
+  if (f_Memory->cb_StepByStep->Checked) {
+     Pin29->Checked = true;
+     if (!f_CPUNode->cb_ActiveDraw->Checked) {
+        f_CPUNode->CallDrawArea(1);
+     }
+  }
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphIO::Pin60Click(TObject *Sender)
+{
+  char Instruction[17];
+  int  Addr;
+
+  //CPU clock rising edge
+  if (this->Pin60->Checked) {
+      //71-78
+      String c1 = BinToHex(Pin71->Checked, Pin72->Checked, Pin73->Checked, Pin74->Checked);
+      String c2 = BinToHex(Pin75->Checked, Pin76->Checked, Pin77->Checked, Pin78->Checked);
+      //51-58
+      String c3 = BinToHex(Pin51->Checked, Pin52->Checked, Pin53->Checked, Pin54->Checked);
+      String c4 = BinToHex(Pin55->Checked, Pin56->Checked, Pin57->Checked, Pin58->Checked);
+
+      Addr = StrToInt("0x" + c2 + c1 + c4 + c3);
+
+      f_Memory->MoveAddrByAbsolute(Addr);
+
+      strncpy(Instruction, AnsiString(f_Memory->cds_MemCode->AsString).c_str(),17);
+      Instruction[16] = '\0';
+
+      this->Pin1->Checked  = Instruction[0]  != '0';
+      this->Pin2->Checked  = Instruction[1]  != '0';
+      this->Pin3->Checked  = Instruction[2]  != '0';
+      this->Pin4->Checked  = Instruction[3]  != '0';
+      this->Pin5->Checked  = Instruction[4]  != '0';
+      this->Pin6->Checked  = Instruction[5]  != '0';
+      this->Pin7->Checked  = Instruction[6]  != '0';
+      this->Pin8->Checked  = Instruction[7]  != '0';
+      this->Pin9->Checked  = Instruction[8]  != '0';
+      this->Pin10->Checked = Instruction[9]  != '0';
+      this->Pin11->Checked = Instruction[10] != '0';
+      this->Pin12->Checked = Instruction[11] != '0';
+      this->Pin13->Checked = Instruction[12] != '0';
+      this->Pin14->Checked = Instruction[13] != '0';
+      this->Pin15->Checked = Instruction[14] != '0';
+      this->Pin16->Checked = Instruction[15] != '0';
+  }
+
+  if (f_Memory->cb_StepByStep->Checked) {
+     Pin29->Checked = true;
+     if (!f_CPUNode->cb_ActiveDraw->Checked) {
+        f_CPUNode->CallDrawArea(1);
+     }
   }
 }
 //---------------------------------------------------------------------------
@@ -278,7 +332,5 @@ void __fastcall Tf_GraphIO::Line6Click(TObject *Sender)
   l_Line6->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
-
-
 
 

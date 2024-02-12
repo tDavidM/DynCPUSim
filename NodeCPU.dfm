@@ -107,7 +107,7 @@ object f_CPUNode: Tf_CPUNode
       Max = 28
       Min = 1
       Orientation = trVertical
-      Position = 15
+      Position = 16
       TabOrder = 0
       TickMarks = tmTopLeft
       OnChange = tb_SpeedChange

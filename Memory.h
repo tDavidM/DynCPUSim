@@ -18,7 +18,9 @@
 #include <Xml.XMLIntf.hpp>
 
 //---------------------------------------------------------------------------
+#include "GraphIO.h"
 
+//---------------------------------------------------------------------------
 class TInstruc
 {
 public:
@@ -83,6 +85,10 @@ __published:	// Composants gérés par l'EDI
    TStringField *cds_MemComment;
    TButton *b_Clear;
    TOpenDialog *od_Assembler;
+   TCheckBox *cb_StepByStep;
+   TButton *b_Next;
+   TButton *b_BreakPoint;
+   TBooleanField *cds_MemBreakPoint;
     void __fastcall cb_OpCodeChange(TObject *Sender);
     void __fastcall b_AddClick(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
@@ -103,6 +109,11 @@ __published:	// Composants gérés par l'EDI
    void __fastcall dbg_MemDblClick(TObject *Sender);
    void __fastcall b_ClearClick(TObject *Sender);
    void __fastcall b_ImportClick(TObject *Sender);
+   void __fastcall cb_StepByStepClick(TObject *Sender);
+   void __fastcall b_NextClick(TObject *Sender);
+   void __fastcall dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect, TField *Field,
+          TGridDrawState State);
+   void __fastcall b_BreakPointClick(TObject *Sender);
 private:	// Déclarations de l'utilisateur
     int LastDataType;
     int LastSelLine;
@@ -125,6 +136,7 @@ private:	// Déclarations de l'utilisateur
 public:		// Déclarations de l'utilisateur
     __fastcall Tf_Memory(TComponent* Owner);
     void MoveAddrByDelta(int Delta);
+    void MoveAddrByAbsolute(int Addr);
     void LoadInstructionSet(_di_IXMLNode pInstructionSet);
 };
 //---------------------------------------------------------------------------
