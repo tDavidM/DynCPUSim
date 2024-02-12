@@ -84,18 +84,21 @@ Op-Codes (A [B [C]]):
 1111 1111 1111 0000 - RSTC  - ResetCarry()   (??)
 1111 1111 1111 0001 - SETC  - SetCarry()     (??)
 1111 1111 1111 0010 - SIFNC - SkipNotCarry()(???)//Skip the following instruction if carry flag set
+1111 1111 1111 0011 - RSTAR - ResetAllReg()   (?)//
+1111 1111 1111 0100 - FLUSH - FlushStack()    (?)//
+1111 1111 1111 0101 - Unused                     // (0101 to 1101)
+1111 1111 1111 1110 - HALT  - HALT()          (?)//
 1111 1111 1111 1111 - NOP   - NOP()
-
 
 
 Alias
 Copy($B)->$D accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000 (Mnemonic CPY)
 Erase()->$D accomplished with AND($B,$C)->$D where $B and $C are the fixed value register 0x00000000 and 0x11111111 (Mnemonic RST)
-Trigger a debug halt with Set() any value to register E (Mnemonic HALT)
-Erase all registers with Set() any value to register F
 
 
 ToDo/Idea:
 Improve error detection in Import, (Param counter, line counter)
-Erase all registers with Set() any value to register F
-improve carryflag on substraction 
+SkipIfCarry ?
+RngSeed from reg $D or RngSeed from line D
+Improve carryflag on substraction 
+Multiplication co-processor ?

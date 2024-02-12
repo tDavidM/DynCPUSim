@@ -76,42 +76,46 @@
                         WJMP  #:*HALT_ON_ERR:         ;If Error
                         SIF   $E,     0x01            ;Test SkipIf (no skip)
                         SIF   $F,     0x80            ;Test SkipIf (skip)
-                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        WJMP  #:*HALT_ON_ERR:         ;If Error                      
                         SIF   $F,     0x00            ;Test SkipIf (no skip)
-                        SIF   $F,     0x01            ;Test SkipIf (no skip)
-                        SIF   $F,     0xFF            ;Test SkipIf (skip)
+                        SIF   $E,     0xFF            ;Test SkipIf (skip)
 :TEST_WIDEJMP1          WJMP  #:*TEST_WIDEJMP2:       ;Should make a small jump backward
 ;Test 8, NOT, OR, XOR and IfZeroReg
                         SET   "0x09", $3              ;Keep track of where it halts, if it does
                         NOT   $E,     $0              ;Test seting $0 to !0xFF
                         NOT   $C,     $1              ;Test seting $1 to !0x00
-                        AND   $E,     $1,     $2      ;Test AND with 0xFF & 0xFF
-                        SIF   $2,     0xFF            ;Test SkipIf
+                        AND   $0,     $C,     $2      ;Test AND with 0x00 & 0x00
+                        SEQ   $0,     $2              ;Both should be 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
-                        OR    $2,     $E,     $0      ;Test OR with 0xFF | 0xFF
-                        OR    $2,     $C,     $1      ;Test OR with 0xFF | 0x00
+                        SIF   $1,     0xFF            ;Should be 0xFF
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        OR    $1,     $E,     $0      ;Test OR with 0xFF | 0xFF
+                        OR    $0,     $C,     $1      ;Test OR with 0xFF | 0x00
                         SEQ   $0,     $1              ;
                         WJMP  #:*HALT_ON_ERR:         ;If Error
                         OR    $C,     $C,     $0      ;Test OR with 0x00 | 0x00
-                        OR    $C,     $2,     $1      ;Test OR with 0x00 | 0xFF
-                        SIF   $0,     0xFF            ;$0 should be == to 0x00
+                        OR    $C,     $E,     $1      ;Test OR with 0x00 | 0xFF
+                        SIF   $1,     0xFF            ;$1 should be == to 0xFF
                         WJMP  #:*HALT_ON_ERR:         ;If Error
                         SET   "0x0A", $3              ;Keep track of where it halts, if it does
-                        SIF   $1,     0x00            ;$1 should be == to 0xFF
+                        SIF   $0,     0x00            ;$0 should be == to 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
                         XOR   $0,     $1,     $2      ;Test XOR with 0x00 ^ 0xFF
                         XOR   $1,     $2,     $0      ;Test XOR with 0xFF ^ 0xFF
                         XOR   $2,     $0,     $1      ;Test XOR with 0xFF ^ 0x00
                         XOR   $0,     $C,     $2      ;Test XOR with 0x00 ^ 0x00
-                        SET   :TEST_NO_9:,    $1      ;Set $1 for testing IfZeroReg
-                        IFZR  $2,     $1              ;Test IfZeroReg, after those 4 XOR, $2 should be 0x00
+                        SEQ   $0,     $2              ;After those 4 XOR, $0 and $2 should be 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
 ;Test 9, SkipIfNotZero and JumpReg (with more IfZeroReg)
                         SET   "0x0B", $3              ;Keep track of where it halts, if it does
-:TEST_NO_9              SIFNZ $1                      ;Test SkipIfNotZero with $1 that is != 0x00
+                        SET   0x82,   $2              ;Set $2 for testing IfZeroReg, relative addr from where it's going to be used
+                        IFZR  $0,     $2              ;Test IfZeroReg, $0 should be 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
-                        SET   :TEST_NO_9B:,   $2      ;Set $2 for testing IfZeroReg
-                        SET   :TEST_NO_9C:,   $0      ;Set $0 for testing SkipIfNotZero                  
+                        WJMP  #:*HALT_ON_ERR:         ;
+                        SIFNZ $1                      ;Test SkipIfNotZero with $1 that is != 0x00
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SET   0x7F,   $2              ;Set $2 for testing IfZeroReg, relative addr from where it's going to be used
+                        SET   0x81,   $0              ;Set $0 for testing JumpReg, relative addr from where it's going to be used                
                         SIFNZ $C                      ;Test SkipIfNotZero with $C that is == 0x00
                         JMPR  $0                      ;Test JumpReg
 :TEST_NO_9B             WJMP  #:*HALT_ON_ERR:         ;If Error
@@ -174,12 +178,11 @@
                         CFLG  $1                      ;Save Carry Flag to $1
                         SIFZ  $1                      ;Check that $1 is == 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
-                        ADD   $D,     $0,     $0      ;Test Add with 0x00 + 0x00
+                        ADD   $C,     $0,     $0      ;Test Add with 0x00 + 0x00
                         SIFZ  $0                      ;Check that $0 is == 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
 ;Test 13, Substract, Increment, Decrement and DecSkipNotZero
                         SET   "0x12", $3              ;Keep track of where it halts, if it does
-                        SET   "0x08", $3              ;Keep track of where it halts, if it does
                         SUB   $F,     $D,     $0      ;Test SUB with 0x80 - 0x01
                         SET   0x0F,   $1
                         SUB   $0,     $1,     $0      ;Test SUB with 0x7F - 0x0F
@@ -208,11 +211,18 @@
                         JMPA  #:TEST_NO_13_LOOP_DEC:  ;Loop to DEC $0
                         SET   0x10,   $0
                         SET   "0x15", $3              ;Keep track of where it halts, if it does
-:TEST_NO_13_LOOP_DSINZ  DSINZ $0                      ;Test DecSkipNotZero :-) my favorite instruction
+:TEST_NO_13_LOOP_DSIZ   DSIZ  $0                      ;Test DecSkipZero :-) my favorite instruction
+                        JMPA  #:TEST_NO_13_LOOP_DSIZ: ;Loop to DEC $0
+                        SIFZ  $0                      ;$0 Should be zero by now
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SET   0x10,   $0
+:TEST_NO_13_LOOP_DSINZ  DSINZ $0                      ;Test DecSkipNotZero
                         JMPA  #:TEST_NO_14:           ;quit Loop when $0 == 0x00
-                        JMPA  #:TEST_NO_13_LOOP_DSINZ:;Loop to DEC $0
+                        JMPA  #:TEST_NO_13_LOOP_DSINZ:;Loop to DEC $0    
 ;Test 14, Basic Left and Right Shift
-:TEST_NO_14             CPY   $D,     $0              ;CPY is an alias for OR with 0x00
+:TEST_NO_14             SIFZ  $0                      ;$0 Should be zero by now
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        CPY   $D,     $0              ;CPY is an alias for OR with 0x00
                         SET   "0x16", $3              ;Keep track of where it halts, if it does
                         LSHT  $0,     $0              ;Test LeftShift with 0x01
                         SIF   $0,     0x02            ;Check that $0 is == 0x02
