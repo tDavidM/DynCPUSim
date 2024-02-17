@@ -389,7 +389,7 @@
 :TEST_NO_21             RND   $0                      ;Get a random number in $0
                         SETR  @$1,    $0              ;Write that number to RAM @ $1
                         INC   $1
-                        SIF   $0,     0x1F            ;Stop the loop after 16 iteration
+                        SIF   $1,     0x1F            ;Stop the loop after 16 iteration
                         JMPA  #:TEST_NO_21:           ;Go get an other random number
 ;Test 22, Push and Pop
                         SET   "0x25", $3              ;Keep track of where it halts, if it does
