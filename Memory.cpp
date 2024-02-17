@@ -1441,20 +1441,20 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
               InstrucCode = InstrucCode + DataToBin(LineParam[CurrParam], Instruc->DataWidth, LabelList, LineCount);
               CurrParam++;
             } else if (Instruc->BlockDSource != "") {
-              InstrucCode = InstrucCode + HexToBin(LineParam[CurrParam].SubString(2, LineParam[CurrParam].Length()));  
+              InstrucCode = InstrucCode + HexToBin(LineParam[CurrParam].SubString(2, LineParam[CurrParam].Length()));
               CurrParam++;         
             }
              
             //Save to DataSet
             this->cds_Mem->Append();
-            //this->cds_MemOpCode->AsInteger   = this->cb_OpCode->ItemIndex;
+            this->cds_MemOpCode->AsInteger   = this->cb_OpCode->Items->IndexOf(Instruc->Descr);
             this->cds_MemMnemonic->AsString  = LineOpCode;
             //this->cds_MemData->AsString      = ;
             this->cds_MemComment->AsString   = LineComment;
             //this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
             //this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
             //this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
-            //this->cds_MemDataType->AsInteger = BaseId;
+            //this->cds_MemDataType->AsInteger = 0:0b 1: 2:0x   //LineParam[CurrParam].SubString(1,2) == "0X"
             this->cds_MemBreakPoint->AsBoolean = false;
             this->cds_MemHumData->AsString   = InstrucText;
             this->cds_MemCode->AsString      = InstrucCode;
