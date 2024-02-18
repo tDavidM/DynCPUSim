@@ -401,6 +401,8 @@ void __fastcall Tf_Memory::FormCreate(TObject *Sender)
   this->LastSelLine = 0;
   //this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP( )"); //30;
   //this->b_Add->Click();
+
+  this->ExecCmp = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::FormCloseQuery(TObject *Sender, bool &CanClose)
@@ -680,6 +682,8 @@ void Tf_Memory::MoveAddrByDelta(int Delta)
    cds_Mem->FreeBookmark(Location);
 
    this->cds_Mem->EnableControls();
+   this->ExecCmp++;
+   f_GraphIO->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(this->ExecCmp);
 
    if (this->cds_MemBreakPoint->AsBoolean) {
      f_GraphIO->Pin29->Checked = true;
@@ -705,9 +709,12 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
    cds_Mem->FreeBookmark(Location);
 
    this->cds_Mem->EnableControls();
+   this->ExecCmp++;
+   f_GraphIO->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(this->ExecCmp);
 
    if (this->cds_MemBreakPoint->AsBoolean) {
      f_GraphIO->Pin29->Checked = true;
+     b_Next->Enabled = true;
      if (!f_CPUNode->cb_ActiveDraw->Checked) {
         f_CPUNode->CallDrawArea(1);
      }
@@ -757,6 +764,8 @@ void __fastcall Tf_Memory::b_LoadClick(TObject *Sender)
 	   this->cds_Mem->LogChanges = false;
 	   this->cds_Mem->LoadFromFile(this->od_Mem->FileName);
 	   this->cds_Mem->LogChanges = false;
+
+      this->ExecCmp = 0;
     }
   }
   //this->cds_Mem->IndexFieldNames = "Sort";
@@ -926,6 +935,8 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
 
 void __fastcall Tf_Memory::b_ClearClick(TObject *Sender)
 {
+   this->ExecCmp = 0;
+
    this->b_Add->Enabled    = true;
    this->b_Insert->Enabled = true;
    this->b_Edit->Enabled   = true;
@@ -1605,6 +1616,8 @@ void __fastcall Tf_Memory::cb_StepByStepClick(TObject *Sender)
 void __fastcall Tf_Memory::b_NextClick(TObject *Sender)
 {
    f_GraphIO->Pin39->Checked = false;
+   if (!cb_StepByStep->Checked)
+      b_Next->Enabled = false;
 }
 //---------------------------------------------------------------------------
 
@@ -1625,6 +1638,12 @@ void __fastcall Tf_Memory::b_BreakPointClick(TObject *Sender)
    this->cds_Mem->Edit();
    this->cds_MemBreakPoint->AsBoolean = !this->cds_MemBreakPoint->AsBoolean;
    this->cds_Mem->Post();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Memory::b_bootClick(TObject *Sender)
+{
+   f_GraphIO->Pin70->Checked = true;
 }
 //---------------------------------------------------------------------------
 

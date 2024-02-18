@@ -89,6 +89,7 @@ __published:	// Composants gérés par l'EDI
    TButton *b_Next;
    TButton *b_BreakPoint;
    TBooleanField *cds_MemBreakPoint;
+   TButton *b_boot;
     void __fastcall cb_OpCodeChange(TObject *Sender);
     void __fastcall b_AddClick(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
@@ -114,10 +115,12 @@ __published:	// Composants gérés par l'EDI
    void __fastcall dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect, TField *Field,
           TGridDrawState State);
    void __fastcall b_BreakPointClick(TObject *Sender);
+   void __fastcall b_bootClick(TObject *Sender);
 private:	// Déclarations de l'utilisateur
     int LastDataType;
     int LastSelLine;
     int InstrucCmp;
+    int ExecCmp;
 
     TList* InstrucList;
 

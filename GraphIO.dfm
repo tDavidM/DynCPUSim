@@ -412,6 +412,7 @@ object f_GraphIO: Tf_GraphIO
       Width = 160
       Height = 13
       Caption = 'ROM I/O Pins (Program Memory):'
+      OnDblClick = l_romDblClick
     end
     object l_Romdata: TLabel
       Left = 107
@@ -460,7 +461,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 13
       Caption = 'ROM Page Line (Out)'
     end
-    object Label5: TLabel
+    object l_Line7: TLabel
       Left = 233
       Top = 113
       Width = 38
@@ -472,6 +473,14 @@ object f_GraphIO: Tf_GraphIO
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
+    end
+    object l_PgrmCmp: TLabel
+      Left = 210
+      Top = 6
+      Width = 52
+      Height = 13
+      Caption = 'PgrmCmp: '
+      Visible = False
     end
     object Pin1: TCheckBox
       Left = 19
@@ -696,7 +705,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '71'
       TabOrder = 24
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin72: TCheckBox
       Left = 63
@@ -705,7 +714,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '72'
       TabOrder = 25
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin73: TCheckBox
       Left = 107
@@ -714,7 +723,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '73'
       TabOrder = 26
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin74: TCheckBox
       Left = 151
@@ -723,7 +732,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '74'
       TabOrder = 27
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin75: TCheckBox
       Left = 195
@@ -732,7 +741,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '75'
       TabOrder = 28
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin76: TCheckBox
       Left = 239
@@ -741,7 +750,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '76'
       TabOrder = 29
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin77: TCheckBox
       Left = 283
@@ -750,7 +759,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '77'
       TabOrder = 30
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
     object Pin78: TCheckBox
       Left = 327
@@ -759,7 +768,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '78'
       TabOrder = 31
-      OnClick = Line1Click
+      OnClick = Line7Click
     end
   end
   object p_Misc: TPanel
@@ -826,8 +835,6 @@ object f_GraphIO: Tf_GraphIO
       Width = 86
       Height = 17
       Caption = '70 (Boot In)'
-      Checked = True
-      State = cbChecked
       TabOrder = 5
       OnClick = Pin70Click
     end

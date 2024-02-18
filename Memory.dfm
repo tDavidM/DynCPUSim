@@ -285,7 +285,7 @@ object f_Memory: Tf_Memory
     OnClick = b_InsertClick
   end
   object b_Save: TButton
-    Left = 8
+    Left = 186
     Top = 8
     Width = 75
     Height = 18
@@ -294,7 +294,7 @@ object f_Memory: Tf_Memory
     OnClick = b_SaveClick
   end
   object b_Load: TButton
-    Left = 104
+    Left = 8
     Top = 8
     Width = 75
     Height = 18
@@ -322,7 +322,7 @@ object f_Memory: Tf_Memory
     TabOrder = 17
   end
   object b_Clear: TButton
-    Left = 504
+    Left = 514
     Top = 8
     Width = 75
     Height = 18
@@ -331,7 +331,7 @@ object f_Memory: Tf_Memory
     OnClick = b_ClearClick
   end
   object cb_StepByStep: TCheckBox
-    Left = 265
+    Left = 307
     Top = 8
     Width = 82
     Height = 17
@@ -340,7 +340,7 @@ object f_Memory: Tf_Memory
     OnClick = cb_StepByStepClick
   end
   object b_Next: TButton
-    Left = 349
+    Left = 390
     Top = 8
     Width = 75
     Height = 18
@@ -359,6 +359,15 @@ object f_Memory: Tf_Memory
     Enabled = False
     TabOrder = 21
     OnClick = b_BreakPointClick
+  end
+  object b_boot: TButton
+    Left = 97
+    Top = 8
+    Width = 75
+    Height = 18
+    Caption = 'Boot'
+    TabOrder = 22
+    OnClick = b_bootClick
   end
   object cds_Mem: TClientDataSet
     Aggregates = <>

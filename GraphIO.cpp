@@ -334,3 +334,19 @@ void __fastcall Tf_GraphIO::Line6Click(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
+void __fastcall Tf_GraphIO::Line7Click(TObject *Sender)
+{
+  //71-78
+  String c1 = BinToHex(Pin71->Checked, Pin72->Checked, Pin73->Checked, Pin74->Checked);
+  String c2 = BinToHex(Pin75->Checked, Pin76->Checked, Pin77->Checked, Pin78->Checked);
+
+  l_Line7->Caption = "[0x" + c2 + c1 + "]";
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_GraphIO::l_romDblClick(TObject *Sender)
+{
+   l_PgrmCmp->Visible = !l_PgrmCmp->Visible;
+}
+//---------------------------------------------------------------------------
+

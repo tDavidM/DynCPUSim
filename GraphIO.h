@@ -99,7 +99,7 @@ __published:	// Composants gérés par l'EDI
 	TLabel *l_Line6;
 	TCheckBox *Pin60;
 	TLabel *Label4;
-	TLabel *Label5;
+   TLabel *l_Line7;
 	TCheckBox *Pin71;
 	TCheckBox *Pin72;
 	TCheckBox *Pin73;
@@ -118,6 +118,7 @@ __published:	// Composants gérés par l'EDI
    TCheckBox *Pin69;
    TCheckBox *Pin20;
    TCheckBox *Pin79;
+   TLabel *l_PgrmCmp;
     void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
     void __fastcall b_ResetClick(TObject *Sender);
     void __fastcall Line1Click(TObject *Sender);
@@ -134,6 +135,8 @@ __published:	// Composants gérés par l'EDI
 	void __fastcall Pin39Click(TObject *Sender);
 	void __fastcall Line6Click(TObject *Sender);
    void __fastcall Pin60Click(TObject *Sender);
+   void __fastcall Line7Click(TObject *Sender);
+   void __fastcall l_romDblClick(TObject *Sender);
 private:	// Déclarations de l'utilisateur
 	char BinToHex(bool p1, bool p2, bool p3, bool p4 );
 
