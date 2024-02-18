@@ -394,7 +394,7 @@
 ;Test 22, Push and Pop
                         SET   "0x25", $3              ;Keep track of where it halts, if it does
                         SET   0xFF,   $0              ;
-                        SET   0x0F,   $1              ;Set for 16 iterations
+                        SET   0x10,   $1              ;Set for 16 iterations
 :TEST_NO_22_PUSH        PUSH  $0
                         DEC   $1
                         IFNZ  $1,     :TEST_NO_22_PUSH:;IfNotZero, goto Push
@@ -404,10 +404,9 @@
 :TEST_NO_22_POP         POP   $0
                         SIF   $0,     0xFF            ;Check that $0 is == 0xFF
                         WJMP  #:*HALT_ON_ERR:         ;If Error
-                        DSINZ $1                      ;Decrement $1 until zero
-                        JMPA  #:TEST_NO_22_END:       ;If End of Loop at Zero
+                        DSIZ  $1                      ;Decrement $1 until zero
                         JMPA  #:TEST_NO_22_POP:       ;Go Pop an other value
-:TEST_NO_22_END         SET   "0x27", $3              ;Keep track of where it halts, if it does
+                        SET   "0x27", $3              ;Keep track of where it halts, if it does
                         POP   $0                      ;Poping beyond the max depth of the stack should return zero
                         SIFZ  $0                      ;Check that $0 is == 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
@@ -441,10 +440,34 @@
                         POP   $0
                         SIFZ  $0                      ;Check that $0 is == 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
+;Test 23, FlushStack and ResetAllReg
+                        SET   "0x30", $3              ;Keep track of where it halts, if it does  
+                        PUSH  $E                      ;Add back some values to the stack
+                        PUSH  $1
+                        PUSH  $2
+                        PUSH  $E
+                        FLUSH                         ;In order to test the Flush instruction
+                        POP   $0
+                        SIFZ  $0                      ;Check that $0 is == 0x00
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
                         
-                        SET   "0x30", $3              ;Keep track of where it halts, if it does
+                        SET   0xFF,   $0              ;Set for $0 for the next test
+                        RSTAR                         ;reset all register
+                        SET   "0x31", $3              ;Keep track of where it halts, if it does  
+                        SIFZ  $0                      ;Check that $0 is == 0x00
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SIFZ  $1                      ;Check that $1 is == 0x00
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+                        SIFZ  $2                      ;Check that $2 is == 0x00
+                        WJMP  #:*HALT_ON_ERR:         ;If Error
+;End of test routine                        
+                        NOP
+                        HALT                          ;SUCCESS !!!
+                        NOP
                         WJMP  #:*START_OVER:
+                        NOP
 :HALT_ON_ERR            HALT
+                        NOP
 
  
 
