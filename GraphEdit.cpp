@@ -16,6 +16,8 @@ __fastcall Tf_GraphEdit::Tf_GraphEdit(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphEdit::b_UpdateClick(TObject *Sender)
 {
+  (void)Sender;
+
   if(e_Name->Text == "")
     ShowMessage("Must have a Name");
   if(   l_SaveName->Caption != e_Name->Text
@@ -44,18 +46,22 @@ void __fastcall Tf_GraphEdit::b_UpdateClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphEdit::b_deleteClick(TObject *Sender)
 {
-  if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes)
-  {
-    cb_Delete->Checked = true;
-    f_CPUNode->UpdateNode();
-  }
+   (void)Sender;
+
+   if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes)
+   {
+      cb_Delete->Checked = true;
+      f_CPUNode->UpdateNode();
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphEdit::e_NameOutUpKeyPress(TObject *Sender, char &Key)
 {
-  if(Key == VK_RETURN )
-    this->b_UpdateClick(Sender);
-  else if(Key == VK_DELETE )
-    this->b_delete->Click();
+   (void)Sender;
+
+   if(Key == VK_RETURN )
+      this->b_UpdateClick(Sender);
+   else if(Key == VK_DELETE )
+      this->b_delete->Click();
 }
 //---------------------------------------------------------------------------

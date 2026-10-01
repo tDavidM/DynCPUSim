@@ -2,6 +2,7 @@
  8 bits operations
  16 bits instructions
  11 x 8 bits general purpose registers
+ 5 x 8 bits special registers
  44 instructions
  1 cycle per instruction
 
@@ -13,10 +14,11 @@
   128 foward and 128 backward (ex.: 10000000 = next, 00000000 = 128 backward, 11111111 = 128 foward, no address for current line )
   Circular Memory (wrapped around at begin and end)
   Trigered by rising edge of Ready Next Flag, returns value immediately
- *Adbsolute address
+ *Absolute address
   16 bits/pins adresses (CPU output pins 51-58 (low) + 71-78 (high))
   1 pin for Ready Next (CPU output pins 60)
   Trigered by rising edge of Ready Next Flag, returns value immediately
+ Current selected ROM absolute address is made availiable to the CPU on pins 81-96
 
 -RAM
  256 pages of 256 values
@@ -25,14 +27,14 @@
  8 bits/pins input paired with 8 bits/pins address output (CPU output pins 21-28) (CPU input pins 41-48)
  8 bits/pins output paired with 8 bits/pins address output (CPU output pins 21-28) (CPU output pins 31-38)
  Trigered by Read or Write Flags, returns value immediately
- Current page set by the value of register B
+ Current page set using the value in register $B
  
 Instruction word format: AAAABBBBCCCCDDDD
 $ - for registers location.
 # - for ROM location.
 @ - for RAM location.
 
-Op-Codes (A [B [C]]): 
+Op-Codes (A [B [C [D]]]) / Instructions: 
 0000 - SET   - Set(BC)->$D                       //BC specifies a fixed value
 0001 - GETA  - ReadAddr(@BC)->$D                 //BC specifies 8 bits address to fetch value from RAM to store in $D
 0010 - SETA  - WriteAddr(@BC)<-$D                //BC specifies 8 bits address to store value to RAM from $D
@@ -67,8 +69,8 @@ Op-Codes (A [B [C]]):
 
 1111 1111 0000 - JMPR  - JumpReg()goto#$D        //Goto relative address at $D
 1111 1111 0001 - CFLG  - CarryFlg()->$D          //Output the value of the carry flag to a register
-1111 1111 0010 - Unused
-1111 1111 0011 - Unused
+1111 1111 0010 - RIOA  - ReadIOA()->$D               //Read from HW I/O A and stores the value in $D
+1111 1111 0011 - RIOB  - ReadIOB()->$D               //Read from HW I/O B and stores the value in $D
 1111 1111 0100 - INC   - Increment($D)           //Increment $D by 1 and stores the result in $D
 1111 1111 0101 - DEC   - Decrement($D)           //Decrement $D by 1 and stores the result in $D *Carry flag unreliable
 1111 1111 0110 - SIFZ  - SkipZero($D)            //Skip the following instruction if $D == 0
@@ -78,26 +80,60 @@ Op-Codes (A [B [C]]):
 1111 1111 1010 - DSINZ - DecSkipNotZero($D)      //Decrement $D by 1 and then skip the following instruction if != 0
 1111 1111 1011 - PUSH  - Push($D)                //Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped )
 1111 1111 1100 - POP   - Pop($D)                 //Pop the value from the top of the internal stack to $D  (it is 16 bytes deep, the overflow is dropped )
-1111 1111 1101 - Unused
-1111 1111 1110 - Unused
+1111 1111 1101 - WIOA  - WriteIOA($D)                //Write to I/O A using the value in $D
+1111 1111 1110 - WIOB  - WriteIOB($D)                //Write to I/O B using the value in $D
 
 1111 1111 1111 0000 - RSTC  - ResetCarry()       //Set the Carry Flag to 0x00
 1111 1111 1111 0001 - SETC  - SetCarry()         //Set the Carry Flag to 0x01
-1111 1111 1111 0010 - SIFNC - SkipNotCarry()     //Skip the following instruction if carry flag set
-1111 1111 1111 0011 - RSTAR - ResetAllReg()      //Set all Registres to 0x00
+1111 1111 1111 0010 - SIFNC - SkipNotCarry()     //Skip the following instruction if carry flag not set
+1111 1111 1111 0011 - RSTAR - ResetAllReg()        //Set all Registres to 0x00
 1111 1111 1111 0100 - FLUSH - FlushStack()       //Set all values stored in the Stack to 0x00
-1111 1111 1111 0101 - Unused                     // (0101 to 1101)
+1111 1111 1111 0101 - INT   - Interupt()             //Trigger Interupt
+1111 1111 1111 0110 - RET   - Return()               //Return from Interupt
+1111 1111 1111 0111 - NOINT - NoInterupt()           //Disable Interupts 
+1111 1111 1111 1000 - OKINT - OkInterupt()           //Enable Interupts
+1111 1111 1111 1001 - RAISE - Raise()                //Trigger Error Handler
+1111 1111 1111 1010 - GOBCK - GoBack()               //Return from Error Handler
+1111 1111 1111 1011 - SRNG  - SetRngSeed()           //Set RngSeed using the value of register B
+1111 1111 1111 1100 - Unused                     //
+1111 1111 1111 1101 - Unused                     //
 1111 1111 1111 1110 - HALT  - HALT()             //Pull pin 29 up to Halts the CPU until Pin 39 is set low
 1111 1111 1111 1111 - NOP   - NOP()              //Does nothing D:
 
 
-Alias
-Copy($B)->$D accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000 (Mnemonic CPY)
-Erase()->$D accomplished with AND($B,$C)->$D where $B and $C are the fixed value register 0x00000000 and 0x11111111 (Mnemonic RST)
+Alias / Pseudo-Instructions:
+CPY   - Copy($B)->$D          //Copy the value from $B to $D, accomplished with OR($B,$C)->$D where $C is the fixed value register 0x00000000
+RST   - Reset()->$D           //Set $D to 0x00, accomplished with AND($B,$C)->$D where $B and $C are the fixed value register 0x00000000 and 0x11111111
+SINTH - SetInteruptH(BC)      //Set Interupt Goto absolute address (High) using a fixed value, accomplished by writing to $E with Set(BC)->$D
+SINTL - SetInteruptL(BC)      //Set Interupt Goto absolute address (Low) using a fixed value, accomplished by writing to $C with Set(BC)->$D
+SERRH - SetErrorH(BC)         //Set Error Handler Goto absolute address (High) using a fixed value, accomplished by writing to $F with Set(BC)->$D
+SERTL - SetErrorL(BC)         //Set Error Handler Goto absolute address (Low) using a fixed value,  accomplished by writing to $D with Set(BC)->$D
+
+
+Special Registers:
+ Resisters $0 to $A are general purpose registers
+ Register $B behaves just as others general purpose registers but also controls the current RAM page (and can be used to seed the LFSH random number generator with SetRngSeed() )
+ Registers $C to $F always return the following values when read:
+   $C=0x00 $D=0x01 $E=0xFF $F=0x80
+   Writing to those register does no change the output value
+   Goto absolute address used by the Interupt and Error Handler can be set by writing to:
+     $C for Low bits / ROM address of the Interupt routine
+     $D for High bits / ROM Page of the Interupt routine
+     $E for Low bits / ROM address of the Error Handler routine
+     $F for High bits / ROM Page of the Error Handler routine
+ 
+ 
+I/Os:
+
+
+
+Interupts:
+
 
 
 ToDo/Idea:
 Improve error detection in Import, (Param counter, line counter)
-New instruction SkipIfCarry ?
-New instruction RngSeed from reg $D or RngSeed from line D
+New instruction SkipIfCarry ? -> Remove RSTAR - ResetAllReg() ?
 Improve carryflag on substraction 
+Clock output pin
+

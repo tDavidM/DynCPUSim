@@ -254,6 +254,8 @@ __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 {
+  (void)Sender;
+
   TNode* Node;
   TNode* NodeCible;
   int X, Y, Type;
@@ -450,7 +452,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
    }
 
    this->pgLoading->Position = 0;
-   this->CallDrawArea(1);
+   this->CallDrawArea(REFRESH_BUFFER);
 }
 
 //---------------------------------------------------------------------------
@@ -481,6 +483,8 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 {
+   (void)Sender;
+
    TNode* NodeCurr;
    int CountOr=0, CountAnd=0, CountNor=0, CountNand=0, CountXor=0, CountNot=0;
    int CountLink = 0, CountNode = 0;
@@ -666,47 +670,58 @@ void Tf_CPUNode::LoadAnnotation(_di_IXMLNode pAnnotation)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_StartClick(TObject *Sender)
 {
-  this->t_Work->Interval = this->DrawTimerSpeed;
-  this->t_Draw->Interval = this->DrawTimerSpeed;
-  this->t_Work->Enabled  = !this->t_Work->Enabled;
-  this->t_Draw->Enabled  = this->t_Work->Enabled;
-  if (this->t_Work->Enabled)
-    this->b_Start->Caption = "Pause";
-  else
-    this->b_Start->Caption = "Start";
+   (void)Sender;
+
+   this->t_Work->Interval = this->DrawTimerSpeed;
+   this->t_Draw->Interval = this->DrawTimerSpeed;
+   this->t_Work->Enabled  = !this->t_Work->Enabled;
+   this->t_Draw->Enabled  = this->t_Work->Enabled;
+   if (this->t_Work->Enabled)
+      this->b_Start->Caption = "Pause";
+   else
+      this->b_Start->Caption = "Start";
 }
+
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::t_WorkTimer(TObject *Sender)
 {
-  TNode* NodeCurr;
-  TNode* NodeUp;
-  TNode* NodeDown;
+   (void)Sender;
 
-  //Read from Input
-  this->ReadInput();
+   TNode* nodeCurr;
+   int nbIter = this->RunInBatch ? 128 : 1;
+  
+   for (int i=0; i<nbIter; i++) {
+      //Read from Input
+      this->ReadInput();
 
-  //Communicate internal state
-  for (int i = 0; i<NodeCmp; i++) {
-     NodeCurr = (TNode*)this->NodeList->Items[i];
-     if(! NodeCurr->DeleteFlag)
-       NodeCurr->Send();
-  }
+      //Communicate internal state
+      for (int i = 0; i<this->NodeCmp; i++) {
+         nodeCurr = (TNode*)this->NodeList->Items[i];
+         if (! nodeCurr->DeleteFlag) {
+            nodeCurr->Send();
+         }
+      }
 
-  //Update internal state
-  for (int i = 0; i<NodeCmp; i++) {
-     NodeCurr = (TNode*)this->NodeList->Items[i];
-     if(! NodeCurr->DeleteFlag)
-       NodeCurr->Work();
-  }
+      //Update internal state
+      for (int i = 0; i<this->NodeCmp; i++) {
+         nodeCurr = (TNode*)this->NodeList->Items[i];
+         if(! nodeCurr->DeleteFlag) {
+            nodeCurr->Work();
+         }
+      }
 
-  //Write to Output
-  this->WriteOutput();
+      //Write to Output
+      this->WriteOutput();
+   }
 }
+
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::t_DrawTimer(TObject *Sender)
 {
-  if(this->cb_ActiveDraw->Checked)
-     this->CallDrawArea(1);
+   (void)Sender;
+
+   if(this->cb_ActiveDraw->Checked)
+      this->CallDrawArea(REFRESH_BUFFER);
 }
 //---------------------------------------------------------------------------
 
@@ -731,7 +746,7 @@ void Tf_CPUNode::ResetAllNode(void)
   }
 
   //Draw
-  this->CallDrawArea(1);
+  this->CallDrawArea(REFRESH_BUFFER);
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::ReadInput(void)
@@ -825,24 +840,7 @@ void Tf_CPUNode::CallDrawArea(int pMode)
   Buffer->Free();
 }
 //---------------------------------------------------------------------------
-void __fastcall Tf_CPUNode::t_DrawMulti1Timer(TObject *Sender)
-{
-  //this->DrawArea(1);
-}
-//---------------------------------------------------------------------------
 
-void __fastcall Tf_CPUNode::t_DrawMulti2Timer(TObject *Sender)
-{
-  //this->DrawArea(2);
-}
-//---------------------------------------------------------------------------
-
-void __fastcall Tf_CPUNode::t_DrawMulti3Timer(TObject *Sender)
-{
-  //this->DrawArea(3);
-  //HeaderControl->Repaint();
-}
-//---------------------------------------------------------------------------
 void Tf_CPUNode::DrawBuffer(int NbDraw)
 {
   TNode* NodeCurr;
@@ -1010,199 +1008,99 @@ void Tf_CPUNode::DrawBuffer(int NbDraw)
 		 }
 	  //}//if modulo
   }
+
+  if( DrawAllAnnotation )
+     DoDrawAllAnnotation();
+}
+//---------------------------------------------------------------------------
+void Tf_CPUNode::DoDrawAllAnnotation(void)
+{
+  TStringList *AnnotationSelect;
+  TRect  SrcRect, DestRect;
+  String PointA, PointB, DrawFlag, Hue;
+  int UpLX, UpLY, DownRX, DownRY;
+  int Height, Width;
+  TBitmap* AnnotationCanvas;
+  TColor SelectPixel;
+  float ColorR, ColorG, ColorB;
+  int ColorInt;
+  String ColR, ColG, ColB;
+  Byte *pyx;
+
+  for(int i = 0; i<AnnotationList->Count ; i++) {
+     AnnotationSelect = (TStringList*)AnnotationList->Items[i];
+     Hue    = AnnotationSelect->Strings[2];
+     PointA = AnnotationSelect->Strings[3];
+     PointB = AnnotationSelect->Strings[4];
+
+     UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
+     UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
+     DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
+     DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
+
+     UpLX   = UpLX * GridSize            ;
+     UpLY   = UpLY * GridSize            ;
+     DownRX = DownRX * GridSize + ObjSize;
+     DownRY = DownRY * GridSize + ObjSize;
+
+     AnnotationCanvas = new TBitmap;
+
+     Height = DownRY-UpLY;
+     Width  = DownRX-UpLX;
+     SrcRect.init(UpLX, UpLY, DownRX, DownRY);
+     DestRect.init(0, 0, Width, Height);
+
+     AnnotationCanvas->Height = Height;
+     AnnotationCanvas->Width  = Width ;
+     AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+     AnnotationCanvas->PixelFormat = pf24bit;
+     AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+
+     ColR = Hue.SubString(7,Hue.Pos(",")-7);
+     ColG = Hue.SubString(Hue.Pos(",")+3,Hue.Pos(".")-Hue.Pos(",")-3);
+     ColB = Hue.SubString(Hue.Pos(".")+3,Hue.Length());
+
+     ColorR = 1.0-(StrToInt(ColR)/200.0);
+     ColorG = 1.0-(StrToInt(ColG)/200.0);
+     ColorB = 1.0-(StrToInt(ColB)/200.0);
+
+     for (int y = 0; y < Height; y++) {
+        pyx=(Byte *)AnnotationCanvas->ScanLine[y];
+        for (int x = 0; x < Width; x++) {
+           ColorInt = (pyx[x*3] * ColorG) * ColorR ; // Blue
+           if (ColorInt > 255)
+              pyx[x*3] = 255;
+           else
+              pyx[x*3] = ColorInt;
+
+           ColorInt = (pyx[x*3 + 1] * ColorR) * ColorB ; //Green
+           if (ColorInt > 255)
+              pyx[x*3 + 1] = 255;
+           else
+              pyx[x*3 + 1] = ColorInt;
+
+           ColorInt = (pyx[x*3 + 2] * ColorB) * ColorG ; //Red
+           if (ColorInt > 255)
+              pyx[x*3 + 2] = 255;
+           else
+              pyx[x*3 + 2] = ColorInt;
+        }
+     }
+
+     this->MainCanvas->Canvas->Draw(UpLX, UpLY, AnnotationCanvas);
+     this->MainCanvas->Canvas->Brush->Color = clBtnFace;
+     this->MainCanvas->Canvas->Pen->Color = clBlack;
+     this->MainCanvas->Canvas->TextOutA(UpLX + 10, UpLY + 10, AnnotationSelect->Strings[0]);
+
+     AnnotationCanvas->Free();
+  }
+
 }
 
 //---------------------------------------------------------------------------
 void Tf_CPUNode::DrawArea(int NbDraw)
 {
-/*  TNode* NodeCurr;
-  TNode* NodeUp;
-  TNode* NodeDown;
 
-  int StartX = OffSetX + this->p_Area->Left;
-  int StartY = OffSetY + this->p_Area->Top;
-  int MaxX   = this->p_Area->Left + this->p_Area->Width;
-  int MaxY   = this->p_Area->Top  + this->p_Area->Height;
-
-  TPoint Triangle[3];
-
-  this->Canvas->Refresh();
-
-  this->Canvas->Brush->Color = clBtnFace;
-  this->Canvas->Pen->Color   = clBlack;
-  //this->Canvas->FillRect(ClientRect);
-
-  for (int i = 0; i<NodeCmp; i++) {
-	 if (i%4 == NbDraw) {
-		 //Node, Black Inactive, Red Active
-		 NodeCurr = (TNode*)this->NodeList->Items[i];
-
-		 if (NodeCurr->TagFlag)
-		   this->Canvas->Brush->Color = clGray;
-		 else
-		   this->Canvas->Brush->Color = clBlack;
-		 this->Canvas->Pen->Color   = clBlack;
-
-		 if (! NodeCurr->DeleteFlag) {
-		   if((StartX + (NodeCurr->X * GridSize)) > 0 &&
-			  (StartY + (NodeCurr->Y * GridSize)) > 0 &&
-			  (StartX + (NodeCurr->X * GridSize)) < MaxX &&
-			  (StartY + (NodeCurr->Y * GridSize)) < MaxY )
-		   {
-			 DrawCmpItem++;
-			 if(NodeCurr == NodeSelect)
-				 this->Canvas->Brush->Color = clWhite;
-			 else if(NodeCurr->GetInOutType() == 0 && NodeCurr->GetActive()) {
-				 if (NodeCurr->TagFlag)
-				   this->Canvas->Brush->Color = clLtGray;
-				 else
-				   this->Canvas->Brush->Color = clRed;
-			 } else if(NodeCurr->GetInOutType() == 1) {
-          //Input, Green/Yellow
-			   if (NodeCurr->GetActive())
-				 this->Canvas->Brush->Color = clYellow;
-			   else
-				 this->Canvas->Brush->Color = clGreen;
-			 } else if(NodeCurr->GetInOutType() == 2) {
-          //Output, Blue/Purple
-			   if (NodeCurr->GetActive())
-				 this->Canvas->Brush->Color = clPurple;
-			   else
-				 this->Canvas->Brush->Color = clBlue;
-			 }
-
-			 switch(NodeCurr->GetType()) {
-			   case 0: { //OR Circle
-				   this->Canvas->Ellipse(StartX + (NodeCurr->X * GridSize),
-										 StartY + (NodeCurr->Y * GridSize),
-										 StartX + (NodeCurr->X * GridSize) + ObjSize,
-										 StartY + (NodeCurr->Y * GridSize) + ObjSize);
-				   break;
-			   }
-			   case 1: { //AND Square
-				   this->Canvas->Rectangle(StartX + (NodeCurr->X * GridSize),
-										   StartY + (NodeCurr->Y * GridSize),
-										   StartX + (NodeCurr->X * GridSize) + ObjSize,
-										   StartY + (NodeCurr->Y * GridSize) + ObjSize);
-				   break;
-			   }
-			   case 2: { //NOR Circle with a Point
-				   this->Canvas->Ellipse(StartX + (NodeCurr->X * GridSize),
-										 StartY + (NodeCurr->Y * GridSize),
-										 StartX + (NodeCurr->X * GridSize) + ObjSize,
-										 StartY + (NodeCurr->Y * GridSize) + ObjSize);
-
-				   //this->Canvas->MoveTo(StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize));
-				   Triangle[0] = Point(StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize));
-				   Triangle[1] = Point(StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize) + ObjSize);
-				   Triangle[2] = Point(StartX + (NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->Polygon(Triangle, 2);
-				   break;
-			   }
-			   case 3: { //NAND Square with a Point
-				   this->Canvas->Rectangle(StartX + (NodeCurr->X * GridSize),
-										   StartY + (NodeCurr->Y * GridSize),
-										   StartX + (NodeCurr->X * GridSize) + ObjSize,
-										   StartY + (NodeCurr->Y * GridSize) + ObjSize);
-
-				   //this->Canvas->MoveTo(StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize));
-				   Triangle[0] = Point(StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize));
-				   Triangle[1] = Point(StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize) + ObjSize);
-				   Triangle[2] = Point(StartX + (NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->Polygon(Triangle, 2);
-				   break;
-			   }
-			   case 4: { //XOR Circle with a White +
-				   this->Canvas->Ellipse(StartX + (NodeCurr->X * GridSize),
-										 StartY + (NodeCurr->Y * GridSize),
-										 StartX + (NodeCurr->X * GridSize) + ObjSize,
-										 StartY + (NodeCurr->Y * GridSize) + ObjSize);
-
-				   if(NodeCurr == NodeSelect)
-					 this->Canvas->Pen->Color = clBlack;
-				   else
-					 this->Canvas->Pen->Color = clWhite;
-				   this->Canvas->MoveTo( StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize) );
-				   this->Canvas->LineTo( StartX + (NodeCurr->X * GridSize) + (ObjSize/2), StartY + (NodeCurr->Y * GridSize) + ObjSize );
-				   this->Canvas->MoveTo( StartX + (NodeCurr->X * GridSize)              , StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->LineTo( StartX + (NodeCurr->X * GridSize) + ObjSize    , StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->Pen->Color = clBlack;
-				   break;
-			   }
-			   case 5: { //NOT Triangle
-				   //this->Canvas->MoveTo(StartX + (NodeCurr->X * GridSize), StartY + (NodeCurr->Y * GridSize));
-				   Triangle[0] = Point(StartX + (NodeCurr->X * GridSize), StartY + (NodeCurr->Y * GridSize));
-				   Triangle[1] = Point(StartX + (NodeCurr->X * GridSize), StartY + (NodeCurr->Y * GridSize) + ObjSize);
-				   Triangle[2] = Point(StartX + (NodeCurr->X * GridSize) + ObjSize, StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->Polygon(Triangle, 2);
-				   break;
-			   }
-            case 6: { //LINK Line
-				   if (NodeCurr == NodeSelect)
-					   this->Canvas->Pen->Color = clWhite;
-               else if (NodeCurr->GetActive()) {
-				      if (NodeCurr->TagFlag)
-				         this->Canvas->Pen->Color = clLtGray;
-				      else
-				         this->Canvas->Pen->Color = clRed;
-			      } else
-					   this->Canvas->Pen->Color = clBlack;
-
-				   this->Canvas->MoveTo( StartX + (NodeCurr->X * GridSize)              , StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->LineTo( StartX + (NodeCurr->X * GridSize) + ObjSize    , StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->Canvas->Pen->Color = clBlack;
-				   break;
-            }
-			 }
-		   }//if in bounds
-
-		   this->Canvas->Brush->Color = clBlack;
-		   if (NodeCurr->GetActive()) {
-			   if (NodeCurr->TagFlag)
-				 this->Canvas->Pen->Color = clYellow;
-			   else
-				 this->Canvas->Pen->Color = clRed;
-		   } else {
-			   if (NodeCurr->TagFlag)
-				 this->Canvas->Pen->Color = clSilver;
-			   else
-				 this->Canvas->Pen->Color = clBlack;
-		   }
-
-		   //Line Out Up
-		   NodeUp = NodeCurr->GetNodeOutUp();
-		   if (NodeUp != NULL) {
-			   if(!( ((StartX + (NodeCurr->X * GridSize)) < 0    && (StartX + (NodeUp->X * GridSize)) < 0    )||
-					 ((StartX + (NodeCurr->X * GridSize)) > MaxX && (StartX + (NodeUp->X * GridSize)) > MaxX )  ) ||
-				  !( ((StartY + (NodeCurr->Y * GridSize)) < 0    && (StartY + (NodeUp->Y * GridSize)) < 0    )||
-					 ((StartY + (NodeCurr->Y * GridSize)) > MaxY && (StartY + (NodeUp->Y * GridSize)) > MaxY )  )   )
-			   {
-				 this->Canvas->MoveTo(StartX + (NodeCurr->X * GridSize) +  ObjSize,
-									  StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				 this->Canvas->LineTo(StartX + (NodeUp->X * GridSize),
-									  StartY + (NodeUp->Y * GridSize) + (ObjSize/2) );
-				 DrawCmpLine++;
-			   }
-		   }
-
-		   //Line Out Down
-		   NodeDown = NodeCurr->GetNodeOutDown();
-		   if (NodeDown != NULL) {
-			   if(!( ((StartX + (NodeCurr->X * GridSize)) < 0    && (StartX + (NodeDown->X * GridSize)) < 0    )||
-					 ((StartX + (NodeCurr->X * GridSize)) > MaxX && (StartX + (NodeDown->X * GridSize)) > MaxX )  ) ||
-				  !( ((StartY + (NodeCurr->Y * GridSize)) < 0    && (StartY + (NodeDown->Y * GridSize)) < 0    )||
-					 ((StartY + (NodeCurr->Y * GridSize)) > MaxY && (StartY + (NodeDown->Y * GridSize)) > MaxY )  )   )
-			   {
-				 this->Canvas->MoveTo(StartX + (NodeCurr->X * GridSize) +  ObjSize,
-									  StartY + (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				 this->Canvas->LineTo(StartX + (NodeDown->X * GridSize),
-									  StartY + (NodeDown->Y * GridSize) + (ObjSize/2) );
-				 DrawCmpLine++;
-			   }
-		   }
-		 }
-	  }//if modulo
-  }*/
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_StepClick(TObject *Sender)
@@ -1316,7 +1214,7 @@ void Tf_CPUNode::UpdateNode(void)
 
   //Draw
   this->Invalidate();
-  this->CallDrawArea(1);
+  this->CallDrawArea(REFRESH_BUFFER);
 }
 //---------------------------------------------------------------------------
 //Set a button font to Bold
@@ -1356,6 +1254,8 @@ bool Tf_CPUNode::NodeNameExists(String pName)
 void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
       TShiftState Shift, int X, int Y)
 {
+  (void)Sender;
+
   TNode* NodeCurr;
   int pX, pY, Type;
   String Name;
@@ -1384,7 +1284,7 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
 
                 if(this->cb_ColorLine->Checked)
                    TagFollowList(this->NodeSelect, 10, true);
-                this->CallDrawArea(1);
+                this->CallDrawArea(REFRESH_BUFFER);
 
                 f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
                 f_GraphEdit->e_Name->Text = NodeCurr->Name;
@@ -1422,7 +1322,7 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
 
     //Draw
     this->Invalidate();
-    this->CallDrawArea(1);
+    this->CallDrawArea(REFRESH_BUFFER);
   }
   //Middle Click = Create
   else if(Button == mbMiddle)
@@ -1453,7 +1353,7 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
     }
 
     //Draw
-    this->CallDrawArea(1);
+    this->CallDrawArea(REFRESH_BUFFER);
   }
   //Left Click + Shift or Ctlr = Link Selected
   else if (Button == mbLeft && (Shift.Contains(ssCtrl) || Shift.Contains(ssShift))) {
@@ -1493,7 +1393,7 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                 f_GraphEdit->l_NameOutDown->Caption = NodeCurr->Name;
 
               //Draw
-              this->CallDrawArea(1);
+              this->CallDrawArea(REFRESH_BUFFER);
           }
       }
   }
@@ -1521,7 +1421,7 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                this->NodeSelect->SetOutDown(0, NULL);
                //Draw
                this->Invalidate();
-               this->CallDrawArea(1);
+               this->CallDrawArea(REFRESH_BUFFER);
 
                f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
                f_GraphEdit->e_Name->Text = NodeCurr->Name;
@@ -1567,6 +1467,8 @@ void Tf_CPUNode::EmptyFollowList(void)
 
 void __fastcall Tf_CPUNode::tb_SizeChange(TObject *Sender)
 {
+  (void)Sender;
+
   double PreviousGridSize = GridSize;
   double CurrentGridSize;
   double ZoomFactor;
@@ -1611,12 +1513,16 @@ void __fastcall Tf_CPUNode::tb_SizeChange(TObject *Sender)
 
   //Draw
   this->Invalidate();
-  this->CallDrawArea(1);
+  this->CallDrawArea(REFRESH_BUFFER);
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::FormMouseWheel(TObject *Sender, TShiftState Shift,
       int WheelDelta, TPoint &MousePos, bool &Handled)
 {
+  (void)Sender;
+  (void)Shift;
+
+
   //Reset last mouse position
   this->MouseDownX = MousePos.x;
   this->MouseDownY = MousePos.y;
@@ -1647,7 +1553,7 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 				 this->OffSetY += (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
-			  this->CallDrawArea(1);
+			  this->CallDrawArea(REFRESH_BUFFER);
 			  break;
 			}
 			case VK_DOWN:
@@ -1659,7 +1565,7 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 				 this->OffSetY -= (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
-			  this->CallDrawArea(1);
+			  this->CallDrawArea(REFRESH_BUFFER);
 			  break;
 			}
 			case VK_LEFT:
@@ -1671,7 +1577,7 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 				 this->OffSetX += (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
-			  this->CallDrawArea(1);
+			  this->CallDrawArea(REFRESH_BUFFER);
 			  break;
 			}
 			case VK_RIGHT:
@@ -1683,7 +1589,7 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 			   	this->OffSetX -= (GridSize * ((tb_Size->Position + 1) * 10) );
 			  Handled = true;
 			  this->Invalidate();
-			  this->CallDrawArea(1);
+			  this->CallDrawArea(REFRESH_BUFFER);
 			  break;
 			}
 			case VK_SPACE:
@@ -1692,7 +1598,7 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 			  this->OffSetY = 0;
 			  Handled = true;
 			  this->Invalidate();
-			  this->CallDrawArea(1);
+			  this->CallDrawArea(REFRESH_BUFFER);
 			  break;
 			}
 		  }
@@ -1703,6 +1609,9 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {
+  (void)Sender;
+  (void)Shift;
+
   if (Key == VK_DELETE && NodeSelect != NULL) {
     if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes) {
 	  f_GraphEdit->cb_Delete->Checked = true;
@@ -1743,12 +1652,15 @@ void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
 {
+  (void)Sender;
+
   Application->OnMessage = AppMessage;
   this->sb_Main->Parent = this;
   this->sb_Main->Panels->Items[0]->Text = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
   //Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2)
 
   this->ItsUpdated = false;
+  this->RunInBatch = false;
 
   this->DrawTimerSpeed = 100;
   this->OffSetX = -22;
@@ -1771,6 +1683,8 @@ void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
 void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       int X, int Y)
 {
+  (void)Sender;
+
   TNode* NodeCurr;
   String Name;
   int Type;
@@ -1792,7 +1706,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
   int UpdateOffSetY;
 
   //Catch cursor mouvment when "drag & drop" of the Canvas
-  if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift || Shift.Contains(ssAlt)))
+  if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))
      && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) )
    {
    //Move view
@@ -1805,7 +1719,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       //this->Canvas->Brush->Color = clBtnFace;
       //this->Canvas->Pen->Color = clBlack;
       //this->Canvas->FillRect(ClientRect);
-      this->CallDrawArea(0);
+      this->CallDrawArea(FROM_BUFFER);
 
       this->sb_Main->Panels->Items[0]->Text = "Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
   } else if (Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
@@ -1832,7 +1746,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       }
       //Draw
       //this->Invalidate();
-      this->CallDrawArea(0);
+      this->CallDrawArea(FROM_BUFFER);
 
       this->Canvas->Brush->Color = clBtnFace;
       this->Canvas->Pen->Color = clGreen;
@@ -1846,7 +1760,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 
   } else if (Shift.Contains(ssLeft) && Shift.Contains(ssAlt) && !Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
   //Make Annotation
-      this->CallDrawArea(0);
+      this->CallDrawArea(FROM_BUFFER);
 
       this->Canvas->Brush->Color = clBtnFace;
       this->Canvas->Pen->Color = clGreen;
@@ -1883,7 +1797,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->Canvas->Brush->Color = clBtnFace;
       this->Canvas->Pen->Color = clBlack;
       this->Canvas->FillRect(ClientRect);
-      this->CallDrawArea(1);
+      this->CallDrawArea(REFRESH_BUFFER);
   } else {
   //Update status bar Info for Node Name/Type
       for (int i = 0; i<NodeCmp; i++) {
@@ -1908,12 +1822,14 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
          }
       }
 
-      if (cb_Annotation->Checked) {
+      if (cb_Annotation->Checked && !this->DrawAllAnnotation) {
          for(int i = 0; i<AnnotationList->Count ; i++) {
             AnnotationSelect = (TStringList*)AnnotationList->Items[i];
             PointA = AnnotationSelect->Strings[3];
             PointB = AnnotationSelect->Strings[4];
             DrawFlag = AnnotationSelect->Strings[5];
+
+            //When Annotation is drawn, check if cursor is still inside the shape, if not, redraw
             if (DrawFlag == "Draw=True") {
                UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
                UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
@@ -2074,7 +1990,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                AnnotationCanvas->PixelFormat = pf24bit;
                AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
 
-               //this->CallDrawArea(0);
+               //this->CallDrawArea(FROM_BUFFER);
                AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
                this->Canvas->Draw(UpLX+this->p_Area->Left, UpLY+this->p_Area->Top, AnnotationCanvas);
                AnnotationCanvas->Free();
@@ -2083,7 +1999,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
          if (!AnnotationFound && this->AnnotationDrawn) {
             this->AnnotationDrawn = false;
             //this->Invalidate();
-            //this->CallDrawArea(0);
+            //this->CallDrawArea(FROM_BUFFER);
          }
 
       }
@@ -2091,21 +2007,39 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
 }
 //---------------------------------------------------------------------------
 
+void __fastcall Tf_CPUNode::cb_AnnotationClick(TObject *Sender)
+{
+   (void)Sender;
+
+   this->DrawAllAnnotation = !(GetKeyState(VK_CONTROL) & 0x8000 ) && this->cb_Annotation->Checked;
+
+   this->Invalidate();
+   this->CallDrawArea(REFRESH_BUFFER);
+}
+//---------------------------------------------------------------------------
+
 void __fastcall Tf_CPUNode::FormPaint(TObject *Sender)
 {
-   this->CallDrawArea(0);
+   (void)Sender;
+
+   this->CallDrawArea(FROM_BUFFER);
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_CPUNode::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
-  if(this->ItsUpdated && Application->MessageBox( L"Save changes before Quit?", L"Save changes", MB_YESNO) == mrYes)
+   (void)Sender;
+   (void)CanClose;
+
+   if(this->ItsUpdated && Application->MessageBox( L"Save changes before Quit?", L"Save changes", MB_YESNO) == mrYes)
       this->b_Save->Click();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_CPUNode::b_ResetClick(TObject *Sender)
 {
+  (void)Sender;
+
   TCheckBox * CurrPin;
 
   f_GraphIO->DebugOutState = false;
@@ -2127,13 +2061,17 @@ void __fastcall Tf_CPUNode::b_ResetClick(TObject *Sender)
 
 void __fastcall Tf_CPUNode::cb_ColorLineClick(TObject *Sender)
 {
-  if(!this->cb_ColorLine->Checked)
-    this->EmptyFollowList();
+   (void)Sender;
+
+   if(!this->cb_ColorLine->Checked)
+      this->EmptyFollowList();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_CPUNode::tb_SpeedChange(TObject *Sender)
 {
+  (void)Sender;
+
   switch (tb_Speed->Position) {
     case 1:  { this->DrawTimerSpeed = 1;    break;}
     case 2:  { this->DrawTimerSpeed = 2;    break;}
@@ -2173,7 +2111,36 @@ void __fastcall Tf_CPUNode::tb_SpeedChange(TObject *Sender)
 void __fastcall Tf_CPUNode::cb_QuickEditMouseMove(TObject *Sender, TShiftState Shift,
           int X, int Y)
 {
+   (void)Sender;
+   (void)Shift;
+   (void)X;
+   (void)Y;
+
    this->sb_Main->Panels->Items[0]->Text = "Keyboard: O=Or, A=And, R=Nor, D=Nand, X=Xor, N=Not";
 }
 //---------------------------------------------------------------------------
+
+
+void __fastcall Tf_CPUNode::cb_AnnotationMouseMove(TObject *Sender, TShiftState Shift,
+          int X, int Y)
+{
+   (void)Sender;
+   (void)Shift;
+   (void)X;
+   (void)Y;
+
+   this->sb_Main->Panels->Items[0]->Text = "Hold Ctrl to show only Annotations under the cursor";
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_CPUNode::cb_ActiveDrawClick(TObject *Sender)
+{
+   (void)Sender;
+
+   this->RunInBatch = !this->cb_ActiveDraw->Checked;
+}
+//---------------------------------------------------------------------------
+
+
+
 

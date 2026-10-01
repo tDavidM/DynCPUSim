@@ -26,7 +26,7 @@ object f_CPUNode: Tf_CPUNode
   TextHeight = 13
   object p_Area: TPanel
     Left = 0
-    Top = 20
+    Top = 25
     Width = 1102
     Height = 589
     Anchors = [akLeft, akTop, akRight, akBottom]
@@ -166,6 +166,7 @@ object f_CPUNode: Tf_CPUNode
     Checked = True
     State = cbChecked
     TabOrder = 10
+    OnClick = cb_ActiveDrawClick
   end
   object cb_ColorLine: TCheckBox
     Left = 380
@@ -289,6 +290,8 @@ object f_CPUNode: Tf_CPUNode
     Height = 17
     Caption = 'Annotation'
     TabOrder = 21
+    OnClick = cb_AnnotationClick
+    OnMouseMove = cb_AnnotationMouseMove
   end
   object t_Work: TTimer
     Enabled = False
@@ -296,32 +299,10 @@ object f_CPUNode: Tf_CPUNode
     Left = 16
     Top = 56
   end
-  object XPManifest: TXPManifest
-    Left = 48
-    Top = 56
-  end
   object t_Draw: TTimer
     Enabled = False
     OnTimer = t_DrawTimer
     Left = 16
-    Top = 88
-  end
-  object t_DrawMulti1: TTimer
-    Enabled = False
-    OnTimer = t_DrawMulti1Timer
-    Left = 48
-    Top = 88
-  end
-  object t_DrawMulti2: TTimer
-    Enabled = False
-    OnTimer = t_DrawMulti2Timer
-    Left = 80
-    Top = 88
-  end
-  object t_DrawMulti3: TTimer
-    Enabled = False
-    OnTimer = t_DrawMulti3Timer
-    Left = 112
     Top = 88
   end
   object NodeSaveDialog: TSaveDialog
@@ -344,5 +325,41 @@ object f_CPUNode: Tf_CPUNode
     Left = 312
     Top = 56
     DOMVendorDesc = 'MSXML'
+  end
+  object TimerSend1: TTimer
+    Enabled = False
+    Interval = 1
+    Left = 40
+    Top = 200
+  end
+  object TimerSend2: TTimer
+    Enabled = False
+    Interval = 1
+    Left = 104
+    Top = 200
+  end
+  object TimerSend3: TTimer
+    Enabled = False
+    Interval = 1
+    Left = 168
+    Top = 200
+  end
+  object TimerWork1: TTimer
+    Enabled = False
+    Interval = 1
+    Left = 40
+    Top = 264
+  end
+  object TimerWork2: TTimer
+    Enabled = False
+    Interval = 1
+    Left = 104
+    Top = 264
+  end
+  object TimerWork3: TTimer
+    Enabled = False
+    Interval = 1
+    Left = 172
+    Top = 264
   end
 end

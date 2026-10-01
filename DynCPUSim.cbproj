@@ -80,20 +80,20 @@
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>3084</VerInfo_Locale>
         <SanitizedProjectName>DynCPUSim</SanitizedProjectName>
-        <BRCC_IncludePath>E:\Autres\Programmation\Node;$(BDS)\include;$(BDS)\include\vcl;$(BRCC_IncludePath)</BRCC_IncludePath>
-        <AllPackageLibs>rtl.lib;vcl.lib;dbrtl.lib;dsnap.lib;vcldb.lib</AllPackageLibs>
+        <BRCC_IncludePath>$(BDS)\include;$(BRCC_IncludePath)</BRCC_IncludePath>
+        <AllPackageLibs>rtl.lib;vcl.lib;dbrtl.lib;dsnap.lib;vcldb.lib;xmlrtl.lib;IndySystem.lib;IndyCore.lib</AllPackageLibs>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <ILINK_AppType>Windows</ILINK_AppType>
-        <DCC_ObjPath>D:\Autres\Programmation\Node;$(DCC_ObjPath)</DCC_ObjPath>
-        <ILINK_ObjectSearchPath>D:\Autres\Programmation\Node;$(ILINK_ObjectSearchPath)</ILINK_ObjectSearchPath>
+        <DCC_ObjPath>$(DCC_ObjPath)</DCC_ObjPath>
+        <ILINK_ObjectSearchPath>$(ILINK_ObjectSearchPath)</ILINK_ObjectSearchPath>
         <BCC_GenerateWindowsApp>true</BCC_GenerateWindowsApp>
         <PackageImports>vclx.bpi;vcl.bpi;rtl.bpi;dbrtl.bpi;vcldb.bpi;adortl.bpi;dbxcds.bpi;dbexpress.bpi;xmlrtl.bpi;vclie.bpi;inet.bpi;inetdbbde.bpi;inetdbxpress.bpi;soaprtl.bpi;dsnap.bpi;bdertl.bpi;vcldbx.bpi;$(PackageImports)</PackageImports>
-        <DCC_IncludePath>D:\Autres\Programmation\Node;C:\Users\Tiger\Documents\Projets Borland Studio;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_IncludePath)</DCC_IncludePath>
-        <DCC_ResourcePath>D:\Autres\Programmation\Node;$(DCC_ResourcePath)</DCC_ResourcePath>
-        <ILINK_LibraryPath>D:\Autres\Programmation\Node;$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
-        <TASM_IncludePath>E:\Autres\Programmation\Node;$(BDS)\include;$(BDS)\include\vcl;$(TASM_IncludePath)</TASM_IncludePath>
-        <DCC_UnitSearchPath>D:\Autres\Programmation\Node;C:\Users\Tiger\Documents\Projets Borland Studio;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <BCC_IncludePath>E:\Autres\Programmation\Node;$(BDS)\include;$(BDS)\include\vcl;$(BCC_IncludePath)</BCC_IncludePath>
+        <DCC_IncludePath>$(BDS)\lib;$(BDS)\lib\obj;$(DCC_IncludePath)</DCC_IncludePath>
+        <DCC_ResourcePath>$(DCC_ResourcePath)</DCC_ResourcePath>
+        <ILINK_LibraryPath>$(BDS)\lib;$(BDS)\lib\obj;$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <TASM_IncludePath>$(BDS)\include;$(TASM_IncludePath)</TASM_IncludePath>
+        <DCC_UnitSearchPath>$(BDS)\lib;$(BDS)\lib\obj;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <BCC_IncludePath>$(BDS)\include;$(BCC_IncludePath)</BCC_IncludePath>
         <BCC_PCHCache>true</BCC_PCHCache>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
@@ -142,8 +142,9 @@
         <BCC_UserSuppliedOptions> -tWM -k</BCC_UserSuppliedOptions>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <Icon_MainIcon>DynCPUSim_Icon.ico</Icon_MainIcon>
         <DynamicRTL>true</DynamicRTL>
-        <LinkPackageStatics>rtl.lib;vcl.lib;dbrtl.lib;dsnap.lib;vcldb.lib</LinkPackageStatics>
+        <LinkPackageStatics>rtl.lib;vcl.lib;dbrtl.lib;dsnap.lib;vcldb.lib;xmlrtl.lib;IndySystem.lib;IndyCore.lib</LinkPackageStatics>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
         <BCC_UserSuppliedOptions> -tWM -k</BCC_UserSuppliedOptions>
@@ -176,7 +177,6 @@
             <BuildOrder>0</BuildOrder>
         </CppCompile>
         <ResFiles Include="DynCPUSim.res">
-            <ModuleName>DynCPUSim.res</ModuleName>
             <BuildOrder>-1</BuildOrder>
             <BuildOrder>1</BuildOrder>
         </ResFiles>
@@ -733,14 +733,15 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
+            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

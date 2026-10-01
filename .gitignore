@@ -1,0 +1,7 @@
+DynCPUSim.cbproj.local
+Debug_Build/*.obj
+Debug_Build/DynCPUSim.tds
+Debug_Build/DynCPUSim.#*
+Debug_Build/DynCPUSim.map
+Debug_Build/DynCPUSim.pch
+__history/*

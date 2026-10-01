@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+ï»¿//---------------------------------------------------------------------------
 
 #ifndef NodeCPUH
 #define NodeCPUH
@@ -23,6 +23,7 @@
 #include "GraphEdit.h"
 #include "Memory.h"
 #include "Ram.h"
+#include <IdBaseComponent.hpp>
 
 #define VK_KEY_1 0x31
 #define VK_KEY_2 0x32
@@ -30,6 +31,9 @@
 #define VK_KEY_4 0x34
 #define VK_KEY_5 0x35
 #define VK_KEY_6 0x36
+
+#define REFRESH_BUFFER 1
+#define FROM_BUFFER    0
 //---------------------------------------------------------------------------
 class TNode
 {
@@ -86,17 +90,13 @@ public:
 
 class Tf_CPUNode : public TForm
 {
-__published:	// Composants gérés par l'EDI
-    TPanel *p_Area;
-    TTimer *t_Work;
-    TPanel *p_zoom;
-    TLabel *l_gridZoom;
-    TTrackBar *tb_Size;
-    TXPManifest *XPManifest;
-    TTimer *t_Draw;
-	TTimer *t_DrawMulti1;
-	TTimer *t_DrawMulti2;
-	TTimer *t_DrawMulti3;
+__published:	// Composants gï¿½rï¿½s par l'EDI
+   TPanel *p_Area;
+   TTimer *t_Work;
+   TPanel *p_zoom;
+   TLabel *l_gridZoom;
+   TTrackBar *tb_Size;
+   TTimer *t_Draw;
    TStatusBar *sb_Main;
    THeaderControl *HeaderControl;
    TPanel *p_Speed;
@@ -122,34 +122,41 @@ __published:	// Composants gérés par l'EDI
    TButton *b_XOr;
    TButton *b_Not;
    TCheckBox *cb_Annotation;
-    void __fastcall b_InitClick(TObject *Sender);
-    void __fastcall b_StartClick(TObject *Sender);
-    void __fastcall t_WorkTimer(TObject *Sender);
-    void __fastcall b_StepClick(TObject *Sender);
-    void __fastcall FormMouseDown(TObject *Sender, TMouseButton Button,
-          TShiftState Shift, int X, int Y);
-    void __fastcall b_SaveClick(TObject *Sender);
-    void __fastcall b_OrClick(TObject *Sender);
-    void __fastcall tb_SizeChange(TObject *Sender);
-    void __fastcall FormCreate(TObject *Sender);
-    void __fastcall FormMouseMove(TObject *Sender, TShiftState Shift, int X,
-          int Y);
-    void __fastcall FormMouseWheel(TObject *Sender, TShiftState Shift,
-          int WheelDelta, TPoint &MousePos, bool &Handled);
-    void __fastcall FormPaint(TObject *Sender);
-    void __fastcall t_DrawTimer(TObject *Sender);
-    void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
-	void __fastcall FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
-	void __fastcall t_DrawMulti1Timer(TObject *Sender);
-	void __fastcall t_DrawMulti2Timer(TObject *Sender);
-	void __fastcall t_DrawMulti3Timer(TObject *Sender);
+   TTimer *TimerSend1;
+   TTimer *TimerSend2;
+   TTimer *TimerSend3;
+   TTimer *TimerWork1;
+   TTimer *TimerWork2;
+   TTimer *TimerWork3;
+   void __fastcall b_InitClick(TObject *Sender);
+   void __fastcall b_StartClick(TObject *Sender);
+   void __fastcall t_WorkTimer(TObject *Sender);
+   void __fastcall b_StepClick(TObject *Sender);
+   void __fastcall FormMouseDown(TObject *Sender, TMouseButton Button,
+         TShiftState Shift, int X, int Y);
+   void __fastcall b_SaveClick(TObject *Sender);
+   void __fastcall b_OrClick(TObject *Sender);
+   void __fastcall tb_SizeChange(TObject *Sender);
+   void __fastcall FormCreate(TObject *Sender);
+   void __fastcall FormMouseMove(TObject *Sender, TShiftState Shift, int X,
+         int Y);
+   void __fastcall FormMouseWheel(TObject *Sender, TShiftState Shift,
+         int WheelDelta, TPoint &MousePos, bool &Handled);
+   void __fastcall FormPaint(TObject *Sender);
+   void __fastcall t_DrawTimer(TObject *Sender);
+   void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
+   void __fastcall FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
    void __fastcall b_ResetClick(TObject *Sender);
    void __fastcall cb_ColorLineClick(TObject *Sender);
    void __fastcall tb_SpeedChange(TObject *Sender);
    void __fastcall cb_QuickEditMouseMove(TObject *Sender, TShiftState Shift, int X,
           int Y);
+   void __fastcall cb_AnnotationClick(TObject *Sender);
+   void __fastcall cb_AnnotationMouseMove(TObject *Sender, TShiftState Shift, int X,
+          int Y);
+   void __fastcall cb_ActiveDrawClick(TObject *Sender);
 
-private:	// Déclarations de l'utilisateur
+private:   // Dï¿½clarations de l'utilisateur
     void __fastcall AppMessage(TMsg& PassedMsg, bool& Handled);
 
     TBitmap* MainCanvas;
@@ -161,6 +168,7 @@ private:	// Déclarations de l'utilisateur
 
     TList* AnnotationList;
     bool AnnotationDrawn;
+    bool DrawAllAnnotation;
 
     _di_IXMLNode InstructionSetXML;
     _di_IXMLNode AnnotationXML;
@@ -173,26 +181,31 @@ private:	// Déclarations de l'utilisateur
     int DrawCmpItem;
     int DrawCmpLine;
     int DrawTimerSpeed;
+    bool RunInBatch;
 
     int MouseDownX, MouseDownY;
     int OffSetX, OffSetY;
     int ObjSize, GridSize;
 
-	void ReadInput(void);
-	void WriteOutput(void);
-   void DrawBuffer(int NbDraw);
-	void DrawArea(int NbDraw);
-	void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
-   void LoadAnnotation(_di_IXMLNode pAnnotation);
+    void ReadInput(void);
+    void WriteOutput(void);
+    void DrawBuffer(int NbDraw);
+    void DrawArea(int NbDraw);
+    void DoDrawAllAnnotation(void);
+    void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
+    void LoadAnnotation(_di_IXMLNode pAnnotation);
 
-public:		// Déclarations de l'utilisateur
-    __fastcall Tf_CPUNode(TComponent* Owner);
-    void UpdateNode(void);
-    void ResetAllNode(void);
-    void CallDrawArea(int pMode=0);
-	bool NodeNameExists(String pName);
-	void EmptyFollowList(void);
+public:    // Dï¿½clarations de l'utilisateur
+
+   __fastcall Tf_CPUNode(TComponent* Owner);
+   void UpdateNode(void);
+   void ResetAllNode(void);
+   void CallDrawArea(int pMode=0);
+   bool NodeNameExists(String pName);
+   void EmptyFollowList(void);
 };
+
+
 
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_CPUNode *f_CPUNode;

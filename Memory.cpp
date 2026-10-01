@@ -66,6 +66,8 @@ __fastcall Tf_Memory::Tf_Memory(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::cb_OpCodeChange(TObject *Sender)
 {
+   (void)Sender;
+
    TInstruc* Instruc;
 
    Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
@@ -382,48 +384,58 @@ void Tf_Memory::CreateLine(void)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_AddClick(TObject *Sender)
 {
-  this->cds_Mem->Append();
-  //this->cds_MemSort->AsInteger = this->cds_Mem->RecordCount + 1;
-  //this->e_Sort->Text = this->cds_MemSort->AsString;
-  //this->e_Sort->Enabled = true;
-  this->CreateLine();
-  this->cds_Mem->Post();
+   (void)Sender;
+
+   this->cds_Mem->Append();
+   //this->cds_MemSort->AsInteger = this->cds_Mem->RecordCount + 1;
+   //this->e_Sort->Text = this->cds_MemSort->AsString;
+   //this->e_Sort->Enabled = true;
+   this->CreateLine();
+   this->cds_Mem->Post();
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::FormCreate(TObject *Sender)
 {
-  this->cb_OpCode->Clear();
+   (void)Sender;
 
-  this->cds_Mem->CreateDataSet();
-  this->cds_Mem->Open();
-  //this->rb_Hex->Checked = true;
-  this->LastDataType = 2;
-  this->LastSelLine = 0;
-  //this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP( )"); //30;
-  //this->b_Add->Click();
+   this->cb_OpCode->Clear();
 
-  this->ExecCmp = 0;
+   this->cds_Mem->CreateDataSet();
+   this->cds_Mem->Open();
+   //this->rb_Hex->Checked = true;
+   this->LastDataType = 2;
+   this->LastSelLine = 0;
+   //this->cb_OpCode->ItemIndex = this->cb_OpCode->Items->IndexOf("NOP( )"); //30;
+   //this->b_Add->Click();
+
+   this->ExecCmp = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
-  CanClose = false;
+   (void)Sender;
+
+   CanClose = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::cds_MemCalcFields(TDataSet *DataSet)
 {
-  this->cds_MemAddress->AsInteger = this->cds_Mem->RecNo - 1;
-  this->cds_MemAddrHex->AsString  = DecToHex(IntToStr(this->cds_Mem->RecNo - 1), 65535);
+   this->cds_MemAddress->AsInteger = this->cds_Mem->RecNo - 1;
+   this->cds_MemAddrHex->AsString  = DecToHex(IntToStr(this->cds_Mem->RecNo - 1), 65535);
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::dbg_MemDblClick(TObject *Sender)
 {
-  this->cds_MemAddress->Visible = ! this->cds_MemAddress->Visible;
-  this->cds_MemAddrHex->Visible = ! this->cds_MemAddrHex->Visible;
+   (void)Sender;
+
+   this->cds_MemAddress->Visible = ! this->cds_MemAddress->Visible;
+   this->cds_MemAddrHex->Visible = ! this->cds_MemAddrHex->Visible;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_InsertClick(TObject *Sender)
 {
+  (void)Sender;
+
   //int SaveSortVal = this->cds_MemSort->AsInteger;
   this->cds_Mem->Insert();
   //this->cds_MemSort->AsInteger = SaveSortVal;
@@ -453,14 +465,19 @@ void __fastcall Tf_Memory::b_InsertClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_EditClick(TObject *Sender)
 {
-  this->cds_Mem->Edit();
-  //this->cds_MemSort->AsString = this->e_Sort->Text;
-  this->CreateLine();
-  this->cds_Mem->Post();
+   (void)Sender;
+
+   this->cds_Mem->Edit();
+   //this->cds_MemSort->AsString = this->e_Sort->Text;
+   this->CreateLine();
+   this->cds_Mem->Post();
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::ds_MemDataChange(TObject *Sender, TField *Field)
 {
+  (void)Sender;
+  (void)Field;
+
   if (this->cds_Mem->State == dsBrowse) {
       //this->e_Sort->Text         = this->cds_MemSort->AsString;
       //this->e_Sort->Enabled      = true;
@@ -488,14 +505,18 @@ void __fastcall Tf_Memory::ds_MemDataChange(TObject *Sender, TField *Field)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_DeleteClick(TObject *Sender)
 {
-  if(this->cds_Mem->RecordCount > 1) {
+   (void)Sender;
+
+   if(this->cds_Mem->RecordCount > 1) {
       if (Application->MessageBox( L"Delete Instruction ?", L"Instruction Node", MB_YESNO) == mrYes)
-        this->cds_Mem->Delete();
-  }
+         this->cds_Mem->Delete();
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::e_DataKeyPress(TObject *Sender, char &Key)
 {
+  (void)Sender;
+
   if (Key != VK_RETURN && Key != VK_TAB && Key != VK_LEFT && Key != VK_RIGHT && Key != VK_BACK && Key != VK_CLEAR &&
       Key != VK_ESCAPE && Key != VK_DELETE  && Key != VK_HOME && Key != VK_END && Key != VK_INSERT && Key != VK_CANCEL) {
       if (this->rb_Bin->Checked) {
@@ -517,6 +538,8 @@ void __fastcall Tf_Memory::e_DataKeyPress(TObject *Sender, char &Key)
 
 void __fastcall Tf_Memory::rb_BinClick(TObject *Sender)
 {
+  (void)Sender;
+
   int WidthHex;
   String BinData;
   TInstruc* Instruc;
@@ -548,6 +571,8 @@ void __fastcall Tf_Memory::rb_BinClick(TObject *Sender)
 
 void __fastcall Tf_Memory::rb_DecClick(TObject *Sender)
 {
+  (void)Sender;
+
   int WidthHex, DecData = 0, Muliplier;
   String BinData, HexData;
   TInstruc* Instruc;
@@ -582,6 +607,8 @@ void __fastcall Tf_Memory::rb_DecClick(TObject *Sender)
 
 void __fastcall Tf_Memory::rb_HexClick(TObject *Sender)
 {
+  (void)Sender;
+
   String HexData;
   TInstruc* Instruc;
 
@@ -723,6 +750,8 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_SaveClick(TObject *Sender)
 {
+   (void)Sender;
+
   if (this->sd_Mem->Execute()) {
     if (this->sd_Mem->FileName != "") {
       TBookmark CurrAddr;
@@ -759,6 +788,8 @@ void __fastcall Tf_Memory::b_SaveClick(TObject *Sender)
 
 void __fastcall Tf_Memory::b_LoadClick(TObject *Sender)
 {
+   (void)Sender;
+
   if (this->od_Mem->Execute()) {
     if (this->od_Mem->FileName != "") {
 	   this->cds_Mem->LogChanges = false;
@@ -774,6 +805,8 @@ void __fastcall Tf_Memory::b_LoadClick(TObject *Sender)
 
 void __fastcall Tf_Memory::e_DataExit(TObject *Sender)
 {
+   (void)Sender;
+
    int WidthHex, MaxDecimal;
    TInstruc* Instruc;
    String Data = this->e_Data->Text;
@@ -935,6 +968,8 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
 
 void __fastcall Tf_Memory::b_ClearClick(TObject *Sender)
 {
+   (void)Sender;
+
    this->ExecCmp = 0;
 
    this->b_Add->Enabled    = true;
@@ -1242,6 +1277,8 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
 
 void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 {
+   (void)Sender;
+
    String Line, LineData, LineComment, LineOpCode;
    String LineParam[3];
    String InstrucText, InstrucCode, DataHex , DataLineText, DataLineCode;
@@ -1607,6 +1644,8 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::cb_StepByStepClick(TObject *Sender)
 {
+   (void)Sender;
+
    b_Next->Enabled = cb_StepByStep->Checked;
    if (f_GraphIO->Pin39->Checked == true)
       b_Next->Click();
@@ -1615,6 +1654,8 @@ void __fastcall Tf_Memory::cb_StepByStepClick(TObject *Sender)
 
 void __fastcall Tf_Memory::b_NextClick(TObject *Sender)
 {
+   (void)Sender;
+
    f_GraphIO->Pin39->Checked = false;
    if (!cb_StepByStep->Checked)
       b_Next->Enabled = false;
@@ -1624,6 +1665,10 @@ void __fastcall Tf_Memory::b_NextClick(TObject *Sender)
 void __fastcall Tf_Memory::dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect,
           TField *Field, TGridDrawState State)
 {
+   (void)Sender;
+   (void)Rect;
+   (void)State;
+
    if (Field->Name == "cds_MemAddress" || Field->Name == "cds_MemAddrHex" ) {
       if (this->cds_MemBreakPoint->AsBoolean) {
          //dbg_Mem->Canvas->Font->Style = dbg_Mem->Canvas->Font->Style << fsBold;
@@ -1635,6 +1680,8 @@ void __fastcall Tf_Memory::dbg_MemDrawDataCell(TObject *Sender, const TRect &Rec
 
 void __fastcall Tf_Memory::b_BreakPointClick(TObject *Sender)
 {
+   (void)Sender;
+
    this->cds_Mem->Edit();
    this->cds_MemBreakPoint->AsBoolean = !this->cds_MemBreakPoint->AsBoolean;
    this->cds_Mem->Post();
@@ -1643,6 +1690,8 @@ void __fastcall Tf_Memory::b_BreakPointClick(TObject *Sender)
 
 void __fastcall Tf_Memory::b_bootClick(TObject *Sender)
 {
+   (void)Sender;
+
    f_GraphIO->Pin70->Checked = true;
 }
 //---------------------------------------------------------------------------

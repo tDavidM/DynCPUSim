@@ -19,11 +19,15 @@ __fastcall Tf_Ram::Tf_Ram(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
+  (void)Sender;
+
   CanClose = false;    
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::FormCreate(TObject *Sender)
 {
+  (void)Sender;
+
   this->LastX = -1;
   this->LastY = -1;
 
@@ -125,6 +129,8 @@ void __fastcall Tf_Ram::sg_RamKeyPress(TObject *Sender, char &Key)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::sg_RamExit(TObject *Sender)
 {
+  (void)Sender;
+
    for(int i=1;i<=32;i++)
    {
        for(int j=1;j<=8;j++)
@@ -300,6 +306,8 @@ String Tf_Ram::DecToHex(String Hex)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::rb_BinClick(TObject *Sender)
 {
+  (void)Sender;
+
    String Data;
 
    Data = this->e_Page->Text;
@@ -342,6 +350,8 @@ void __fastcall Tf_Ram::rb_BinClick(TObject *Sender)
 
 void __fastcall Tf_Ram::rb_DecClick(TObject *Sender)
 {
+  (void)Sender;
+
    String Data;
 
    Data = this->e_Page->Text;
@@ -382,6 +392,8 @@ void __fastcall Tf_Ram::rb_DecClick(TObject *Sender)
 
 void __fastcall Tf_Ram::rb_HexClick(TObject *Sender)
 {
+  (void)Sender;
+
    String Data;
 
    Data = this->e_Page->Text;
@@ -417,6 +429,8 @@ void __fastcall Tf_Ram::rb_HexClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::b_SaveClick(TObject *Sender)
 {
+  (void)Sender;
+
   String Data;
 
   for(int i=1;i<=32;i++)
@@ -459,6 +473,8 @@ void __fastcall Tf_Ram::b_SaveClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::b_LoadClick(TObject *Sender)
 {
+  (void)Sender;
+
   String Data;
   int Line;
 
@@ -571,6 +587,10 @@ void Tf_Ram::Get(String Addr, char *Value, String Page)
 void __fastcall Tf_Ram::sg_RamSelectCell(TObject *Sender, int ACol, int ARow,
       bool &CanSelect)
 {
+  (void)Sender;
+  (void)CanSelect;
+
+
    this->CleanUpData(this->LastX, this->LastY);
 
    this->LastX = ACol;
@@ -580,6 +600,8 @@ void __fastcall Tf_Ram::sg_RamSelectCell(TObject *Sender, int ACol, int ARow,
 
 void __fastcall Tf_Ram::e_PageExit(TObject *Sender)
 {
+  (void)Sender;
+
    String Data = this->e_Page->Text.UpperCase();
 
    if (this->rb_Bin->Checked) {
@@ -697,6 +719,8 @@ void Tf_Ram::SwapPage(String Current, String New)
 
 void __fastcall Tf_Ram::b_ImportClick(TObject *Sender)
 {
+  (void)Sender;
+
   ifstream FileId;
   String Buffer;  //65536
   String Byte;
@@ -753,16 +777,20 @@ void __fastcall Tf_Ram::b_ImportClick(TObject *Sender)
 
 void __fastcall Tf_Ram::ud_PageClick(TObject *Sender, TUDBtnType Button)
 {
+  (void)Sender;
+
   int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1,1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2,1)));
   if(Button == btNext && NbPage < 255)
-	 this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage+1) ));
+    this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage+1) ));
   else if(Button == btPrev && NbPage > 0)
-	 this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage-1) ));
+    this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage-1) ));
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_Ram::b_ClearPClick(TObject *Sender)
 {
+  (void)Sender;
+
    for (int i=1;i<=32;i++) {
      for (int j=1;j<=8;j++) {
        if (this->rb_Bin->Checked)
