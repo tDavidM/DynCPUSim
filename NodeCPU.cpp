@@ -21,8 +21,8 @@ TNode::TNode(int pIntID, int pX, int pY, int pType, String pName)
     this->X = pX;
     this->Y = pY;
     this->Type = pType;
-	 this->DeleteFlag = false;
-	 this->TagFlag = false;
+     this->DeleteFlag = false;
+     this->TagFlag = false;
 
     //Each Node has 2 input and 2 output (exept for NOT which only eval Up)
     this->PinInUp    = 0;
@@ -57,183 +57,185 @@ TNode::TNode(int pIntID, int pX, int pY, int pType, String pName)
 //Set Pin number to Input Up
 void TNode::SetInUp(int pPin/*, TNode *pID*/)
 {
-  this->PinInUp = pPin;
-  //this->InUp = pID;
+   this->PinInUp = pPin;
+   //this->InUp = pID;
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Input Down
 void TNode::SetInDown(int pPin/*, TNode *pID*/)
 {
-  this->PinInDown = pPin;
-  //this->InDown = pID;
+   this->PinInDown = pPin;
+   //this->InDown = pID;
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Output Up
 void TNode::SetOutUp(int pPin, TNode *pID)
 {
-  this->PinOutUp = pPin;
-  this->NodeOutUp = pID;
+   this->PinOutUp = pPin;
+   this->NodeOutUp = pID;
 }
 //---------------------------------------------------------------------------
 //Set Pin number to Output Down
 void TNode::SetOutDown(int pPin, TNode *pID)
 {
-  this->PinOutDown = pPin;
-  this->NodeOutDown = pID;
+   this->PinOutDown = pPin;
+   this->NodeOutDown = pID;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Input Up
 int TNode::GetPin_InUp(void)
 {
-  return this->PinInUp;
+   return this->PinInUp;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Input Down
 int TNode::GetPin_InDown(void)
 {
-  return this->PinInDown;
+   return this->PinInDown;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Output Up
 int TNode::GetPin_OutUp(void)
 {
-  return this->PinOutUp;
+   return this->PinOutUp;
 }
 //---------------------------------------------------------------------------
 //Get Pin number for Output Down
 int TNode::GetPin_OutDown(void)
 {
-  return this->PinOutDown;
+   return this->PinOutDown;
 }
 //---------------------------------------------------------------------------
 //Get pointer to Output Node Up
 TNode * TNode::GetNodeOutUp(void)
 {
-  return this->NodeOutUp; //gives the Output Up node
+   return this->NodeOutUp; //gives the Output Up node
 }
 //---------------------------------------------------------------------------
 //Get pointer to Output Node Down
 TNode * TNode::GetNodeOutDown(void)
 {
-  return this->NodeOutDown; //gives the Output Down node
+   return this->NodeOutDown; //gives the Output Down node
 }
 //---------------------------------------------------------------------------
 //Get Actual Internal State
 bool TNode::GetActive(void)
 {
-  return this->Active || (this->ActiveDelay > 0); //Gives the Node internal state
+   return this->Active || (this->ActiveDelay > 0); //Gives the Node internal state
 }
 //---------------------------------------------------------------------------
 //Get Type of Node
 int TNode::GetType(void)
 {
-  return this->Type;
+   return this->Type;
 }
 //---------------------------------------------------------------------------
 //Set Type of Node
 void TNode::SetType(int pType)
 {
-  this->Type = pType;
+   this->Type = pType;
 }
 //---------------------------------------------------------------------------
 //Check if connected to a Pin (In or Out) or not
 int TNode::GetInOutType(void)
 {
-  if(this->PinInUp > 0 || this->PinInDown > 0)
-    return 1; //Input, Green/Yellow
-  else if(this->PinOutUp > 0 || this->PinOutDown > 0)
-    return 2; //Output, Blue/Purple
-  else
-    return 0; //Normal, Black/Red
+   if (this->PinInUp > 0 || this->PinInDown > 0) {
+      return 1; //Input, Green/Yellow
+   } else if (this->PinOutUp > 0 || this->PinOutDown > 0) {
+      return 2; //Output, Blue/Purple
+   } else {
+      return 0; //Normal, Black/Red
+   }
 }
 //---------------------------------------------------------------------------
 //Reset Internal State, Inputs States and Activity on Inputs
 void TNode::Reset(void)
 {
-    this->InUpAct      = false;
-    this->InActiveUp   = false;
-    this->InDownAct    = false;
-    this->InActiveDown = false;
-    this->Active       = false;
-    this->ActiveDelay  = 0;
+   this->InUpAct      = false;
+   this->InActiveUp   = false;
+   this->InDownAct    = false;
+   this->InActiveDown = false;
+   this->Active       = false;
+   this->ActiveDelay  = 0;
 }
 //---------------------------------------------------------------------------
 //Trigger Activity on Inputs and Set Input States, DOES NOT change Internal State
 void TNode::Receive(bool pAct)
 {
-  //When a node receives input, it is stacked in Up than Down
-  if (!this->DeleteFlag) {
+   //When a node receives input, it is stacked in Up than Down
+   if (!this->DeleteFlag) {
       if (!this->InActiveUp) {
-        this->InUpAct = pAct;
-        this->InActiveUp = true;
+         this->InUpAct = pAct;
+         this->InActiveUp = true;
       } else if (!this->InActiveDown) {
-        this->InDownAct = pAct;
-        this->InActiveDown = true;
+         this->InDownAct = pAct;
+         this->InActiveDown = true;
       }
-  }
+   }
 }
 //---------------------------------------------------------------------------
 //Notifies Output Nodes of Internal State
 void TNode::Send()
 {
-  TNode* NodeCurr;
+   TNode* NodeCurr;
   
-  //Each node sends internal state to Up and Down Output Node by calling remote Receive methode
-  if (!this->DeleteFlag) {
+   //Each node sends internal state to Up and Down Output Node by calling remote Receive methode
+   if (!this->DeleteFlag) {
       NodeCurr = this->NodeOutUp;
-      if (NodeCurr != NULL)
-        NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
+      if (NodeCurr != NULL) {
+         NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
+      }
 
       NodeCurr = this->NodeOutDown;
-      if (NodeCurr != NULL)
-        NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
+      if (NodeCurr != NULL) {
+         NodeCurr->Receive(this->Active || (this->ActiveDelay > 0));
+      }
   }
 }
 //---------------------------------------------------------------------------
 //Update Internal State according to Inputs States, Reset Inputs Activities
 void TNode::Work(void)
 {
-  //Update internal state
-  switch (this->Type) {
-    case 0: { //OR
-	  this->Active = this->InUpAct || this->InDownAct;
+   //Update internal state
+   switch (this->Type) {
+   case 0: //OR
+      this->Active = this->InUpAct || this->InDownAct;
       break;
-	}
-	case 1: { //AND
-	  this->Active = this->InUpAct && this->InDownAct;
+
+   case 1: //AND
+      this->Active = this->InUpAct && this->InDownAct;
       break;
-	}
-	case 2: { //NOR
-	  this->Active = !(this->InUpAct || this->InDownAct);
+
+   case 2: //NOR
+      this->Active = !(this->InUpAct || this->InDownAct);
       break;
-	}
-	case 3: { //NAND
+
+   case 3: //NAND
       //this->ActiveDelay = this->Active;
-	  this->Active = !(this->InUpAct && this->InDownAct);
+      this->Active = !(this->InUpAct && this->InDownAct);
       //this->ActiveDelay = this->Active ? 3 : this->ActiveDelay - 1;
       break;
-	}
-	case 4: { //XOR
-	  this->Active = this->InUpAct != this->InDownAct;
-      break;
-	}
-	case 5: { //NOT
-	  this->Active = ! this->InUpAct;
-      break;
-	}
-	case 6: { //Link
-	  this->Active = this->InUpAct || this->InDownAct;
-      break;
-	}
-  }
 
-  //Reset the Inputs
-  this->InUpAct   = false;
-  this->InDownAct = false;
+   case 4: //XOR
+      this->Active = this->InUpAct != this->InDownAct;
+      break;
 
-  //reset the receive "stack"
-  this->InActiveUp   = false;
-  this->InActiveDown = false;
+   case 5: //NOT
+      this->Active = ! this->InUpAct;
+      break;
+
+   case 6: //Link
+      this->Active = this->InUpAct || this->InDownAct;
+      break;
+   }
+
+   //Reset the Inputs
+   this->InUpAct   = false;
+   this->InDownAct = false;
+
+   //reset the receive "stack"
+   this->InActiveUp   = false;
+   this->InActiveDown = false;
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -243,13 +245,13 @@ void TNode::Work(void)
 __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
     : TForm(Owner)
 {
-  this->MainCanvas = new TBitmap;
-  this->NodeList = new TList;
-  this->SelectList = new TList;
-  this->AnnotationList = new TList;
-  this->NodeSelect = NULL;
-  this->NodeType = 0;
-  this->NodeCmp = 0;
+   this->MainCanvas = new TBitmap;
+   this->NodeList = new TList;
+   this->SelectList = new TList;
+   this->AnnotationList = new TList;
+   this->NodeSelect = NULL;
+   this->NodeType = 0;
+   this->NodeCmp = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
@@ -1251,6 +1253,7 @@ bool Tf_CPUNode::NodeNameExists(String pName)
     return Found;
 }
 //---------------------------------------------------------------------------
+
 void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
       TShiftState Shift, int X, int Y)
 {
@@ -1262,14 +1265,14 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
 
   bool Found;
 
-  this->sb_Main->SimpleText =	"Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink";
+  this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink";
 
   //Left Click = Select
   if (Button == mbLeft && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))) {
-	  this->SelectList->Clear();
+     this->SelectList->Clear();
 
      this->MouseDownX = X;
-	  this->MouseDownY = Y;
+     this->MouseDownY = Y;
      for (int i = 0; i<NodeCmp; i++) {
          NodeCurr = (TNode*)this->NodeList->Items[i];
          if (! NodeCurr->DeleteFlag) {
@@ -1609,45 +1612,47 @@ void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {
-  (void)Sender;
-  (void)Shift;
+   (void)Sender;
+   (void)Shift;
 
-  if (Key == VK_DELETE && NodeSelect != NULL) {
-    if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes) {
-	  f_GraphEdit->cb_Delete->Checked = true;
-	  this->UpdateNode();
-    }
-  }
-  else if(Key == VK_KEY_1 || Key == VK_NUMPAD1)
-    b_Or->Click();
-  else if(Key == VK_KEY_2 || Key == VK_NUMPAD2)
-    b_And->Click();
-  else if(Key == VK_KEY_3 || Key == VK_NUMPAD3)
-    b_NOr->Click();
-  else if(Key == VK_KEY_4 || Key == VK_NUMPAD4)
-    b_NAnd->Click();
-  else if(Key == VK_KEY_5 || Key == VK_NUMPAD5)
-    b_XOr->Click();
-  else if(Key == VK_KEY_6 || Key == VK_NUMPAD6)
-	b_Not->Click();
-  else if (this->cb_QuickEdit->Checked) {
-    if(Key == 'O' && NodeSelect != NULL)
-      f_GraphEdit->cb_Type->ItemIndex = 0;
-    else if(Key == 'A' && NodeSelect != NULL)
-	   f_GraphEdit->cb_Type->ItemIndex = 1;
-    else if(Key == 'R' && NodeSelect != NULL)
-      f_GraphEdit->cb_Type->ItemIndex = 2;
-    else if(Key == 'D' && NodeSelect != NULL)
-      f_GraphEdit->cb_Type->ItemIndex = 3;
-    else if(Key == 'X' && NodeSelect != NULL)
-      f_GraphEdit->cb_Type->ItemIndex = 4;
-    else if(Key == 'N' && NodeSelect != NULL)
-      f_GraphEdit->cb_Type->ItemIndex = 5;
-    else if(Key == 'L' && NodeSelect != NULL)
-      f_GraphEdit->cb_Type->ItemIndex = 6;
+   if (Key == VK_DELETE && NodeSelect != NULL) {
+      if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes) {
+         f_GraphEdit->cb_Delete->Checked = true;
+         this->UpdateNode();
+      }
+   } else if (Key == VK_KEY_1 || Key == VK_NUMPAD1) {
+      this->b_Or->Click();
+   } else if (Key == VK_KEY_2 || Key == VK_NUMPAD2) {
+      this->b_And->Click();
+   } else if (Key == VK_KEY_3 || Key == VK_NUMPAD3) {
+      this->b_NOr->Click();
+   } else if (Key == VK_KEY_4 || Key == VK_NUMPAD4) {
+      this->b_NAnd->Click();
+   } else if (Key == VK_KEY_5 || Key == VK_NUMPAD5) {
+      this->b_XOr->Click();
+   } else if (Key == VK_KEY_6 || Key == VK_NUMPAD6) {
+      this->b_Not->Click();
+   } else if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+      if (Key == 'E' ) {
+         f_GraphEdit->e_Name->SetFocus();
+      } else if (Key == 'O') {
+         f_GraphEdit->cb_Type->ItemIndex = 0;
+      } else if (Key == 'A') {
+         f_GraphEdit->cb_Type->ItemIndex = 1;
+      } else if (Key == 'R') {
+         f_GraphEdit->cb_Type->ItemIndex = 2;
+      } else if (Key == 'D') {
+         f_GraphEdit->cb_Type->ItemIndex = 3;
+      } else if (Key == 'X') {
+         f_GraphEdit->cb_Type->ItemIndex = 4;
+      } else if (Key == 'N') {
+         f_GraphEdit->cb_Type->ItemIndex = 5;
+      } else if (Key == 'L') {
+         f_GraphEdit->cb_Type->ItemIndex = 6;
+      }
 
-    UpdateNode();
-  }
+      this->UpdateNode();
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
@@ -2116,7 +2121,7 @@ void __fastcall Tf_CPUNode::cb_QuickEditMouseMove(TObject *Sender, TShiftState S
    (void)X;
    (void)Y;
 
-   this->sb_Main->Panels->Items[0]->Text = "Keyboard: O=Or, A=And, R=Nor, D=Nand, X=Xor, N=Not";
+   this->sb_Main->Panels->Items[0]->Text = "Keyboard: E=EditName O=Or, A=And, R=Nor, D=Nand, X=Xor, N=Not";
 }
 //---------------------------------------------------------------------------
 
@@ -2140,6 +2145,7 @@ void __fastcall Tf_CPUNode::cb_ActiveDrawClick(TObject *Sender)
    this->RunInBatch = !this->cb_ActiveDraw->Checked;
 }
 //---------------------------------------------------------------------------
+
 
 
 

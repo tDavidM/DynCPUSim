@@ -135,5 +135,5 @@ Interupts:
 ToDo/Idea:
 Improve error detection in Import, (Param counter, line counter)
 Remove RSTAR - ResetAllReg() ?
-Remoe CFLG  - CarryFlg() ?
-
+Remove CFLG  - CarryFlg() ?
+Annotation editor
