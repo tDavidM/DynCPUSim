@@ -15,7 +15,7 @@
 //---------------------------------------------------------------------------
 class Tf_Ram : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:
     TStringGrid *sg_Ram;
     TButton *b_Save;
     TButton *b_Load;
@@ -56,7 +56,8 @@ __published:	// Composants gérés par l'EDI
 	void __fastcall b_ImportClick(TObject *Sender);
 	void __fastcall ud_PageClick(TObject *Sender, TUDBtnType Button);
    void __fastcall b_ClearPClick(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+    void __fastcall FormShow(TObject *Sender);
+private:
     int LastDataType;
 	int LastX, LastY;
 	String CurrentPage;
@@ -69,7 +70,7 @@ private:	// Déclarations de l'utilisateur
 	void CleanUpData(int X, int Y);
 	void SwapPage(String Current, String New);
 
-public:		// Déclarations de l'utilisateur
+public:
 
 	void Set(String Addr, String Value, String Page = '0');
 	void Get(String Addr, char *Value, String Page = '0');

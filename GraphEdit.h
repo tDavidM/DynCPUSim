@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------
 class Tf_GraphEdit : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:
     TLabel *l_lIntid;
     TEdit *e_PosX;
     TLabel *l_InternalID;
@@ -45,9 +45,10 @@ __published:	// Composants gérés par l'EDI
     void __fastcall b_UpdateClick(TObject *Sender);
     void __fastcall b_deleteClick(TObject *Sender);
     void __fastcall e_NameOutUpKeyPress(TObject *Sender, char &Key);
+    void __fastcall FormShow(TObject *Sender);
 
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
+private:
+public:
     __fastcall Tf_GraphEdit(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

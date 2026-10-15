@@ -777,30 +777,41 @@ void __fastcall Tf_Ram::b_ImportClick(TObject *Sender)
 
 void __fastcall Tf_Ram::ud_PageClick(TObject *Sender, TUDBtnType Button)
 {
-  (void)Sender;
+   (void)Sender;
 
-  int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1,1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2,1)));
-  if(Button == btNext && NbPage < 255)
-    this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage+1) ));
-  else if(Button == btPrev && NbPage > 0)
-    this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage-1) ));
+   int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1,1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2,1)));
+   if (Button == btNext && NbPage < 255) {
+      this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage+1) ));
+   } else if(Button == btPrev && NbPage > 0) {
+      this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage-1) ));
+   }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_Ram::b_ClearPClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
    for (int i=1;i<=32;i++) {
-     for (int j=1;j<=8;j++) {
-       if (this->rb_Bin->Checked)
-         this->sg_Ram->Cells[j][i] = "00000000";
-       else if(this->rb_Dec->Checked)
-         this->sg_Ram->Cells[j][i] = "0";
-       else
-         this->sg_Ram->Cells[j][i] = "00";
-     }
+      for (int j=1;j<=8;j++) {
+         if (this->rb_Bin->Checked) {
+            this->sg_Ram->Cells[j][i] = "00000000";
+         } else if(this->rb_Dec->Checked) {
+            this->sg_Ram->Cells[j][i] = "0";
+         } else {
+            this->sg_Ram->Cells[j][i] = "00";
+         }
+      }
    }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Ram::FormShow(TObject *Sender)
+{
+   (void)Sender;
+
+   this->Left = 5;
+   this->Top = 5;
 }
 //---------------------------------------------------------------------------
 

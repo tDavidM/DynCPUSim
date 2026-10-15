@@ -16,6 +16,7 @@ object f_Ram: Tf_Ram
   Visible = True
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignSize = (
     814
     671)

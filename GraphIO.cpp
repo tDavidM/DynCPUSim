@@ -16,15 +16,14 @@ __fastcall Tf_GraphIO::Tf_GraphIO(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  char Instruction[17];
+   char Instruction[17];
 
-  f_Memory->cds_Mem->First();
+   f_Memory->cds_Mem->First();
 
-  //CPU boot, load first instruction
-  if(this->Pin49->Checked)
-  {
+   //CPU boot, load first instruction
+   if (this->Pin49->Checked) {
       strncpy(Instruction, AnsiString(f_Memory->cds_MemCode->AsString).c_str(),17);
       Instruction[16] = '\0';
 
@@ -44,16 +43,15 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
       this->Pin14->Checked = Instruction[13] != '0';
       this->Pin15->Checked = Instruction[14] != '0';
       this->Pin16->Checked = Instruction[15] != '0';
-  }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::Pin30Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //CPU RAM write flag
-  if(this->Pin30->Checked)
-  {
+   //CPU RAM write flag
+   if (this->Pin30->Checked) {
       //21-28
       String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
       String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
@@ -70,17 +68,16 @@ void __fastcall Tf_GraphIO::Pin30Click(TObject *Sender)
       String Page = c2 + c1;
 
       f_Ram->Set(Addr, Value, Page);
-  }
+   }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Pin40Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //CPU RAM write flag
-  if(this->Pin40->Checked)
-  {
+   //CPU RAM write flag
+   if (this->Pin40->Checked) {
       //21-28
       String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
       String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
@@ -103,19 +100,18 @@ void __fastcall Tf_GraphIO::Pin40Click(TObject *Sender)
       this->Pin46->Checked  = Value[2]  != '0';
       this->Pin47->Checked  = Value[1]  != '0';
       this->Pin48->Checked  = Value[0]  != '0';
-  }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::Pin50Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  char Instruction[17];
-  int Delta;
+   char Instruction[17];
+   int Delta;
 
-  //CPU clock rising edge
-  if(this->Pin50->Checked)
-  {
+   //CPU clock rising edge
+   if (this->Pin50->Checked) {
       //51-58
       String c1 = BinToHex(Pin51->Checked, Pin52->Checked, Pin53->Checked, Pin54->Checked);
       String c2 = BinToHex(Pin55->Checked, Pin56->Checked, Pin57->Checked, Pin58->Checked);
@@ -143,25 +139,25 @@ void __fastcall Tf_GraphIO::Pin50Click(TObject *Sender)
       this->Pin14->Checked = Instruction[13] != '0';
       this->Pin15->Checked = Instruction[14] != '0';
       this->Pin16->Checked = Instruction[15] != '0';
-  }
+   }
 
-  if (f_Memory->cb_StepByStep->Checked) {
-     Pin29->Checked = true;
-     if (!f_CPUNode->cb_ActiveDraw->Checked) {
-        f_CPUNode->CallDrawArea(1);
-     }
-  }
+   if (f_Memory->cb_StepByStep->Checked) {
+      Pin29->Checked = true;
+      if (!f_CPUNode->cb_ActiveDraw->Checked) {
+         f_CPUNode->CallDrawArea(1);
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::Pin60Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  char Instruction[17];
-  int  Addr;
+   char Instruction[17];
+   int  Addr;
 
-  //CPU clock rising edge
-  if (this->Pin60->Checked) {
+   //CPU clock rising edge
+   if (this->Pin60->Checked) {
       //71-78
       String c1 = BinToHex(Pin71->Checked, Pin72->Checked, Pin73->Checked, Pin74->Checked);
       String c2 = BinToHex(Pin75->Checked, Pin76->Checked, Pin77->Checked, Pin78->Checked);
@@ -192,195 +188,190 @@ void __fastcall Tf_GraphIO::Pin60Click(TObject *Sender)
       this->Pin14->Checked = Instruction[13] != '0';
       this->Pin15->Checked = Instruction[14] != '0';
       this->Pin16->Checked = Instruction[15] != '0';
-  }
+   }
 
-  if (f_Memory->cb_StepByStep->Checked) {
-     Pin29->Checked = true;
-     if (!f_CPUNode->cb_ActiveDraw->Checked) {
-        f_CPUNode->CallDrawArea(1);
-     }
-  }
+   if (f_Memory->cb_StepByStep->Checked) {
+      Pin29->Checked = true;
+      if (!f_CPUNode->cb_ActiveDraw->Checked) {
+         f_CPUNode->CallDrawArea(1);
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
-  (void)Sender;
+   (void)Sender;
 
-  CanClose = false;
+   CanClose = false;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::b_ResetClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  TCheckBox * CurrPin;
+   TCheckBox * CurrPin;
 
-  DebugOutState = false;
-  f_Memory->dbg_Mem->Color = clWindow;
+   DebugOutState = false;
+   f_Memory->dbg_Mem->Color = clWindow;
 
-  f_Memory->cds_Mem->First();
-  f_CPUNode->ResetAllNode();
-  f_CPUNode->sb_Main->SimpleText =	"Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
+   f_Memory->cds_Mem->First();
+   f_CPUNode->ResetAllNode();
+   f_CPUNode->sb_Main->SimpleText =	"Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
 
-  for(int i=0; i<=60; i++)
-  {
-     CurrPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(i));
-     if (CurrPin != NULL)
-        CurrPin->Checked = false;
-  }
+   for (int i=0; i<=60; i++) {
+      CurrPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(i));
+      if (CurrPin != NULL) {
+         CurrPin->Checked = false;
+      }
+   }
 }
 //---------------------------------------------------------------------------
 char Tf_GraphIO::BinToHex(bool p1, bool p2, bool p3, bool p4 )
 {
-    if     (!p1 && !p2 && !p3 && !p4) { return '0'; }
-    else if( p1 && !p2 && !p3 && !p4) { return '1'; }
-    else if(!p1 &&  p2 && !p3 && !p4) { return '2'; }
-    else if( p1 &&  p2 && !p3 && !p4) { return '3'; }
-    else if(!p1 && !p2 &&  p3 && !p4) { return '4'; }
-    else if( p1 && !p2 &&  p3 && !p4) { return '5'; }
-    else if(!p1 &&  p2 &&  p3 && !p4) { return '6'; }
-    else if( p1 &&  p2 &&  p3 && !p4) { return '7'; }
-    else if(!p1 && !p2 && !p3 &&  p4) { return '8'; }
-    else if( p1 && !p2 && !p3 &&  p4) { return '9'; }
-    else if(!p1 &&  p2 && !p3 &&  p4) { return 'A'; }
-    else if( p1 &&  p2 && !p3 &&  p4) { return 'B'; }
-    else if(!p1 && !p2 &&  p3 &&  p4) { return 'C'; }
-    else if( p1 && !p2 &&  p3 &&  p4) { return 'D'; }
-    else if(!p1 &&  p2 &&  p3 &&  p4) { return 'E'; }
-    else if( p1 &&  p2 &&  p3 &&  p4) { return 'F'; }
-    else { return 0; } // =^.^= here's a kitty
+   if     (!p1 && !p2 && !p3 && !p4) { return '0'; }
+   else if( p1 && !p2 && !p3 && !p4) { return '1'; }
+   else if(!p1 &&  p2 && !p3 && !p4) { return '2'; }
+   else if( p1 &&  p2 && !p3 && !p4) { return '3'; }
+   else if(!p1 && !p2 &&  p3 && !p4) { return '4'; }
+   else if( p1 && !p2 &&  p3 && !p4) { return '5'; }
+   else if(!p1 &&  p2 &&  p3 && !p4) { return '6'; }
+   else if( p1 &&  p2 &&  p3 && !p4) { return '7'; }
+   else if(!p1 && !p2 && !p3 &&  p4) { return '8'; }
+   else if( p1 && !p2 && !p3 &&  p4) { return '9'; }
+   else if(!p1 &&  p2 && !p3 &&  p4) { return 'A'; }
+   else if( p1 &&  p2 && !p3 &&  p4) { return 'B'; }
+   else if(!p1 && !p2 &&  p3 &&  p4) { return 'C'; }
+   else if( p1 && !p2 &&  p3 &&  p4) { return 'D'; }
+   else if(!p1 &&  p2 &&  p3 &&  p4) { return 'E'; }
+   else if( p1 &&  p2 &&  p3 &&  p4) { return 'F'; }
+   else { return 0; } // =^.^= here's a kitty
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line1Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //1-16
-  String c1 = BinToHex(Pin1->Checked,  Pin2->Checked,  Pin3->Checked,  Pin4->Checked);
-  String c2 = BinToHex(Pin5->Checked,  Pin6->Checked,  Pin7->Checked,  Pin8->Checked);
-  String c3 = BinToHex(Pin9->Checked,  Pin10->Checked, Pin11->Checked, Pin12->Checked);
-  String c4 = BinToHex(Pin13->Checked, Pin14->Checked, Pin15->Checked, Pin16->Checked);
+   //1-16
+   String c1 = BinToHex(Pin1->Checked,  Pin2->Checked,  Pin3->Checked,  Pin4->Checked);
+   String c2 = BinToHex(Pin5->Checked,  Pin6->Checked,  Pin7->Checked,  Pin8->Checked);
+   String c3 = BinToHex(Pin9->Checked,  Pin10->Checked, Pin11->Checked, Pin12->Checked);
+   String c4 = BinToHex(Pin13->Checked, Pin14->Checked, Pin15->Checked, Pin16->Checked);
 
-  l_Line1->Caption = "[0x" + c4 + c3 + c2 + c1 + "]";
+   l_Line1->Caption = "[0x" + c4 + c3 + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line2Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //21-28
-  String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
-  String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
+   //21-28
+   String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
+   String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
 
-  l_Line2->Caption = "[0x" + c2 + c1 + "]";
-
+   l_Line2->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line3Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //31-38
-  String c1 = BinToHex(Pin31->Checked, Pin32->Checked, Pin33->Checked, Pin34->Checked);
-  String c2 = BinToHex(Pin35->Checked, Pin36->Checked, Pin37->Checked, Pin38->Checked);
+   //31-38
+   String c1 = BinToHex(Pin31->Checked, Pin32->Checked, Pin33->Checked, Pin34->Checked);
+   String c2 = BinToHex(Pin35->Checked, Pin36->Checked, Pin37->Checked, Pin38->Checked);
 
-  l_Line3->Caption = "[0x" + c2 + c1 + "]";
+   l_Line3->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line4Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //41-48
-  String c1 = BinToHex(Pin41->Checked, Pin42->Checked, Pin43->Checked, Pin44->Checked);
-  String c2 = BinToHex(Pin45->Checked, Pin46->Checked, Pin47->Checked, Pin48->Checked);
+   //41-48
+   String c1 = BinToHex(Pin41->Checked, Pin42->Checked, Pin43->Checked, Pin44->Checked);
+   String c2 = BinToHex(Pin45->Checked, Pin46->Checked, Pin47->Checked, Pin48->Checked);
 
-  l_Line4->Caption = "[0x" + c2 + c1 + "]";
+   l_Line4->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line5Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //51-58
-  String c1 = BinToHex(Pin51->Checked, Pin52->Checked, Pin53->Checked, Pin54->Checked);
-  String c2 = BinToHex(Pin55->Checked, Pin56->Checked, Pin57->Checked, Pin58->Checked);
+   //51-58
+   String c1 = BinToHex(Pin51->Checked, Pin52->Checked, Pin53->Checked, Pin54->Checked);
+   String c2 = BinToHex(Pin55->Checked, Pin56->Checked, Pin57->Checked, Pin58->Checked);
 
-  l_Line5->Caption = "[0x" + c2 + c1 + "]";
+   l_Line5->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 
 void __fastcall Tf_GraphIO::Pin29Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  if(Pin29->Checked != DebugOutState)
-  {
-    if(Pin29->Checked)
-    {
-      DebugOutState = true;
-      Pin39->Checked = true;
-      f_Memory->dbg_Mem->Color = clRed;
-    }
-    else
-    {
-      DebugOutState = false;
-      //f_Memory->dbg_Mem->Color = clWindow;
-    }
-  }
+   if (Pin29->Checked != DebugOutState) {
+      if (Pin29->Checked) {
+         DebugOutState = true;
+         Pin39->Checked = true;
+         f_Memory->dbg_Mem->Color = clRed;
+      } else {
+         DebugOutState = false;
+         //f_Memory->dbg_Mem->Color = clWindow;
+      }
+   }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::FormCreate(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  DebugOutState = false;
+   DebugOutState = false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Pin39Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  f_Memory->dbg_Mem->Color = clWindow;
+   f_Memory->dbg_Mem->Color = clWindow;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line6Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //61-68
-  String c1 = BinToHex(Pin61->Checked, Pin62->Checked, Pin63->Checked, Pin64->Checked);
-  String c2 = BinToHex(Pin65->Checked, Pin66->Checked, Pin67->Checked, Pin68->Checked);
+   //61-68
+   String c1 = BinToHex(Pin61->Checked, Pin62->Checked, Pin63->Checked, Pin64->Checked);
+   String c2 = BinToHex(Pin65->Checked, Pin66->Checked, Pin67->Checked, Pin68->Checked);
 
-  l_Line6->Caption = "[0x" + c2 + c1 + "]";
+   l_Line6->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 
 void __fastcall Tf_GraphIO::Line7Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //71-78
-  String c1 = BinToHex(Pin71->Checked, Pin72->Checked, Pin73->Checked, Pin74->Checked);
-  String c2 = BinToHex(Pin75->Checked, Pin76->Checked, Pin77->Checked, Pin78->Checked);
+   //71-78
+   String c1 = BinToHex(Pin71->Checked, Pin72->Checked, Pin73->Checked, Pin74->Checked);
+   String c2 = BinToHex(Pin75->Checked, Pin76->Checked, Pin77->Checked, Pin78->Checked);
 
-  l_Line7->Caption = "[0x" + c2 + c1 + "]";
+   l_Line7->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::l_romDblClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
    l_PgrmCmp->Visible = !l_PgrmCmp->Visible;
 }
@@ -388,64 +379,72 @@ void __fastcall Tf_GraphIO::l_romDblClick(TObject *Sender)
 
 void __fastcall Tf_GraphIO::Line8Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //81-96
-  String c1 = BinToHex(Pin81->Checked,  Pin82->Checked,  Pin83->Checked,  Pin84->Checked);
-  String c2 = BinToHex(Pin85->Checked,  Pin86->Checked,  Pin87->Checked,  Pin88->Checked);
-  String c3 = BinToHex(Pin89->Checked,  Pin90->Checked,  Pin91->Checked,  Pin92->Checked);
-  String c4 = BinToHex(Pin93->Checked,  Pin94->Checked,  Pin95->Checked,  Pin96->Checked);
+   //81-96
+   String c1 = BinToHex(Pin81->Checked,  Pin82->Checked,  Pin83->Checked,  Pin84->Checked);
+   String c2 = BinToHex(Pin85->Checked,  Pin86->Checked,  Pin87->Checked,  Pin88->Checked);
+   String c3 = BinToHex(Pin89->Checked,  Pin90->Checked,  Pin91->Checked,  Pin92->Checked);
+   String c4 = BinToHex(Pin93->Checked,  Pin94->Checked,  Pin95->Checked,  Pin96->Checked);
 
-  l_Line8->Caption = "[0x" + c4 + c3 + c2 + c1 + "]";
+   l_Line8->Caption = "[0x" + c4 + c3 + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line9Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //97-104
-  String c1 = BinToHex(Pin97->Checked,  Pin98->Checked,  Pin99->Checked,  Pin100->Checked);
-  String c2 = BinToHex(Pin101->Checked, Pin102->Checked, Pin103->Checked, Pin104->Checked);
+   //97-104
+   String c1 = BinToHex(Pin97->Checked,  Pin98->Checked,  Pin99->Checked,  Pin100->Checked);
+   String c2 = BinToHex(Pin101->Checked, Pin102->Checked, Pin103->Checked, Pin104->Checked);
 
-  l_Line9->Caption = "[0x" + c2 + c1 + "]";
+   l_Line9->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line10Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //105-112
-  String c1 = BinToHex(Pin105->Checked, Pin106->Checked, Pin107->Checked, Pin108->Checked);
-  String c2 = BinToHex(Pin109->Checked, Pin110->Checked, Pin111->Checked, Pin112->Checked);
+   //105-112
+   String c1 = BinToHex(Pin105->Checked, Pin106->Checked, Pin107->Checked, Pin108->Checked);
+   String c2 = BinToHex(Pin109->Checked, Pin110->Checked, Pin111->Checked, Pin112->Checked);
 
-  l_Line10->Caption = "[0x" + c2 + c1 + "]";
+   l_Line10->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line11Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //113-120
-  String c1 = BinToHex(Pin113->Checked, Pin114->Checked, Pin115->Checked, Pin116->Checked);
-  String c2 = BinToHex(Pin117->Checked, Pin118->Checked, Pin119->Checked, Pin120->Checked);
+   //113-120
+   String c1 = BinToHex(Pin113->Checked, Pin114->Checked, Pin115->Checked, Pin116->Checked);
+   String c2 = BinToHex(Pin117->Checked, Pin118->Checked, Pin119->Checked, Pin120->Checked);
 
-  l_Line11->Caption = "[0x" + c2 + c1 + "]";
+   l_Line11->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Line12Click(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  //121-128
-  String c1 = BinToHex(Pin121->Checked, Pin121->Checked, Pin123->Checked, Pin124->Checked);
-  String c2 = BinToHex(Pin125->Checked, Pin126->Checked, Pin127->Checked, Pin128->Checked);
+   //121-128
+   String c1 = BinToHex(Pin121->Checked, Pin121->Checked, Pin123->Checked, Pin124->Checked);
+   String c2 = BinToHex(Pin125->Checked, Pin126->Checked, Pin127->Checked, Pin128->Checked);
 
-  l_Line12->Caption = "[0x" + c2 + c1 + "]";
+   l_Line12->Caption = "[0x" + c2 + c1 + "]";
 }
 //---------------------------------------------------------------------------
 
+void __fastcall Tf_GraphIO::FormShow(TObject *Sender)
+{
+   (void)Sender;
+
+   this->Left = Screen->Width - (this->Width + 9);
+   this->Top = 5;
+}
+//---------------------------------------------------------------------------
 

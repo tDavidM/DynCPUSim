@@ -35,10 +35,33 @@
 #define REFRESH_BUFFER 1
 #define FROM_BUFFER    0
 //---------------------------------------------------------------------------
+
+#define HELP_BAR_TEXT_HOWTO "Mouse Click: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move"
+#define HELP_BAR_TEXT_KEY "Keyboard: E=EditName O=Or, A=And, R=Nor, D=Nand, X=Xor, N=Not"
+#define HELP_BAR_TEXT_ANOT "Hold Ctrl while clicking to show all Annotations"
+
+//---------------------------------------------------------------------------
+
+//OR Circle
+//AND Square
+//NOR Circle with a Point
+//NAND Square with a Point
+//XOR Circle with a White +
+//NOT Triangle
+//LINK Line
+enum NodeTypes: int { N_OR, N_AND, N_NOR, N_NAND, N_XOR, N_NOT, N_LINK};
+
+//Normal, Black/Red
+//Input, Green/Yellow
+//Output, Blue/Purple
+enum NodeUses: int { N_NORMAL, N_INPUT, N_OUTPUT};
+
+//---------------------------------------------------------------------------
+
 class TNode
 {
 private:
-  int Type;
+  NodeTypes type;
 
   int PinInUp, PinInDown, PinOutUp, PinOutDown;
   TNode /* *InUp, *InDown,*/ *NodeOutUp, *NodeOutDown;
@@ -76,21 +99,21 @@ public:
   int GetPin_OutUp(void);
   int GetPin_OutDown(void);
 
-  int  GetType(void);
-  void SetType(int pType);
+  NodeTypes  GetType(void);
+  void SetType(NodeTypes pType);
 
   bool GetActive(void);
-  int  GetInOutType(void);
+  NodeUses GetInOutType(void);
 
   TNode * GetNodeOutUp(void);
   TNode * GetNodeOutDown(void);
 
-  TNode(int pIntID, int pX, int pY, int pType, String pName);
+  TNode(int pIntID, int pX, int pY, NodeTypes pType, String pName);
 };
 
 class Tf_CPUNode : public TForm
 {
-__published:	// Composants g�r�s par l'EDI
+__published:
    TPanel *p_Area;
    TTimer *t_Work;
    TPanel *p_zoom;
@@ -156,7 +179,7 @@ __published:	// Composants g�r�s par l'EDI
           int Y);
    void __fastcall cb_ActiveDrawClick(TObject *Sender);
 
-private:   // D�clarations de l'utilisateur
+private:
     void __fastcall AppMessage(TMsg& PassedMsg, bool& Handled);
 
     TBitmap* MainCanvas;
@@ -175,7 +198,7 @@ private:   // D�clarations de l'utilisateur
 
     bool FlagNewNode;
     int NodeCmp, NodeMaxID;
-    int NodeType;
+    NodeTypes NodeType;
 
     bool ItsUpdated;
     int DrawCmpItem;
@@ -195,7 +218,7 @@ private:   // D�clarations de l'utilisateur
     void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
     void LoadAnnotation(_di_IXMLNode pAnnotation);
 
-public:    // D�clarations de l'utilisateur
+public:
 
    __fastcall Tf_CPUNode(TComponent* Owner);
    void UpdateNode(void);
@@ -204,7 +227,6 @@ public:    // D�clarations de l'utilisateur
    bool NodeNameExists(String pName);
    void EmptyFollowList(void);
 };
-
 
 
 //---------------------------------------------------------------------------

@@ -40,7 +40,7 @@ public:
 //---------------------------------------------------------------------------
 class Tf_Memory : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:
     TComboBox *cb_OpCode;
     TComboBox *cb_D;
     TComboBox *cb_C;
@@ -116,7 +116,8 @@ __published:	// Composants gérés par l'EDI
           TGridDrawState State);
    void __fastcall b_BreakPointClick(TObject *Sender);
    void __fastcall b_bootClick(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+    void __fastcall FormShow(TObject *Sender);
+private:
     int LastDataType;
     int LastSelLine;
     int InstrucCmp;
@@ -136,7 +137,7 @@ private:	// Déclarations de l'utilisateur
     void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList);
     void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList);
 
-public:		// Déclarations de l'utilisateur
+public:
     __fastcall Tf_Memory(TComponent* Owner);
     void MoveAddrByDelta(int Delta);
     void MoveAddrByAbsolute(int Addr);

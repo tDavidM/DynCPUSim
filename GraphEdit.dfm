@@ -13,6 +13,7 @@ object f_GraphEdit: Tf_GraphEdit
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnShow = FormShow
   DesignSize = (
     289
     397)

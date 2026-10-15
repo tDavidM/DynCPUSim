@@ -2,8 +2,8 @@ object f_CPUNode: Tf_CPUNode
   Left = 0
   Top = 0
   Caption = 'Dynamic CPU Simulation'
-  ClientHeight = 632
-  ClientWidth = 1102
+  ClientHeight = 937
+  ClientWidth = 1693
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,6 +12,7 @@ object f_CPUNode: Tf_CPUNode
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
@@ -20,27 +21,31 @@ object f_CPUNode: Tf_CPUNode
   OnMouseWheel = FormMouseWheel
   OnPaint = FormPaint
   DesignSize = (
-    1102
-    632)
+    1693
+    937)
   PixelsPerInch = 96
   TextHeight = 13
   object p_Area: TPanel
     Left = 0
     Top = 25
-    Width = 1102
-    Height = 589
+    Width = 1693
+    Height = 894
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     Visible = False
+    ExplicitWidth = 1102
+    ExplicitHeight = 589
   end
   object p_zoom: TPanel
-    Left = 1062
-    Top = 413
+    Left = 1653
+    Top = 718
     Width = 40
     Height = 199
     Anchors = [akRight, akBottom]
     ParentBackground = False
     TabOrder = 0
+    ExplicitLeft = 1062
+    ExplicitTop = 413
     object l_gridZoom: TLabel
       Left = 5
       Top = 6
@@ -65,8 +70,8 @@ object f_CPUNode: Tf_CPUNode
   end
   object sb_Main: TStatusBar
     Left = 0
-    Top = 613
-    Width = 1102
+    Top = 918
+    Width = 1693
     Height = 19
     Panels = <
       item
@@ -75,22 +80,26 @@ object f_CPUNode: Tf_CPUNode
     SimpleText = 
       #9#9#9#9#9#9#9#9'Mouse: Left=Select, Right=Move, Middle=Create, Shift+Lef' +
       't=Link(1), Ctrl+Left=Link(2)'
+    ExplicitTop = 613
+    ExplicitWidth = 1102
   end
   object HeaderControl: THeaderControl
     Left = 0
     Top = 0
-    Width = 1102
+    Width = 1693
     Height = 21
     Sections = <>
+    ExplicitWidth = 1102
   end
   object p_Speed: TPanel
-    Left = 1062
+    Left = 1653
     Top = 27
     Width = 40
     Height = 246
     Anchors = [akTop, akRight]
     ParentBackground = False
     TabOrder = 4
+    ExplicitLeft = 1062
     object l_Speed: TLabel
       Left = 4
       Top = 5
@@ -114,12 +123,14 @@ object f_CPUNode: Tf_CPUNode
     end
   end
   object pgLoading: TProgressBar
-    Left = 888
-    Top = 615
+    Left = 1479
+    Top = 920
     Width = 198
     Height = 16
     Anchors = [akRight, akBottom]
     TabOrder = 5
+    ExplicitLeft = 888
+    ExplicitTop = 615
   end
   object b_Init: TButton
     Left = 8
@@ -171,14 +182,14 @@ object f_CPUNode: Tf_CPUNode
   object cb_ColorLine: TCheckBox
     Left = 380
     Top = 2
-    Width = 89
+    Width = 94
     Height = 17
-    Caption = 'Color Line (10)'
+    Caption = 'Follow Line (10)'
     TabOrder = 11
     OnClick = cb_ColorLineClick
   end
   object b_Save: TButton
-    Left = 551
+    Left = 556
     Top = 0
     Width = 59
     Height = 21
@@ -187,7 +198,7 @@ object f_CPUNode: Tf_CPUNode
     OnClick = b_SaveClick
   end
   object p_DrawCmp: TPanel
-    Left = 616
+    Left = 621
     Top = 1
     Width = 145
     Height = 18
@@ -197,7 +208,7 @@ object f_CPUNode: Tf_CPUNode
     Visible = False
   end
   object cb_QuickEdit: TCheckBox
-    Left = 767
+    Left = 1358
     Top = 2
     Width = 68
     Height = 17
@@ -205,9 +216,10 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'Quick Edit'
     TabOrder = 14
     OnMouseMove = cb_QuickEditMouseMove
+    ExplicitLeft = 767
   end
   object b_Or: TButton
-    Left = 838
+    Left = 1429
     Top = 0
     Width = 38
     Height = 21
@@ -222,10 +234,11 @@ object f_CPUNode: Tf_CPUNode
     ParentFont = False
     TabOrder = 15
     OnClick = b_OrClick
+    ExplicitLeft = 838
   end
   object b_And: TButton
     Tag = 1
-    Left = 882
+    Left = 1473
     Top = 0
     Width = 38
     Height = 21
@@ -234,10 +247,11 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'AND'
     TabOrder = 16
     OnClick = b_OrClick
+    ExplicitLeft = 882
   end
   object b_NOr: TButton
     Tag = 2
-    Left = 926
+    Left = 1517
     Top = 0
     Width = 38
     Height = 21
@@ -246,10 +260,11 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NOR'
     TabOrder = 17
     OnClick = b_OrClick
+    ExplicitLeft = 926
   end
   object b_NAnd: TButton
     Tag = 3
-    Left = 970
+    Left = 1561
     Top = 0
     Width = 38
     Height = 21
@@ -258,10 +273,11 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NAND'
     TabOrder = 18
     OnClick = b_OrClick
+    ExplicitLeft = 970
   end
   object b_XOr: TButton
     Tag = 4
-    Left = 1014
+    Left = 1605
     Top = 0
     Width = 38
     Height = 21
@@ -270,10 +286,11 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'XOR'
     TabOrder = 19
     OnClick = b_OrClick
+    ExplicitLeft = 1014
   end
   object b_Not: TButton
     Tag = 5
-    Left = 1058
+    Left = 1649
     Top = 0
     Width = 38
     Height = 21
@@ -282,9 +299,10 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NOT'
     TabOrder = 20
     OnClick = b_OrClick
+    ExplicitLeft = 1058
   end
   object cb_Annotation: TCheckBox
-    Left = 475
+    Left = 480
     Top = 2
     Width = 75
     Height = 17

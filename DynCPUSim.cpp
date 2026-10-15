@@ -15,11 +15,11 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     {
          Application->Initialize();
          Application->CreateForm(__classid(Tf_CPUNode), &f_CPUNode);
-       Application->CreateForm(__classid(Tf_GraphIO), &f_GraphIO);
-       Application->CreateForm(__classid(Tf_GraphEdit), &f_GraphEdit);
-       Application->CreateForm(__classid(Tf_Memory), &f_Memory);
-       Application->CreateForm(__classid(Tf_Ram), &f_Ram);
-       Application->Run();
+         Application->CreateForm(__classid(Tf_GraphIO), &f_GraphIO);
+         Application->CreateForm(__classid(Tf_GraphEdit), &f_GraphEdit);
+         Application->CreateForm(__classid(Tf_Memory), &f_Memory);
+         Application->CreateForm(__classid(Tf_Ram), &f_Ram);
+         Application->Run();
     }
     catch (Exception &exception)
     {

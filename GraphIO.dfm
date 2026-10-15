@@ -16,6 +16,7 @@ object f_GraphIO: Tf_GraphIO
   Visible = True
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object p_MemInput: TPanel

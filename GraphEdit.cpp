@@ -16,40 +16,43 @@ __fastcall Tf_GraphEdit::Tf_GraphEdit(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphEdit::b_UpdateClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  if(e_Name->Text == "")
-    ShowMessage("Must have a Name");
-  if(   l_SaveName->Caption != e_Name->Text
-     && f_CPUNode->NodeNameExists(e_Name->Text))
-  {
-     ShowMessage("Name Already Exists");
-  } else {
-     if(e_PosX->Text == "")
-        ShowMessage("Must have a X");
-     else if(e_PosY->Text == "")
-        ShowMessage("Must have a Y");
-     else {
-        if(e_PinIDInUp->Text == "")
-          e_PinIDInUp->Text = "0";
-        if(e_PinIDInDown->Text == "")
-          e_PinIDInDown->Text = "0";
-        if(e_PinIDOutUp->Text == "")
-          e_PinIDOutUp->Text = "0";
-        if(e_PinIDOutDown->Text == "")
-          e_PinIDOutDown->Text = "0";
+   if (e_Name->Text == "") {
+      ShowMessage("Must have a Name");
+   }
+   if (l_SaveName->Caption != e_Name->Text &&
+       f_CPUNode->NodeNameExists(e_Name->Text)) {
+      ShowMessage("Name Already Exists");
+   } else {
+      if (e_PosX->Text == "") {
+         ShowMessage("Must have a X");
+      } else if (e_PosY->Text == "") {
+         ShowMessage("Must have a Y");
+      } else {
+         if (e_PinIDInUp->Text == "") {
+            e_PinIDInUp->Text = "0";
+         }
+         if (e_PinIDInDown->Text == "") {
+            e_PinIDInDown->Text = "0";
+         }
+         if (e_PinIDOutUp->Text == "") {
+            e_PinIDOutUp->Text = "0";
+         }
+         if (e_PinIDOutDown->Text == "") {
+            e_PinIDOutDown->Text = "0";
+         }
 
-        f_CPUNode->UpdateNode();
-     }
-  }
+         f_CPUNode->UpdateNode();
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_GraphEdit::b_deleteClick(TObject *Sender)
 {
    (void)Sender;
 
-   if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes)
-   {
+   if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes) {
       cb_Delete->Checked = true;
       f_CPUNode->UpdateNode();
    }
@@ -59,9 +62,19 @@ void __fastcall Tf_GraphEdit::e_NameOutUpKeyPress(TObject *Sender, char &Key)
 {
    (void)Sender;
 
-   if(Key == VK_RETURN )
+   if (Key == VK_RETURN ) {
       this->b_UpdateClick(Sender);
-   else if(Key == VK_DELETE )
+   } else if (Key == VK_DELETE ) {
       this->b_delete->Click();
+   }
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::FormShow(TObject *Sender)
+{
+   (void)Sender;
+
+   this->Left = 5;
+   this->Top = Screen->Height - (this->Height + 50);
+}
+//---------------------------------------------------------------------------
+

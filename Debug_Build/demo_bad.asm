@@ -1,8 +1,8 @@
 ;TEST Demo Loading from ASM File, shows a file that can successfully be parsed, it demonstrated by how much it can deviate while still being "valid" 
 ;Comment lines and blank lines are removed
-;;Comment with a double semicolon are kept, adding a NOP instruction
+;;Comments with a double semicolon are kept, adding a NOP instruction
 
-                        SET   "0xFF",  $0                  ;But comment at the end of a line are kept after import
+                        SET   "0xFF",  $0                  ;Comments at the end of a line are kept after import
                         GETA  @"0xFF", $0                  ;The first 25 columns are for Labels only, then 5 columns for the instruction followed by 1 space
 %TESTMACRO                                                 ;
 [TESTMACRO                                                 ;

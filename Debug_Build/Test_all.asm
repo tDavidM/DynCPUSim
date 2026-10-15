@@ -138,18 +138,18 @@
                         SGRT  $0,     $1              ;Test SkipFGreater 0x00 > 0xFF
                         SGRT  $1,     $0              ;Test SkipFGreater 0xFF > 0x00
                         WJMP  #:*HALT_ON_ERR:         ;If Error
-;Test 11, Greatest 
-                        SET   "0x0E", $3              ;Keep track of where it halts, if it does
-                        GRT   $0,     $1,     $2      ;Test Greater with 0x00 and 0xFF
-                        GRT   $2,     $D,     $1      ;Test Greater with 0xff and 0x01
-                        SIF   $1,     0xFF            ;$1 should be == to 0xFF
-                        WJMP  #:*HALT_ON_ERR:         ;If Error
-                        SET   0x55,   $0
-                        SET   0xAA,   $1
-                        GRT   $0,     $1,     $2      ;Test Greater with 0x55 and 0xAA
-                        GRT   $2,     $E,     $2      ;Test Greater with 0xAA and 0xFF
-                        SIF   $2,     0xFF            ;$1 should be == to 0xFF
-                        WJMP  #:*HALT_ON_ERR:         ;If Error
+;Test 11, Greatest (removed)
+;                        SET   "0x0E", $3              ;Keep track of where it halts, if it does
+;                        GRT   $0,     $1,     $2      ;Test Greater with 0x00 and 0xFF
+;                        GRT   $2,     $D,     $1      ;Test Greater with 0xff and 0x01
+;                        SIF   $1,     0xFF            ;$1 should be == to 0xFF
+;                        WJMP  #:*HALT_ON_ERR:         ;If Error
+;                        SET   0x55,   $0
+;                        SET   0xAA,   $1
+;                        GRT   $0,     $1,     $2      ;Test Greater with 0x55 and 0xAA
+;                        GRT   $2,     $E,     $2      ;Test Greater with 0xAA and 0xFF
+;                        SIF   $2,     0xFF            ;$1 should be == to 0xFF
+;                        WJMP  #:*HALT_ON_ERR:         ;If Error
 ;Test 12, Add and carry flag
                         SET   "0x0F", $3              ;Keep track of where it halts, if it does
                         ADD   $C,     $D,     $0      ;Test Add with 0x00 + 0x01

@@ -3,7 +3,7 @@
 
 ;;Comment with a double semicolon are kept, adding a NOP instruction
 
-                        SET   0xFF,  $0                    ;But comment at the end of a line are kept after import
+                        SET   0xFF,  $0                    ;Comments at the end of a line are kept after import
                         GETA  @0xFF, $0                    ;The first 25 columns are for Labels only, then 5 columns for the instruction followed by 1 space
                                                            ;
                         SETA  @0b11111111,  $0             ;Each parameter is seperated by , and spaces are optional

@@ -1371,7 +1371,7 @@
 			<Point X="668" Y="185"/>
 			<Point X="677" Y="200"/>
 		</Shape>
-		<Shape ID="70" Name="Logic Jump control" Type="Rect">
+		<Shape ID="70" Name="Logic Jump Control" Type="Rect">
 			<Hue R="15" G="16" B="0"/>
 			<Point X="290" Y="13"/>
 			<Point X="315" Y="57"/>

@@ -16,7 +16,7 @@
 //---------------------------------------------------------------------------
 class Tf_GraphIO : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:
     TPanel *p_MemInput;
     TLabel *l_MemInput;
     TCheckBox *Pin41;
@@ -202,10 +202,11 @@ __published:	// Composants gérés par l'EDI
    void __fastcall Line3Click(TObject *Sender);
    void __fastcall Line4Click(TObject *Sender);
    void __fastcall Line5Click(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+    void __fastcall FormShow(TObject *Sender);
+private:
 	char BinToHex(bool p1, bool p2, bool p3, bool p4 );
 
-public:		// Déclarations de l'utilisateur
+public:
     __fastcall Tf_GraphIO(TComponent* Owner);
     bool DebugOutState;
 };
