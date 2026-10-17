@@ -808,7 +808,7 @@
 				<Head Mnemonic="RET" Suffix=" () "/>
 			</TextBlock>
 		</Instruction>
-		<Instruction ID="52" Name="" OpCode="1111111111110111" DisplayOrder="58">
+		<Instruction ID="52" Name="NOINTERUPT" OpCode="1111111111110111" DisplayOrder="58">
 			<Desc>NoInterupt ()</Desc>
 			<Comment>Disable Interupts</Comment>
 			<DataField Data="False" Width="" B="False" C="False" D="False"/>
@@ -822,7 +822,7 @@
 				<Head Mnemonic="NOINT" Suffix=" () "/>
 			</TextBlock>
 		</Instruction>
-		<Instruction ID="53" Name="" OpCode="1111111111111000" DisplayOrder="59">
+		<Instruction ID="53" Name="OKINTERUPT" OpCode="1111111111111000" DisplayOrder="59">
 			<Desc>OkInterupt ()</Desc>
 			<Comment>Enable Interupts</Comment>
 			<DataField Data="False" Width="" B="False" C="False" D="False"/>

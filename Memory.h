@@ -19,6 +19,7 @@
 
 //---------------------------------------------------------------------------
 #include "GraphIO.h"
+#include "ErrorList.h"
 
 #define ERR_UNKNOWN_FILE "File not found: "
 #define ERR_REDEFINED_MACRO "Macro redefined: "

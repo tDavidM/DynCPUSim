@@ -1142,7 +1142,7 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
          //if the end tag ] was not found
          if (!FoundEnd) {
             pErrorList->Add(ERR_NO_ENDTAG_MACRO + MacroName + pMetaASMFile->Strings[i]);
-            ShowMessage("Error in macro " + MacroName + ": No End Tag");
+            //ShowMessage("Error in macro " + MacroName + ": No End Tag");
          }
       }
    }
@@ -1155,10 +1155,9 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
    TStringList *MacroLine;  
    TStringList *LocalLabelList;
    bool FoundMatch = false;
-   int i, j, k;
 
    //Main loop, line Count will vary with Insert and Delete made here
-   for (i = 0; i<pASMFile->Count ; i++) {
+   for (int i = 0; i<pASMFile->Count ; i++) {
       Line = pASMFile->Strings[i];
       Line = Line.TrimRight();
 
@@ -1168,25 +1167,21 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
          //Extract Macro name
          MacroName = Line.SubString(2,Line.Pos(" ")-2);
          MacroName = MacroName.UpperCase();
-            
-         j=0;
+
          FoundMatch = false;
          //Look for the code lines of the Macro 
-         while ( j<pMacroList->Count && !FoundMatch) {
+         for (int j = 0; j < pMacroList->Count && !FoundMatch; j++) {
             MacroLine = (TStringList*)pMacroList->Items[j];
             FoundMatch = MacroLine->Strings[0] == MacroName;
-            j++;
          }
 
          //If that Macro was found on the first pass
          if (FoundMatch) {
-            j=0;
             FoundMatch = false;
             //Look for the list of Labels for that Macro 
-            while ( j<pMacroLabelList->Count && !FoundMatch) {
+            for (int j = 0; j < pMacroLabelList->Count && !FoundMatch; j++) {
                LocalLabelList = (TStringList*)pMacroLabelList->Items[j];
                FoundMatch = LocalLabelList->Strings[0] == MacroName;
-               j++;
             }
 
             //Remove the Macro Call line
@@ -1194,7 +1189,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
             String macroLocation = pMetaASMFile->Strings[i];
             pMetaASMFile->Delete(i);
             //Loop for the number of lines contained in the macro
-            for ( j=1 ; j < MacroLine->Count ; j++ ) {
+            for (int j = 1; j < MacroLine->Count; j++) {
                Line = MacroLine->Strings[j];
 
                //Extract Labels
@@ -1213,7 +1208,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                //Skip Macro call lines
                if (LineLbl.SubString(1,1) != "%" ) {
                   //Loop to replace all Labels found in the Macro
-                  for (k=1; k < LocalLabelList->Count; k++) {
+                  for (int k = 1; k < LocalLabelList->Count; k++) {
                      //Rename by concatenting "_MACRO_[X]" to the name where X goes from 0 to the number of time the Macro is called
                      //That insure every Macro call as a unique set of Labels
                      LineLbl = StringReplace(LineLbl, ":" + LocalLabelList->Strings[k] + " ",
@@ -1374,7 +1369,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 
    ASMFile->LoadFromFile(this->od_Assembler->FileName);
    for (int i = 1; i<=ASMFile->Count; i++) {
-      metaASMFile->Add("[" + this->od_Assembler->FileName + ":" + IntToStr(i) + "]");
+      metaASMFile->Add("[" + ExtractFileName(this->od_Assembler->FileName) + ":" + IntToStr(i) + "]");
    }
 
    //First pass, process includes and list macros definitions
@@ -1590,6 +1585,24 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       this->cds_Mem->Post();
    }
    ASMFile->Clear();
+
+   //Show Errors
+   if (errorList->Count != 0) {
+      Tf_ErrorList *f_ErrorList = ::new Tf_ErrorList(NULL);
+      try {
+         errorList->Insert(0, this->od_Assembler->FileName);
+         errorList->Insert(1, FormatDateTime("yyyy-mm-dd hh:mm:ss", Now()));
+         errorList->Insert(2, "");
+         errorList->Insert(3, "Error count: " + IntToStr(errorList->Count));
+         errorList->Insert(4, "");
+
+         f_ErrorList->InitList(errorList);
+
+         f_ErrorList->ShowModal();
+      } __finally {
+          delete f_ErrorList;
+      }
+   }
 
    //Cleanup
    ASMFile->Free();
