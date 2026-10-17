@@ -420,6 +420,8 @@ void __fastcall Tf_Memory::FormCloseQuery(TObject *Sender, bool &CanClose)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::cds_MemCalcFields(TDataSet *DataSet)
 {
+   (void)DataSet;
+
    this->cds_MemAddress->AsInteger = this->cds_Mem->RecNo - 1;
    this->cds_MemAddrHex->AsString  = DecToHex(IntToStr(this->cds_Mem->RecNo - 1), 65535);
 }
@@ -634,62 +636,65 @@ void __fastcall Tf_Memory::rb_HexClick(TObject *Sender)
 
 void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
 {
-  char Instruction[17];
-  int Delta = this->cds_Mem->RecNo - this->LastSelLine;
+   (void)DataSet;
 
-  if (Delta < 128 && Delta > -128) {
-    if (Delta >=0)
-      Delta = (Delta-1)+128;
-    else {
-      Delta = abs(Delta);
-      Delta = 128 - Delta;
-    }
-    this->l_AddrVal->Caption = DecToHex(IntToStr(Delta) );
-  } else {
-    this->l_AddrVal->Caption = "0x____";
-  }
-  this->LastSelLine = this->cds_Mem->RecNo;
+   char Instruction[17];
+   int Delta = this->cds_Mem->RecNo - this->LastSelLine;
 
-  strncpy(Instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
-  Instruction[16] = '\0';
+   if (Delta < 128 && Delta > -128) {
+      if (Delta >=0) {
+         Delta = (Delta-1)+128;
+      } else {
+         Delta = abs(Delta);
+         Delta = 128 - Delta;
+      }
+      this->l_AddrVal->Caption = DecToHex(IntToStr(Delta) );
+   } else {
+      this->l_AddrVal->Caption = "0x____";
+   }
+   this->LastSelLine = this->cds_Mem->RecNo;
 
-  f_GraphIO->Pin1->Checked  = Instruction[0]  != '0';
-  f_GraphIO->Pin2->Checked  = Instruction[1]  != '0';
-  f_GraphIO->Pin3->Checked  = Instruction[2]  != '0';
-  f_GraphIO->Pin4->Checked  = Instruction[3]  != '0';
-  f_GraphIO->Pin5->Checked  = Instruction[4]  != '0';
-  f_GraphIO->Pin6->Checked  = Instruction[5]  != '0';
-  f_GraphIO->Pin7->Checked  = Instruction[6]  != '0';
-  f_GraphIO->Pin8->Checked  = Instruction[7]  != '0';
-  f_GraphIO->Pin9->Checked  = Instruction[8]  != '0';
-  f_GraphIO->Pin10->Checked = Instruction[9]  != '0';
-  f_GraphIO->Pin11->Checked = Instruction[10] != '0';
-  f_GraphIO->Pin12->Checked = Instruction[11] != '0';
-  f_GraphIO->Pin13->Checked = Instruction[12] != '0';
-  f_GraphIO->Pin14->Checked = Instruction[13] != '0';
-  f_GraphIO->Pin15->Checked = Instruction[14] != '0';
-  f_GraphIO->Pin16->Checked = Instruction[15] != '0';
+   strncpy(Instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
+   Instruction[16] = '\0';
 
+   f_GraphIO->Pin1->Checked  = Instruction[0]  != '0';
+   f_GraphIO->Pin2->Checked  = Instruction[1]  != '0';
+   f_GraphIO->Pin3->Checked  = Instruction[2]  != '0';
+   f_GraphIO->Pin4->Checked  = Instruction[3]  != '0';
+   f_GraphIO->Pin5->Checked  = Instruction[4]  != '0';
+   f_GraphIO->Pin6->Checked  = Instruction[5]  != '0';
+   f_GraphIO->Pin7->Checked  = Instruction[6]  != '0';
+   f_GraphIO->Pin8->Checked  = Instruction[7]  != '0';
+   f_GraphIO->Pin9->Checked  = Instruction[8]  != '0';
+   f_GraphIO->Pin10->Checked = Instruction[9]  != '0';
+   f_GraphIO->Pin11->Checked = Instruction[10] != '0';
+   f_GraphIO->Pin12->Checked = Instruction[11] != '0';
+   f_GraphIO->Pin13->Checked = Instruction[12] != '0';
+   f_GraphIO->Pin14->Checked = Instruction[13] != '0';
+   f_GraphIO->Pin15->Checked = Instruction[14] != '0';
+   f_GraphIO->Pin16->Checked = Instruction[15] != '0';
 }
 //---------------------------------------------------------------------------
 int Tf_Memory::DeltaToAddr(int Delta)
 {
-  int Target = 0;
+   int Target = 0;
 
-  if (Delta <= 127 && Delta >= 0) {
-     Delta = 128 - Delta;
-     Target = this->cds_MemAddress->AsInteger - Delta;
+   if (Delta <= 127 && Delta >= 0) {
+      Delta = 128 - Delta;
+      Target = this->cds_MemAddress->AsInteger - Delta;
 
-     while (Target < 0)
-        Target = Target + this->cds_Mem->RecordCount;
-  } else if (Delta >= 128 && Delta <= 255) {
-     Delta = (Delta - 128) + 1;
-     Target = this->cds_MemAddress->AsInteger + Delta;
+      while (Target < 0) {
+         Target = Target + this->cds_Mem->RecordCount;
+      }
+   } else if (Delta >= 128 && Delta <= 255) {
+      Delta = (Delta - 128) + 1;
+      Target = this->cds_MemAddress->AsInteger + Delta;
 
-     while (Target >= this->cds_Mem->RecordCount)
-        Target = Target - this->cds_Mem->RecordCount;
-  }
-  return Target;
+      while (Target >= this->cds_Mem->RecordCount) {
+         Target = Target - this->cds_Mem->RecordCount;
+      }
+   }
+   return Target;
 }
 //---------------------------------------------------------------------------
 void Tf_Memory::MoveAddrByDelta(int Delta)
@@ -726,8 +731,9 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
    this->cds_Mem->First();
 
    if (this->cds_Mem->RecordCount > 1 ) {
-       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr)
+       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr) {
            this->cds_Mem->Next();
+       }
    }
 
    TByteDynArray Location = cds_Mem->GetBookmark();
@@ -790,16 +796,16 @@ void __fastcall Tf_Memory::b_LoadClick(TObject *Sender)
 {
    (void)Sender;
 
-  if (this->od_Mem->Execute()) {
-    if (this->od_Mem->FileName != "") {
-	   this->cds_Mem->LogChanges = false;
-	   this->cds_Mem->LoadFromFile(this->od_Mem->FileName);
-	   this->cds_Mem->LogChanges = false;
+   if (this->od_Mem->Execute()) {
+      if (this->od_Mem->FileName != "") {
+         this->cds_Mem->LogChanges = false;
+         this->cds_Mem->LoadFromFile(this->od_Mem->FileName);
+         this->cds_Mem->LogChanges = false;
 
-      this->ExecCmp = 0;
-    }
-  }
-  //this->cds_Mem->IndexFieldNames = "Sort";
+         this->ExecCmp = 0;
+      }
+   }
+   //this->cds_Mem->IndexFieldNames = "Sort";
 }
 //---------------------------------------------------------------------------
 
@@ -989,7 +995,7 @@ void __fastcall Tf_Memory::b_ClearClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList)
+void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
    String Line, MacroName, LineLbl, LbLName, LineData;
    TStringList *MacroLine;
@@ -1007,23 +1013,32 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
          // from #INCLUDE "exemple.asm" to exemple.asm
          Line = Line.SubString(11,Line.Length()-11);
          //Remove comment
-            if (Line.Pos(";")>0)
+            if (Line.Pos(";")>0) {
                Line = Line.SubString(1,Line.Pos(";")-1);
+            }
          Line = Line.Trim();
 
-         //remove the line with #include
-         pASMFile->Delete(i);
+         if (FileExists(ExtractFilePath(this->od_Assembler->FileName) + Line)) {
+            //remove the line with #include
+            pASMFile->Delete(i);
+            pMetaASMFile->Delete(i);
 
-         ASMFileInclude = new TStringList;
-         ASMFileInclude->LoadFromFile(ExtractFilePath(this->od_Assembler->FileName) + Line);
-         //Once opened, insert every line from the included file at that location
-         for(int j = 0; j<ASMFileInclude->Count ; j++) {
-            Line = ASMFileInclude->Strings[j];
-            pASMFile->Insert(i+j, Line);
+            ASMFileInclude = new TStringList;
+            ASMFileInclude->LoadFromFile(ExtractFilePath(this->od_Assembler->FileName) + Line);
+
+            //Once opened, insert every line from the included file at that location
+            for (int j = 0; j<ASMFileInclude->Count ; j++) {
+               pASMFile->Insert(i+j, ASMFileInclude->Strings[j]);
+               pMetaASMFile->Insert(i+j, "[" + Line + ":" + IntToStr(j) + "]");
+            }
+            //As #include was remove, line at i must be scanned again
+            i--;
+            ASMFileInclude->Free();
+         } else {
+            pErrorList->Add(ERR_UNKNOWN_FILE + Line + pMetaASMFile->Strings[i]);
+            pASMFile->Strings[i] = ";" + pASMFile->Strings[i];
          }
-         //As #include was remove, line at i must be scanned again
-         i--;
-         ASMFileInclude->Free();
+         continue;
       }
 
       //Looking for Macro definition start tag
@@ -1032,8 +1047,30 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
          Line = Line + " ";
          MacroName = Line.SubString(2,Line.Pos(" ")-2);
 
-         if (pMacroUsageCmp->IndexOfName(MacroName.UpperCase()) > 0)
-            ShowMessage("Error: Macro " + MacroName + " Redefined");
+         if (pMacroUsageCmp->IndexOfName(MacroName.UpperCase()) > 0) {
+            pErrorList->Add(ERR_REDEFINED_MACRO + MacroName + pMetaASMFile->Strings[i]);
+
+            pASMFile->Delete(i);
+            pMetaASMFile->Delete(i);
+
+            while (i < pASMFile->Count && !FoundEnd) {
+               Line = pASMFile->Strings[i];
+               Line = Line.TrimRight();
+
+               if (Line.SubString(1,1) == "]" ) {
+                  FoundEnd = true;
+               }
+               pASMFile->Delete(i);
+               pMetaASMFile->Delete(i);
+
+               //if the end tag ] was not found
+               if (!FoundEnd) {
+                  pErrorList->Add(ERR_NO_ENDTAG_MACRO + MacroName + pMetaASMFile->Strings[i]);
+                  ShowMessage("Error in macro " + MacroName + ": No End Tag");
+               }
+            }
+            continue;
+         }
 
          //Add that name as index 0 to:
          MacroLine      = new TStringList;
@@ -1048,6 +1085,7 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
          //Keep a list of the number of calls to a Macro to rewrite the lable with a unique name
          pMacroUsageCmp->Add(MacroName.UpperCase() + "=0");
          pASMFile->Delete(i);
+         pMetaASMFile->Delete(i);
 
          FoundEnd = false;
          //Loop until the Macro end tag ] is found
@@ -1071,20 +1109,22 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
                LineLbl = LineLbl.Trim();
 
                //Test if already defined, keep the Label in a list for renaming later
-               if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+               if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0) {
                   LocalLabelList->Add(LbLName);
-               else
-                  ShowMessage("Error in macro " + MacroName + ": Label " + LbLName + " Redefined");
+               } else {
+                  pErrorList->Add(ERR_REDEFINED_LABEL + MacroName + ":" + LbLName + pMetaASMFile->Strings[i]);
+               }
 
                //Second Label
                if( LineLbl != "" && LineLbl.SubString(1,1) == ":" ) {
                   LbLName = LineLbl.SubString(2, LineLbl.Length());
 
                   //Test if already defined, keep the Label in a list for renaming later
-                  if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+                  if (LocalLabelList->IndexOfName(LbLName.UpperCase()) < 0) {
                      LocalLabelList->Add(LbLName.UpperCase());
-                  else
-                     ShowMessage("Error in macro " + MacroName + ": Label " + LbLName + " Redefined");
+                  } else {
+                     pErrorList->Add(ERR_REDEFINED_LABEL + MacroName + ":" + LbLName + pMetaASMFile->Strings[i]);
+                  }
                }
             }
 
@@ -1096,17 +1136,20 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
 
             //Line from Macro are removed from the main file, but kept in MacroLine for when it's called
             pASMFile->Delete(i);
+            pMetaASMFile->Delete(i);
          }
 
          //if the end tag ] was not found
-         if (!FoundEnd)
+         if (!FoundEnd) {
+            pErrorList->Add(ERR_NO_ENDTAG_MACRO + MacroName + pMetaASMFile->Strings[i]);
             ShowMessage("Error in macro " + MacroName + ": No End Tag");
+         }
       }
    }
 }
 //---------------------------------------------------------------------------
 
-void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList)
+void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
    String Line, MacroName, LineLbl, LbLName, LineData;
    TStringList *MacroLine;  
@@ -1115,7 +1158,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
    int i, j, k;
 
    //Main loop, line Count will vary with Insert and Delete made here
-   for(i = 0; i<pASMFile->Count ; i++) {
+   for (i = 0; i<pASMFile->Count ; i++) {
       Line = pASMFile->Strings[i];
       Line = Line.TrimRight();
 
@@ -1148,6 +1191,8 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
 
             //Remove the Macro Call line
             pASMFile->Delete(i);
+            String macroLocation = pMetaASMFile->Strings[i];
+            pMetaASMFile->Delete(i);
             //Loop for the number of lines contained in the macro
             for ( j=1 ; j < MacroLine->Count ; j++ ) {
                Line = MacroLine->Strings[j];
@@ -1189,25 +1234,29 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                }
                //Insert the line in place
                pASMFile->Insert(i+(j-1), Line);
+               pMetaASMFile->Insert(i+(j-1), "[MACRO:" + MacroName + "->" + macroLocation + ":" + IntToStr(j-1) + "]");
             }
             //As the Macro call line was removed (%) the line at i must be reprocessed
             i--;
             //Macro call counter incremented so later calls will rename the Labels with a different number
             pMacroUsageCmp->Values[MacroName] = IntToStr(StrToInt(pMacroUsageCmp->Values[MacroName])+1);
-         } else
-            ShowMessage("Error: Call For Undefined Macro " + MacroName );
+         } else {
+            pErrorList->Add(ERR_UNKNOWN_MACRO + MacroName + pMetaASMFile->Strings[i]);
+            pASMFile->Delete(i);
+            pMetaASMFile->Delete(i);
+         }
       }
    }
 }
 //---------------------------------------------------------------------------
 
-void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList)
+void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
    String Line, LineLbl, LbLName, LineData, LineComment;
-   int LineCount=1;
+   int LineCount = 1;
 
    //Main loop
-   for(int i = 0; i<pASMFile->Count ; i++) {
+   for (int i = 0; i<pASMFile->Count ; i++) {
       Line = pASMFile->Strings[i];
       LineComment = "";
 
@@ -1217,14 +1266,17 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
          LineData    = Line.SubString(1, Line.Pos(";")-1);
 
          //If double semicolon, the comment line is kept with an NOP instruction placeholder
-         if (LineComment.Pos(";;") == 1)
+         if (LineComment.Pos(";;") == 1) {
             LineData = " /NOP  ;" + LineComment;
+         }
          Line = LineData;
-      } else
+      } else {
          LineData = Line;
+      }
       //Remove blank lines
       if (LineData.Trim() == "") {
          pASMFile->Delete(i);
+         pMetaASMFile->Delete(i);
          i--;
       } else {
 
@@ -1241,7 +1293,7 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
          Line     = LineData + "  ;";
 
          //Process Label
-         if( LineLbl.SubString(1,1) == ":" ) {
+         if ( LineLbl.SubString(1,1) == ":" ) {
             //First Label
             LineLbl = LineLbl + " ";
             LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
@@ -1250,21 +1302,23 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
             Line    = Line + ":" + LbLName + " ";
 
             //Test if already defined
-            if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+            if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0) {
                pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
-            else
-               ShowMessage("Error at line " + IntToStr(LineCount) + ": Label " + LbLName + " Redefined");
+            } else {
+               pErrorList->Add(ERR_REDEFINED_LABEL + LbLName + pMetaASMFile->Strings[i]);
+            }
 
             //Second Label
-            if(LineLbl.SubString(1,1) == ":" ) {
+            if (LineLbl.SubString(1,1) == ":" ) {
                LbLName = LineLbl.SubString(2, LineLbl.Length());
                Line    = Line + ":" + LbLName + " ";
 
                //Test if already defined
-               if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0)
+               if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0) {
                   pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
-               else
-                  ShowMessage("Error at line " + IntToStr(LineCount) + ": Label " + LbLName + " Redefined");
+               } else {
+                  pErrorList->Add(ERR_REDEFINED_LABEL + LbLName + pMetaASMFile->Strings[i]);
+               }
             }
          }
          //Output instruction + comment
@@ -1280,7 +1334,6 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 {
    (void)Sender;
 
-   int lineCount=1;
    String DataHex , DataLineText, DataLineCode;
    TStringList *ASMFile   = new TStringList;
    TStringList *LabelList = new TStringList;
@@ -1288,6 +1341,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    TStringList *MacroUsageCmp = new TStringList;
    TList* MacroLabelList  = new TList;
    TStringList *errorList = new TStringList;
+   TStringList *metaASMFile = new TStringList;
    
    LabelList->NameValueSeparator = '=';
    MacroUsageCmp->NameValueSeparator = '=';
@@ -1319,13 +1373,16 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    this->cb_D->Enabled = false;
 
    ASMFile->LoadFromFile(this->od_Assembler->FileName);
+   for (int i = 1; i<=ASMFile->Count; i++) {
+      metaASMFile->Add("[" + this->od_Assembler->FileName + ":" + IntToStr(i) + "]");
+   }
 
    //First pass, process includes and list macros definitions
-   this->Parse4MacroDefineAndInclude(ASMFile, MacroList, MacroUsageCmp, MacroLabelList);
+   this->Parse4MacroDefineAndInclude(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, errorList, metaASMFile);
    //Second pass, replace calls for macros, and rename labels inside macros
-   this->Parse4MacroUsage(ASMFile, MacroList, MacroUsageCmp, MacroLabelList);
+   this->Parse4MacroUsage(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, errorList, metaASMFile);
    //Third pass, remove empty or blank lines, comment lines and list labels
-   this->Parse4LabelAndBlank(ASMFile, LabelList);
+   this->Parse4LabelAndBlank(ASMFile, LabelList, errorList, metaASMFile);
 
    //Fourth pass, process instruction lines and any comments at the end of a line
    for (int i = 0; i<ASMFile->Count ; i++) {
@@ -1375,22 +1432,22 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       //Find the Instruction in the list
       TInstruc* instruc;
       bool foundIt = false;
-      for (int i = 0; i<this->InstrucCmp; i++) {
-         instruc = (TInstruc*)this->InstrucList->Items[i];
+      for (int j = 0; j<this->InstrucCmp; j++) {
+         instruc = (TInstruc*)this->InstrucList->Items[j];
          if (instruc->HeadMnemo.UpperCase() == lineOpCode) {
             foundIt = true;
             break;
          }
       }
       if (!foundIt) {
-         //errorList->Add();
+         errorList->Add(ERR_UNKNOWN_OPCODE + lineOpCode + metaASMFile->Strings[i]);
       }
 
       String lineParam[3];
       lineParam[0] = "";
       lineParam[1] = "";
       lineParam[2] = "";
-      int paramCount = 0, currParam = 0, LineCount=1;
+      int paramCount = 0;
 
       //Process Params
       if (lineData != "") {
@@ -1399,155 +1456,154 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
             lineParam[0] = lineParam[0].Trim();
             lineData = lineData.SubString(lineData.Pos(",")+1, lineData.Length());
             lineData = lineData.Trim();
-         } else {
-            lineParam[0]  = lineData;
-            paramCount = 1;
-         }
 
-         if (paramCount == 0) {
             if (lineData.Pos(",") > 0 ) {
                lineParam[1] = lineData.SubString(1, lineData.Pos(",")-1);
                lineParam[1] = lineParam[1].Trim();
                lineData = lineData.SubString(lineData.Pos(",")+1, lineData.Length());
                lineData = lineData.Trim();
-            } else {
-               lineParam[1] = lineData;
-               paramCount = 2;
-            }
 
-            if (paramCount == 0) {
                if (lineData.Pos(",") > 0 ) {
-                  ShowMessage("Error");
+                  errorList->Add(ERR_OPCODE_PARAM_MANY + lineOpCode + metaASMFile->Strings[i]);
                } else {
                   lineParam[2] = lineData;
                   paramCount = 3;
                }
+            } else {
+               lineParam[1] = lineData;
+               paramCount = 2;
             }
+         } else {
+            lineParam[0]  = lineData;
+            paramCount = 1;
          }
+      }
+      if (instruc->NbParam != paramCount) {
+         errorList->Add(ERR_OPCODE_PARAM_COUNT + lineOpCode + metaASMFile->Strings[i]);
       }
             
       //Print readable line
       String instrucText = instruc->HeadMnemo + instruc->HeadSuffix;
 
-
-            if (instruc->NbParam > 0) {
-               if (instruc->Param1Source == "Data") {
-                  DataLineCode = DataToBin(lineParam[0], instruc->DataWidth, LabelList, lineCount);
-                  DataLineText = "0x";
-                  for (int i=1; i<=instruc->DataWidth; i+=4) {
-                     DataLineText = DataLineText + BinToHex(DataLineCode.SubString(i,4));
-                  }
-                  instrucText = instrucText + instruc->Param1Type + DataLineText + instruc->Param1Suffix;
-               } else if (instruc->Param1Source != "") {
-                  instrucText = instrucText + instruc->Param1Type + lineParam[0].SubString(2,1) + instruc->Param1Suffix;
+      switch (instruc->NbParam) {
+         case 3:
+            if (instruc->Param3Source == "Data") {
+               DataLineCode = DataToBin(lineParam[2], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+               DataLineText = "0x";
+               for (int j=1; j<=instruc->DataWidth; j+=4) {
+                  DataLineText = DataLineText + BinToHex(DataLineCode.SubString(j,4));
                }
+               instrucText = instrucText + instruc->Param3Type + DataLineText + instruc->Param3Suffix;
+            } else if (instruc->Param3Source != "") {
+               instrucText = instrucText + instruc->Param3Type + lineParam[2].SubString(2,1) + instruc->Param3Suffix;
+            }
 
-               if (instruc->NbParam > 1) {
-                  if (instruc->Param2Source == "Data") {
-                     DataLineCode = DataToBin(lineParam[1], instruc->DataWidth, LabelList, lineCount);
-                     DataLineText = "0x";
-                     for (int i=1; i<=instruc->DataWidth; i+=4) {
-                        DataLineText = DataLineText + BinToHex(DataLineCode.SubString(i,4));
-                     }
-                     instrucText = instrucText + instruc->Param2Type + DataLineText + instruc->Param2Suffix;
-                  } else if (instruc->Param2Source != "") {
-                     instrucText = instrucText + instruc->Param2Type + lineParam[1].SubString(2,1) + instruc->Param2Suffix;
-                  }
-           
-                  if (instruc->NbParam > 2) {
-                     if (instruc->Param3Source == "Data") {
-                        DataLineCode = DataToBin(lineParam[2], instruc->DataWidth, LabelList, lineCount);
-                        DataLineText = "0x";
-                        for (int i=1; i<=instruc->DataWidth; i+=4) {
-                           DataLineText = DataLineText + BinToHex(DataLineCode.SubString(i,4));
-                        }
-                        instrucText = instrucText + instruc->Param3Type + DataLineText + instruc->Param3Suffix;
-                     } else if (instruc->Param3Source != "") {
-                        instrucText = instrucText + instruc->Param3Type + lineParam[2].SubString(2,1) + instruc->Param3Suffix;
-                     }
-                  }
+         case 2:
+            if (instruc->Param2Source == "Data") {
+               DataLineCode = DataToBin(lineParam[1], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+               DataLineText = "0x";
+               for (int j=1; j<=instruc->DataWidth; j+=4) {
+                  DataLineText = DataLineText + BinToHex(DataLineCode.SubString(j,4));
                }
+               instrucText = instrucText + instruc->Param2Type + DataLineText + instruc->Param2Suffix;
+            } else if (instruc->Param2Source != "") {
+               instrucText = instrucText + instruc->Param2Type + lineParam[1].SubString(2,1) + instruc->Param2Suffix;
             }
 
-            //Compute Machine Code
-            String instrucCode = "";
-            if (instruc->BlockAFix) {
-               instrucCode = instruc->BlockAVal;
-            } else if (instruc->BlockASource == "Data") {
-               instrucCode = DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, lineCount);
-               currParam++;
-            } else if (instruc->BlockASource != "") {
-               instrucCode = HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
-               currParam++;
+         case 1:
+            if (instruc->Param1Source == "Data") {
+               DataLineCode = DataToBin(lineParam[0], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+               DataLineText = "0x";
+               for (int j=1; j<=instruc->DataWidth; j+=4) {
+                  DataLineText = DataLineText + BinToHex(DataLineCode.SubString(j,4));
+               }
+               instrucText = instrucText + instruc->Param1Type + DataLineText + instruc->Param1Suffix;
+            } else if (instruc->Param1Source != "") {
+               instrucText = instrucText + instruc->Param1Type + lineParam[0].SubString(2,1) + instruc->Param1Suffix;
             }
 
-            if (instruc->BlockBFix) {
-              instrucCode = instrucCode + instruc->BlockBVal;
-            } else if (instruc->BlockBSource == "Data") {
-               instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, lineCount);
-               currParam++;
-            } else if (instruc->BlockBSource != "") {
-               instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
-               currParam++;
-            }
-
-            if (instruc->BlockCFix) {
-               instrucCode = instrucCode + instruc->BlockCVal;
-            } else if (instruc->BlockCSource == "Data") {
-               instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, lineCount);
-               currParam++;
-            } else if (instruc->BlockCSource != "") {
-               instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
-               currParam++;
-            }
-
-            if (instruc->BlockDFix) {
-               instrucCode = instrucCode + instruc->BlockDVal;
-            } else if (instruc->BlockDSource == "Data") {
-               instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, lineCount);
-               currParam++;
-            } else if (instruc->BlockDSource != "") {
-               instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
-               currParam++;
-            }
-             
-            //Save to DataSet
-            this->cds_Mem->Append();
-            this->cds_MemOpCode->AsInteger   = this->cb_OpCode->Items->IndexOf(instruc->Descr);
-            this->cds_MemMnemonic->AsString  = lineOpCode;
-            //this->cds_MemData->AsString      = ;
-            this->cds_MemComment->AsString   = lineComment;
-            //this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
-            //this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
-            //this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
-            //this->cds_MemDataType->AsInteger = 0:0b 1: 2:0x   //LineParam[CurrParam].SubString(1,2) == "0X"
-            this->cds_MemBreakPoint->AsBoolean = false;
-            this->cds_MemHumData->AsString   = instrucText;
-            this->cds_MemCode->AsString      = instrucCode;
-            this->cds_MemCodeHex->AsString   = BinToHex(instrucCode.SubString(1,4)) + BinToHex(instrucCode.SubString(5,4)) +
-                                               BinToHex(instrucCode.SubString(9,4)) + BinToHex(instrucCode.SubString(13,4));
-         
-            lineCount++;
-            this->cds_Mem->Post();
+         //case 0:
+         //default:
       }
-      ASMFile->Clear();
 
+      //Compute Machine Code
+      String instrucCode = "";
+      int currParam = 0;
 
+      if (instruc->BlockAFix) {
+         instrucCode = instruc->BlockAVal;
+      } else if (instruc->BlockASource == "Data") {
+         instrucCode = DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         currParam++;
+      } else if (instruc->BlockASource != "") {
+         instrucCode = HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
+         currParam++;
+      }
 
+      if (instruc->BlockBFix) {
+         instrucCode = instrucCode + instruc->BlockBVal;
+      } else if (instruc->BlockBSource == "Data") {
+         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         currParam++;
+      } else if (instruc->BlockBSource != "") {
+         instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
+         currParam++;
+      }
 
+      if (instruc->BlockCFix) {
+         instrucCode = instrucCode + instruc->BlockCVal;
+      } else if (instruc->BlockCSource == "Data") {
+         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         currParam++;
+      } else if (instruc->BlockCSource != "") {
+         instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
+         currParam++;
+      }
 
+      if (instruc->BlockDFix) {
+         instrucCode = instrucCode + instruc->BlockDVal;
+      } else if (instruc->BlockDSource == "Data") {
+         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         currParam++;
+      } else if (instruc->BlockDSource != "") {
+         instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
+         currParam++;
+      }
+
+      //Save to DataSet
+      this->cds_Mem->Append();
+      this->cds_MemOpCode->AsInteger   = this->cb_OpCode->Items->IndexOf(instruc->Descr);
+      this->cds_MemMnemonic->AsString  = lineOpCode;
+      //this->cds_MemData->AsString      = ;
+      this->cds_MemComment->AsString   = lineComment;
+      //this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
+      //this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
+      //this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
+      //this->cds_MemDataType->AsInteger = 0:0b 1: 2:0x   //LineParam[CurrParam].SubString(1,2) == "0X"
+      this->cds_MemBreakPoint->AsBoolean = false;
+      this->cds_MemHumData->AsString   = instrucText;
+      this->cds_MemCode->AsString      = instrucCode;
+      this->cds_MemCodeHex->AsString   = BinToHex(instrucCode.SubString(1,4)) + BinToHex(instrucCode.SubString(5,4)) +
+                                         BinToHex(instrucCode.SubString(9,4)) + BinToHex(instrucCode.SubString(13,4));
+      this->cds_MemSource->AsString    = metaASMFile->Strings[i];
+
+      this->cds_Mem->Post();
+   }
+   ASMFile->Clear();
 
    //Cleanup
    ASMFile->Free();
    LabelList->Free();
    MacroUsageCmp->Free();
+   errorList->Free();
+   metaASMFile->Free();
 
-   for(int i = 0; i<MacroList->Count ; i++) {
+   for (int i = 0; i<MacroList->Count ; i++) {
       ASMFile = (TStringList*)MacroList->Items[i];
       ASMFile->Free();
    }
 
-   for(int i = 0; i<MacroLabelList->Count ; i++) {
+   for (int i = 0; i<MacroLabelList->Count ; i++) {
       ASMFile = (TStringList*)MacroLabelList->Items[i];
       ASMFile->Free();
    }
@@ -1559,105 +1615,118 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    this->cds_Mem->First();
 }
 //---------------------------------------------------------------------------
-String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine)
+String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
-   String DataIn, DataOut = "", Addr;
+   String DataIn, DataOut = "", Addr, lblName;
    int Delta;
-   
+
    if (pData.SubString(1,2) == "::") {
    //Absolute Addr (Higer bits)
-      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-3)];
+      lblName = pData.SubString(3,pData.Length()-3);
+      Addr = pLabelList->Values[lblName];
       if (Addr == "") {
-         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
+         pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
          Addr = "0";
       }
-      
+
       if (StrToInt(Addr) >= 65536 ) {
-         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Absolute Addr Out of Range");
+         pErrorList->Add(ERR_ABS_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
          Addr = "0";
       }
       Addr = DecToHex(Addr, 65535);
-      
+
       //Left Padding
-      while(Addr.Length() < 4)
-         Addr = "0" + Addr;   
-      for (int i=1; i<=pSize/4; i++)
+      while (Addr.Length() < 4) {
+         Addr = "0" + Addr;
+      }
+      for (int i=1; i<=pSize/4; i++) {
          DataOut = DataOut + HexToBin(Addr.SubString(i,1));
+      }
 
    } else if (pData.SubString(1,2) == ":*") {
    //Absolute Addr (Lower bits)
-      Addr = pLabelList->Values[pData.SubString(3,pData.Length()-3)];
+      lblName = pData.SubString(3,pData.Length()-3);
+      Addr = pLabelList->Values[lblName];
       if (Addr == "") {
-         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
+         pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
          Addr = "0";
       }
-      
+
       if (StrToInt(Addr) >= 65536 ) {
-         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Absolute Addr Out of Range");
+         pErrorList->Add(ERR_ABS_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
          Addr = "0";
       }
       Addr = DecToHex(Addr, 65535);
-      
-      //Left Padding
-      while(Addr.Length() < 4)
-         Addr = "0" + Addr;   
-      for (int i=4; i>4-(pSize/4); i--)
-         DataOut = HexToBin(Addr.SubString(i,1)) + DataOut;
-                                                            
-   } else if (pData.SubString(1,1) == ":") {
-   //Relative  Addr  
-      //Lookup
-      if (pLabelList->Values[pData.SubString(2,pData.Length()-2)] == "") {
-         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Label Not Found");
-         Delta = 0;
-      } else     
-      Delta = StrToInt(pLabelList->Values[pData.SubString(2,pData.Length()-2)]) - pCurrLine;
 
+      //Left Padding
+      while (Addr.Length() < 4) {
+         Addr = "0" + Addr;
+      }
+      for (int i=4; i>4-(pSize/4); i--) {
+         DataOut = HexToBin(Addr.SubString(i,1)) + DataOut;
+      }
+
+   } else if (pData.SubString(1,1) == ":") {
+   //Relative  Addr
+      //Lookup
+      lblName = pData.SubString(2,pData.Length()-2);
+      if (pLabelList->Values[lblName] == "") {
+         pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         Delta = 0;
+      } else {
+         Delta = StrToInt(pLabelList->Values[lblName]) - pCurrLine - 1;
+      }
 
       if (Delta < 128 && Delta > -128) {
-         if (Delta >=0)
+         if (Delta >=0) {
             Delta = (Delta-1)+128;
-         else {
+         } else {
             Delta = abs(Delta);
             Delta = 128 - Delta;
          }
          DataIn = DecToHex(IntToStr(Delta));
-         if (DataIn.Length() == 1)
+         if (DataIn.Length() == 1) {
             DataIn = "0" + DataIn;
+         }
       } else {
-         ShowMessage("Error at line " + IntToStr(pCurrLine) + ": Relative Addr Out of Range");
+         pErrorList->Add(ERR_REL_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
          DataIn = "80";
       }
       DataOut = HexToBin(DataIn.SubString(1,1)) + HexToBin(DataIn.SubString(2,1));
       
-   }else if (pData.SubString(1,2) == "0X") {
+   } else if (pData.SubString(1,2) == "0X") {
    //Hex Value
       DataIn = pData.SubString(3, pData.Length()); //,(pSize/4)-2);
       //Left Padding
-      while(DataIn.Length() < pSize/4)
-         DataIn = "0" + DataIn;   
+      while (DataIn.Length() < pSize/4) {
+         DataIn = "0" + DataIn;
+      }
       DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
-      for (int i=1; i<=pSize/4; i++)
+      for (int i=1; i<=pSize/4; i++) {
          DataOut = DataOut + HexToBin(DataIn.SubString(i,1));
-         
+      }
+
    } else if (pData.SubString(1,2) == "0B") {
    //Binary Value
       DataOut = pData.SubString(3, pData.Length()); //,(pSize)-2);
       //Left Padding
-      while(DataOut.Length() < pSize)
-         DataOut = "0" + DataOut;   
-         
+      while (DataOut.Length() < pSize) {
+         DataOut = "0" + DataOut;
+      }
+
    } else {
    //Decimal Value
       DataIn = pData.SubString(1,(pSize/4)+1);
       DataIn = DecToHex(DataIn);
       //Left Padding
-      while(DataIn.Length() < pSize/4)
-         DataIn = "0" + DataIn;   
+      while (DataIn.Length() < pSize/4) {
+         DataIn = "0" + DataIn;
+      }
       DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
-      for (int i=1; i<=pSize/4; i++)
+      for (int i=1; i<=pSize/4; i++) {
          DataOut = DataOut + HexToBin(DataIn.SubString(i,1));
-         
+      }
+
    }
    DataOut = DataOut.Trim();
    return DataOut;

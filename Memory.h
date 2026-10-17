@@ -20,6 +20,21 @@
 //---------------------------------------------------------------------------
 #include "GraphIO.h"
 
+#define ERR_UNKNOWN_FILE "File not found: "
+#define ERR_REDEFINED_MACRO "Macro redefined: "
+#define ERR_REDEFINED_LABEL "Label redefined: "
+#define ERR_NO_ENDTAG_MACRO "No end tag for macro: "
+#define ERR_UNKNOWN_MACRO "Unknown macro: "
+
+#define ERR_UNKNOWN_OPCODE "Unknown opcode: "
+#define ERR_OPCODE_PARAM_MANY "Too many parameters: "
+#define ERR_OPCODE_PARAM_COUNT "Wrong parameter count for opcode: "
+
+#define ERR_UNKNOWN_LABEL "Unknown label: "
+#define ERR_ABS_ADDR_FAR " : "
+#define ERR_REL_ADDR_FAR " : "
+
+
 //---------------------------------------------------------------------------
 class TInstruc
 {
@@ -90,6 +105,7 @@ __published:
    TButton *b_BreakPoint;
    TBooleanField *cds_MemBreakPoint;
    TButton *b_boot;
+    TStringField *cds_MemSource;
     void __fastcall cb_OpCodeChange(TObject *Sender);
     void __fastcall b_AddClick(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
@@ -131,11 +147,11 @@ private:
     String HexToDec(String Hex);
     String HexToBin(String Hex);
     String DecToHex(String pDec, int pMax=4095);
-    String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine);
+    String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile);
 
-    void Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList);
-    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList);
-    void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList);
+    void Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
+    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
+    void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
 
 public:
     __fastcall Tf_Memory(TComponent* Owner);
