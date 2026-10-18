@@ -260,7 +260,7 @@ object f_Memory: Tf_Memory
     TitleFont.Height = -11
     TitleFont.Name = 'Tahoma'
     TitleFont.Style = []
-    OnDrawDataCell = dbg_MemDrawDataCell
+    OnDrawColumnCell = dbg_MemDrawColumnCell
     OnDblClick = dbg_MemDblClick
   end
   object e_Sort: TEdit
@@ -328,6 +328,7 @@ object f_Memory: Tf_Memory
     Width = 75
     Height = 18
     Caption = 'Clear'
+    Enabled = False
     TabOrder = 18
     OnClick = b_ClearClick
   end

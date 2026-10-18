@@ -34,7 +34,9 @@ object f_ErrorList: Tf_ErrorList
     Width = 484
     Height = 345
     Anchors = [akLeft, akTop, akRight, akBottom]
+    HideSelection = False
     ReadOnly = True
+    ScrollBars = ssVertical
     TabOrder = 1
   end
 end

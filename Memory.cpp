@@ -961,6 +961,7 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
    }*/
 
    this->b_Import->Enabled     = true;
+   this->b_Clear->Enabled      = true;
    this->b_Load->Enabled       = true;
    this->b_Add->Enabled        = true;
    this->b_Insert->Enabled     = true;
@@ -995,7 +996,7 @@ void __fastcall Tf_Memory::b_ClearClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile)
+void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, String* pIncludes, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
    String Line, MacroName, LineLbl, LbLName, LineData;
    TStringList *MacroLine;
@@ -1025,11 +1026,12 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
 
             ASMFileInclude = new TStringList;
             ASMFileInclude->LoadFromFile(ExtractFilePath(this->od_Assembler->FileName) + Line);
+            *pIncludes = *pIncludes + Line + " ";
 
             //Once opened, insert every line from the included file at that location
             for (int j = 0; j<ASMFileInclude->Count ; j++) {
                pASMFile->Insert(i+j, ASMFileInclude->Strings[j]);
-               pMetaASMFile->Insert(i+j, "[" + Line + ":" + IntToStr(j) + "]");
+               pMetaASMFile->Insert(i+j, "[" + Line + ":" + IntToStr(j+1) + "]");
             }
             //As #include was remove, line at i must be scanned again
             i--;
@@ -1203,7 +1205,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                LineLbl  = LineLbl.Trim() + " ";
                LineData = LineData.Trim();
                LineLbl  = LineLbl.UpperCase();
-               LineData = LineData.UpperCase();
+               //LineData = LineData.UpperCase();
 
                //Skip Macro call lines
                if (LineLbl.SubString(1,1) != "%" ) {
@@ -1229,7 +1231,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                }
                //Insert the line in place
                pASMFile->Insert(i+(j-1), Line);
-               pMetaASMFile->Insert(i+(j-1), "[MACRO:" + MacroName + "->" + macroLocation + ":" + IntToStr(j-1) + "]");
+               pMetaASMFile->Insert(i+(j-1), "[MACRO:" + MacroName + "->" + macroLocation + ":" + IntToStr(j) + "]");
             }
             //As the Macro call line was removed (%) the line at i must be reprocessed
             i--;
@@ -1329,7 +1331,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 {
    (void)Sender;
 
-   String DataHex , DataLineText, DataLineCode;
+   String DataHex , DataLineText, DataLineCode, includes;
    TStringList *ASMFile   = new TStringList;
    TStringList *LabelList = new TStringList;
    TList* MacroList       = new TList;
@@ -1373,7 +1375,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    }
 
    //First pass, process includes and list macros definitions
-   this->Parse4MacroDefineAndInclude(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, errorList, metaASMFile);
+   this->Parse4MacroDefineAndInclude(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, &includes, errorList, metaASMFile);
    //Second pass, replace calls for macros, and rename labels inside macros
    this->Parse4MacroUsage(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, errorList, metaASMFile);
    //Third pass, remove empty or blank lines, comment lines and list labels
@@ -1399,16 +1401,19 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       lineData = StringReplace(lineData, "GOTO", " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "->",   ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "-",    ", ", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, ">>",   ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, ">",    ", ", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "<<",   ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "<",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "+",    " ,", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "|",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "&",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "^",    ", ", TReplaceFlags() << rfReplaceAll );
-      lineData = StringReplace(lineData, "?",    " ",  TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "?",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "!",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "@",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "#",    " ",  TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "==",   ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "=",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "(",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, ")",    " ",  TReplaceFlags() << rfReplaceAll );
@@ -1449,12 +1454,20 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
          if (lineData.Pos(",") > 0) {
             lineParam[0] = lineData.SubString(1, lineData.Pos(",")-1);
             lineParam[0] = lineParam[0].Trim();
+            if (lineParam[0] == "") { 
+               errorList->Add(ERR_OPCODE_PARAM_EMPTY + lineOpCode + metaASMFile->Strings[i]);
+               lineParam[0] = "0";
+            }
             lineData = lineData.SubString(lineData.Pos(",")+1, lineData.Length());
             lineData = lineData.Trim();
 
             if (lineData.Pos(",") > 0 ) {
                lineParam[1] = lineData.SubString(1, lineData.Pos(",")-1);
                lineParam[1] = lineParam[1].Trim();
+               if (lineParam[1] == "") { 
+                  errorList->Add(ERR_OPCODE_PARAM_EMPTY + lineOpCode + metaASMFile->Strings[i]);
+                  lineParam[1] = "0";
+               }
                lineData = lineData.SubString(lineData.Pos(",")+1, lineData.Length());
                lineData = lineData.Trim();
 
@@ -1475,10 +1488,14 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       }
       if (instruc->NbParam != paramCount) {
          errorList->Add(ERR_OPCODE_PARAM_COUNT + lineOpCode + metaASMFile->Strings[i]);
+         lineParam[0] = "0";
+         lineParam[1] = "0";
+         lineParam[2] = "0";
       }
             
       //Print readable line
       String instrucText = instruc->HeadMnemo + instruc->HeadSuffix;
+      String instrucTextParam[3] = {"", "", ""};
 
       switch (instruc->NbParam) {
          case 3:
@@ -1488,9 +1505,9 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                for (int j=1; j<=instruc->DataWidth; j+=4) {
                   DataLineText = DataLineText + BinToHex(DataLineCode.SubString(j,4));
                }
-               instrucText = instrucText + instruc->Param3Type + DataLineText + instruc->Param3Suffix;
+               instrucTextParam[2] = instruc->Param3Type + DataLineText + instruc->Param3Suffix;
             } else if (instruc->Param3Source != "") {
-               instrucText = instrucText + instruc->Param3Type + lineParam[2].SubString(2,1) + instruc->Param3Suffix;
+               instrucTextParam[2] = instruc->Param3Type + lineParam[2].SubString(2,1) + instruc->Param3Suffix;
             }
 
          case 2:
@@ -1500,9 +1517,9 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                for (int j=1; j<=instruc->DataWidth; j+=4) {
                   DataLineText = DataLineText + BinToHex(DataLineCode.SubString(j,4));
                }
-               instrucText = instrucText + instruc->Param2Type + DataLineText + instruc->Param2Suffix;
+               instrucTextParam[1] = instruc->Param2Type + DataLineText + instruc->Param2Suffix;
             } else if (instruc->Param2Source != "") {
-               instrucText = instrucText + instruc->Param2Type + lineParam[1].SubString(2,1) + instruc->Param2Suffix;
+               instrucTextParam[1] = instruc->Param2Type + lineParam[1].SubString(2,1) + instruc->Param2Suffix;
             }
 
          case 1:
@@ -1512,14 +1529,16 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                for (int j=1; j<=instruc->DataWidth; j+=4) {
                   DataLineText = DataLineText + BinToHex(DataLineCode.SubString(j,4));
                }
-               instrucText = instrucText + instruc->Param1Type + DataLineText + instruc->Param1Suffix;
+               instrucTextParam[0] = instruc->Param1Type + DataLineText + instruc->Param1Suffix;
             } else if (instruc->Param1Source != "") {
-               instrucText = instrucText + instruc->Param1Type + lineParam[0].SubString(2,1) + instruc->Param1Suffix;
+               instrucTextParam[0] = instruc->Param1Type + lineParam[0].SubString(2,1) + instruc->Param1Suffix;
             }
 
          //case 0:
          //default:
       }
+
+      instrucText = instrucText + instrucTextParam[0] + instrucTextParam[1] + instrucTextParam[2] ;
 
       //Compute Machine Code
       String instrucCode = "";
@@ -1593,8 +1612,10 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
          errorList->Insert(0, this->od_Assembler->FileName);
          errorList->Insert(1, FormatDateTime("yyyy-mm-dd hh:mm:ss", Now()));
          errorList->Insert(2, "");
-         errorList->Insert(3, "Error count: " + IntToStr(errorList->Count));
+         errorList->Insert(3, "Includes: " + includes);
          errorList->Insert(4, "");
+         errorList->Insert(5, "Error count: " + IntToStr(errorList->Count));
+         errorList->Insert(6, "");
 
          f_ErrorList->InitList(errorList);
 
@@ -1766,19 +1787,34 @@ void __fastcall Tf_Memory::b_NextClick(TObject *Sender)
    }
 }
 //---------------------------------------------------------------------------
-
+/*
 void __fastcall Tf_Memory::dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect,
           TField *Field, TGridDrawState State)
 {
    (void)Sender;
-   (void)Rect;
-   (void)Field;
-   (void)State;
+   //(void)State;
 
    if (Field->Name == "cds_MemAddress" || Field->Name == "cds_MemAddrHex" ) {
       if (this->cds_MemBreakPoint->AsBoolean) {
          //dbg_Mem->Canvas->Font->Style = dbg_Mem->Canvas->Font->Style << fsBold;
          dbg_Mem->Canvas->Brush->Color = clRed;
+         //dbg_Mem->Canvas->FillRect(Rect);
+         //dbg_Mem->Canvas->TextRect(Rect, Rect.Left + 2, Rect.Top + 2, Field->AsString);
+         dbg_Mem->DefaultDrawDataCell(Rect, Field, State);
+      }
+   }
+}
+*/
+//---------------------------------------------------------------------------
+void __fastcall Tf_Memory::dbg_MemDrawColumnCell(TObject *Sender, const TRect &Rect,
+          int DataCol, TColumn *Column, TGridDrawState State)
+{
+   (void)Sender;
+
+   if (Column->FieldName == "Address" || Column->FieldName == "AddrHex") {
+      if (this->cds_MemBreakPoint->AsBoolean) {
+         dbg_Mem->Canvas->Brush->Color = clRed;
+         dbg_Mem->DefaultDrawColumnCell(Rect, DataCol, Column, State);
       }
    }
 }

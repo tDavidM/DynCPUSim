@@ -9,12 +9,12 @@
                         SETA  @"0b11111111" , $0           ;Each parameter is seperated by , and spaces are optional
 :2ND_TEST   :TrdTest    IFNZ  $0,     goto#:SNDBLOCK:      ;Labels are not case sensitive, up to 2 per line, can be used for relative adresse with :
                         IFZ   $9,     #"255"               ;All characters used for readablity beside $ are optional (#@"=-<>?!|&) as well as "goto" tag
-                        SIF   $0,  =  0xFF                 ;Labels can only use a-z 0-9 and _
+                        SIF   $0  =  0xFF                 ;Labels can only use a-z 0-9 and _
                         ADD   $0,$1,   $2                  ;0b and 0x tags are required to indicate a binary or hexadecimal value
                         SUB   $0,   $1,$2                  ;
                         AND   $0,$1,$2                     ;Labels are always defined with a single : (left side) but when used (inside an instruction), a single : mean relative address
-                        OR    ($C,   $1), ->  $2           ;  as opposed to double :: and :* used for absolute address
-                        XOR   $0, ^ $1,   $2               ;  where :: provide the 4 most significant bits and :* the 4 least significant bits of an 8bits addr
+                        OR    ($C,   $1) ->  $2           ;  as opposed to double :: and :* used for absolute address
+                        XOR   $0  ^ $1,  $2               ;  where :: provide the 4 most significant bits and :* the 4 least significant bits of an 8bits addr
                         WJMP  #::LBLTEST:                  ;WJMP is a special case as the data portion is 12 bits long, here ::LBLTEST outputs 0x002 as :LBLTEST is at 0x002A
                         SETV  @$0,    (0xFF)               ;When used (inside an instruction), Labels are also terminated by a :
                         GRT   $0, ? $2,  $1                ;

@@ -28,12 +28,13 @@
 #define ERR_UNKNOWN_MACRO "Unknown macro: "
 
 #define ERR_UNKNOWN_OPCODE "Unknown opcode: "
+#define ERR_OPCODE_PARAM_EMPTY "Empty parameter: "
 #define ERR_OPCODE_PARAM_MANY "Too many parameters: "
 #define ERR_OPCODE_PARAM_COUNT "Wrong parameter count for opcode: "
 
 #define ERR_UNKNOWN_LABEL "Unknown label: "
-#define ERR_ABS_ADDR_FAR " : "
-#define ERR_REL_ADDR_FAR " : "
+#define ERR_ABS_ADDR_FAR "Absolute Addr Out of Range : "
+#define ERR_REL_ADDR_FAR "Relative Addr Out of Range : "
 
 
 //---------------------------------------------------------------------------
@@ -129,11 +130,12 @@ __published:
    void __fastcall b_ImportClick(TObject *Sender);
    void __fastcall cb_StepByStepClick(TObject *Sender);
    void __fastcall b_NextClick(TObject *Sender);
-   void __fastcall dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect, TField *Field,
-          TGridDrawState State);
+   //void __fastcall dbg_MemDrawDataCell(TObject *Sender, const TRect &Rect, TField *Field, TGridDrawState State);
    void __fastcall b_BreakPointClick(TObject *Sender);
    void __fastcall b_bootClick(TObject *Sender);
     void __fastcall FormShow(TObject *Sender);
+    void __fastcall dbg_MemDrawColumnCell(TObject *Sender, const TRect &Rect, int DataCol,
+          TColumn *Column, TGridDrawState State);
 private:
     int LastDataType;
     int LastSelLine;
@@ -151,7 +153,7 @@ private:
     String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile);
 
     void Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
-    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
+    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, String* pIncludes, TStringList* pErrorList, TStringList* pMetaASMFile);
     void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
 
 public:
