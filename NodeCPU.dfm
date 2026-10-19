@@ -33,8 +33,6 @@ object f_CPUNode: Tf_CPUNode
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 1
     Visible = False
-    ExplicitWidth = 1102
-    ExplicitHeight = 589
   end
   object p_zoom: TPanel
     Left = 1653
@@ -44,8 +42,6 @@ object f_CPUNode: Tf_CPUNode
     Anchors = [akRight, akBottom]
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 1062
-    ExplicitTop = 413
     object l_gridZoom: TLabel
       Left = 5
       Top = 6
@@ -80,8 +76,6 @@ object f_CPUNode: Tf_CPUNode
     SimpleText = 
       #9#9#9#9#9#9#9#9'Mouse: Left=Select, Right=Move, Middle=Create, Shift+Lef' +
       't=Link(1), Ctrl+Left=Link(2)'
-    ExplicitTop = 613
-    ExplicitWidth = 1102
   end
   object HeaderControl: THeaderControl
     Left = 0
@@ -89,7 +83,6 @@ object f_CPUNode: Tf_CPUNode
     Width = 1693
     Height = 21
     Sections = <>
-    ExplicitWidth = 1102
   end
   object p_Speed: TPanel
     Left = 1653
@@ -99,7 +92,6 @@ object f_CPUNode: Tf_CPUNode
     Anchors = [akTop, akRight]
     ParentBackground = False
     TabOrder = 4
-    ExplicitLeft = 1062
     object l_Speed: TLabel
       Left = 4
       Top = 5
@@ -129,8 +121,6 @@ object f_CPUNode: Tf_CPUNode
     Height = 16
     Anchors = [akRight, akBottom]
     TabOrder = 5
-    ExplicitLeft = 888
-    ExplicitTop = 615
   end
   object b_Init: TButton
     Left = 8
@@ -216,7 +206,6 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'Quick Edit'
     TabOrder = 14
     OnMouseMove = cb_QuickEditMouseMove
-    ExplicitLeft = 767
   end
   object b_Or: TButton
     Left = 1429
@@ -234,7 +223,6 @@ object f_CPUNode: Tf_CPUNode
     ParentFont = False
     TabOrder = 15
     OnClick = b_OrClick
-    ExplicitLeft = 838
   end
   object b_And: TButton
     Tag = 1
@@ -247,7 +235,6 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'AND'
     TabOrder = 16
     OnClick = b_OrClick
-    ExplicitLeft = 882
   end
   object b_NOr: TButton
     Tag = 2
@@ -260,7 +247,6 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NOR'
     TabOrder = 17
     OnClick = b_OrClick
-    ExplicitLeft = 926
   end
   object b_NAnd: TButton
     Tag = 3
@@ -273,7 +259,6 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NAND'
     TabOrder = 18
     OnClick = b_OrClick
-    ExplicitLeft = 970
   end
   object b_XOr: TButton
     Tag = 4
@@ -286,7 +271,6 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'XOR'
     TabOrder = 19
     OnClick = b_OrClick
-    ExplicitLeft = 1014
   end
   object b_Not: TButton
     Tag = 5
@@ -299,7 +283,6 @@ object f_CPUNode: Tf_CPUNode
     Caption = 'NOT'
     TabOrder = 20
     OnClick = b_OrClick
-    ExplicitLeft = 1058
   end
   object cb_Annotation: TCheckBox
     Left = 480

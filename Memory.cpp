@@ -87,298 +87,312 @@ void __fastcall Tf_Memory::cb_OpCodeChange(TObject *Sender)
 //---------------------------------------------------------------------------
 String Tf_Memory::BinToHex(String Bin)
 {
-    if     (Bin == "1111") { return "F"; }
-    else if(Bin == "1110") { return "E"; }
-    else if(Bin == "1101") { return "D"; }
-    else if(Bin == "1100") { return "C"; }
-    else if(Bin == "1011") { return "B"; }
-    else if(Bin == "1010") { return "A"; }
-    else if(Bin == "1001") { return "9"; }
-    else if(Bin == "1000") { return "8"; }
-    else if(Bin == "0111") { return "7"; }
-    else if(Bin == "0110") { return "6"; }
-    else if(Bin == "0101") { return "5"; }
-    else if(Bin == "0100") { return "4"; }
-    else if(Bin == "0011") { return "3"; }
-    else if(Bin == "0010") { return "2"; }
-    else if(Bin == "0001") { return "1"; }
-    else if(Bin == "0000") { return "0"; }
-    else { return "0"; } // =^.^= here's a kitty
+        if (Bin == "1111") { return "F"; }
+   else if (Bin == "1110") { return "E"; }
+   else if (Bin == "1101") { return "D"; }
+   else if (Bin == "1100") { return "C"; }
+   else if (Bin == "1011") { return "B"; }
+   else if (Bin == "1010") { return "A"; }
+   else if (Bin == "1001") { return "9"; }
+   else if (Bin == "1000") { return "8"; }
+   else if (Bin == "0111") { return "7"; }
+   else if (Bin == "0110") { return "6"; }
+   else if (Bin == "0101") { return "5"; }
+   else if (Bin == "0100") { return "4"; }
+   else if (Bin == "0011") { return "3"; }
+   else if (Bin == "0010") { return "2"; }
+   else if (Bin == "0001") { return "1"; }
+   else if (Bin == "0000") { return "0"; }
+   else { return "0"; } // =^.^= here's a kitty
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::HexToDec(String Hex)
 {
-      if     (Hex == "0") { return "0"; }
-      else if(Hex == "1") { return "1"; }
-      else if(Hex == "2") { return "2"; }
-      else if(Hex == "3") { return "3"; }
-      else if(Hex == "4") { return "4"; }
-      else if(Hex == "5") { return "5"; }
-      else if(Hex == "6") { return "6"; }
-      else if(Hex == "7") { return "7"; }
-      else if(Hex == "8") { return "8"; }
-      else if(Hex == "9") { return "9"; }
-      else if(Hex == "A") { return "10"; }
-      else if(Hex == "B") { return "11"; }
-      else if(Hex == "C") { return "12"; }
-      else if(Hex == "D") { return "13"; }
-      else if(Hex == "E") { return "14"; }
-      else if(Hex == "F") { return "15"; }
-      else { return "0"; }
+         if (Hex == "0") { return "0"; }
+    else if (Hex == "1") { return "1"; }
+    else if (Hex == "2") { return "2"; }
+    else if (Hex == "3") { return "3"; }
+    else if (Hex == "4") { return "4"; }
+    else if (Hex == "5") { return "5"; }
+    else if (Hex == "6") { return "6"; }
+    else if (Hex == "7") { return "7"; }
+    else if (Hex == "8") { return "8"; }
+    else if (Hex == "9") { return "9"; }
+    else if (Hex == "A") { return "10"; }
+    else if (Hex == "B") { return "11"; }
+    else if (Hex == "C") { return "12"; }
+    else if (Hex == "D") { return "13"; }
+    else if (Hex == "E") { return "14"; }
+    else if (Hex == "F") { return "15"; }
+    else { return "0"; }
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::HexToBin(String Hex)
 {
-      if     (Hex == "0") { return "0000"; }
-      else if(Hex == "1") { return "0001"; }
-      else if(Hex == "2") { return "0010"; }
-      else if(Hex == "3") { return "0011"; }
-      else if(Hex == "4") { return "0100"; }
-      else if(Hex == "5") { return "0101"; }
-      else if(Hex == "6") { return "0110"; }
-      else if(Hex == "7") { return "0111"; }
-      else if(Hex == "8") { return "1000"; }
-      else if(Hex == "9") { return "1001"; }
-      else if(Hex == "A") { return "1010"; }
-      else if(Hex == "B") { return "1011"; }
-      else if(Hex == "C") { return "1100"; }
-      else if(Hex == "D") { return "1101"; }
-      else if(Hex == "E") { return "1110"; }
-      else if(Hex == "F") { return "1111"; }
-      else { return "0"; }
+         if (Hex == "0") { return "0000"; }
+    else if (Hex == "1") { return "0001"; }
+    else if (Hex == "2") { return "0010"; }
+    else if (Hex == "3") { return "0011"; }
+    else if (Hex == "4") { return "0100"; }
+    else if (Hex == "5") { return "0101"; }
+    else if (Hex == "6") { return "0110"; }
+    else if (Hex == "7") { return "0111"; }
+    else if (Hex == "8") { return "1000"; }
+    else if (Hex == "9") { return "1001"; }
+    else if (Hex == "A") { return "1010"; }
+    else if (Hex == "B") { return "1011"; }
+    else if (Hex == "C") { return "1100"; }
+    else if (Hex == "D") { return "1101"; }
+    else if (Hex == "E") { return "1110"; }
+    else if (Hex == "F") { return "1111"; }
+    else { return "0"; }
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::DecToHex(String pDec, int pMax)
 {
-  int Dec = StrToInt(pDec);
-  int Div;
-  String Stack = "";
+   int Dec = StrToInt(pDec);
+   int Div;
+   String Stack = "";
 
-  if (Dec < 0)
-     return "0";
+   if (Dec < 0) {
+      return "0";
+   }
 
-  if (Dec > pMax)
-     return "0";
-     
-  if (Dec > 4095) {
+   if (Dec > pMax) {
+      return "0";
+   }
+
+   if (Dec > 4095) {
       Div = Dec / 4095;
       Dec = Dec % 4095;
       switch (Div) {
-          case 0:{Stack  = "0"; break;}
-          case 1:{Stack  = "1"; break;}
-          case 2:{Stack  = "2"; break;}
-          case 3:{Stack  = "3"; break;}
-          case 4:{Stack  = "4"; break;}
-          case 5:{Stack  = "5"; break;}
-          case 6:{Stack  = "6"; break;}
-          case 7:{Stack  = "7"; break;}
-          case 8:{Stack  = "8"; break;}
-          case 9:{Stack  = "9"; break;}
-          case 10:{Stack = "A"; break;}
-          case 11:{Stack = "B"; break;}
-          case 12:{Stack = "C"; break;}
-          case 13:{Stack = "D"; break;}
-          case 14:{Stack = "E"; break;}
-          case 15:{Stack = "F"; break;}
+         case 0:{Stack  = "0"; break;}
+         case 1:{Stack  = "1"; break;}
+         case 2:{Stack  = "2"; break;}
+         case 3:{Stack  = "3"; break;}
+         case 4:{Stack  = "4"; break;}
+         case 5:{Stack  = "5"; break;}
+         case 6:{Stack  = "6"; break;}
+         case 7:{Stack  = "7"; break;}
+         case 8:{Stack  = "8"; break;}
+         case 9:{Stack  = "9"; break;}
+         case 10:{Stack = "A"; break;}
+         case 11:{Stack = "B"; break;}
+         case 12:{Stack = "C"; break;}
+         case 13:{Stack = "D"; break;}
+         case 14:{Stack = "E"; break;}
+         case 15:{Stack = "F"; break;}
       }
    }
-  if (Dec > 255) {
+   if (Dec > 255) {
       Div = Dec / 256;
       Dec = Dec % 256;
       switch (Div) {
-          case 0:{Stack  = Stack + "0"; break;}
-          case 1:{Stack  = Stack + "1"; break;}
-          case 2:{Stack  = Stack + "2"; break;}
-          case 3:{Stack  = Stack + "3"; break;}
-          case 4:{Stack  = Stack + "4"; break;}
-          case 5:{Stack  = Stack + "5"; break;}
-          case 6:{Stack  = Stack + "6"; break;}
-          case 7:{Stack  = Stack + "7"; break;}
-          case 8:{Stack  = Stack + "8"; break;}
-          case 9:{Stack  = Stack + "9"; break;}
-          case 10:{Stack = Stack + "A"; break;}
-          case 11:{Stack = Stack + "B"; break;}
-          case 12:{Stack = Stack + "C"; break;}
-          case 13:{Stack = Stack + "D"; break;}
-          case 14:{Stack = Stack + "E"; break;}
-          case 15:{Stack = Stack + "F"; break;}
+         case 0:{Stack  = Stack + "0"; break;}
+         case 1:{Stack  = Stack + "1"; break;}
+         case 2:{Stack  = Stack + "2"; break;}
+         case 3:{Stack  = Stack + "3"; break;}
+         case 4:{Stack  = Stack + "4"; break;}
+         case 5:{Stack  = Stack + "5"; break;}
+         case 6:{Stack  = Stack + "6"; break;}
+         case 7:{Stack  = Stack + "7"; break;}
+         case 8:{Stack  = Stack + "8"; break;}
+         case 9:{Stack  = Stack + "9"; break;}
+         case 10:{Stack = Stack + "A"; break;}
+         case 11:{Stack = Stack + "B"; break;}
+         case 12:{Stack = Stack + "C"; break;}
+         case 13:{Stack = Stack + "D"; break;}
+         case 14:{Stack = Stack + "E"; break;}
+         case 15:{Stack = Stack + "F"; break;}
       }
    }
    Div = Dec / 16;
    switch (Div) {
-       case 0:{Stack  = Stack + "0"; break;}
-       case 1:{Stack  = Stack + "1"; break;}
-       case 2:{Stack  = Stack + "2"; break;}
-       case 3:{Stack  = Stack + "3"; break;}
-       case 4:{Stack  = Stack + "4"; break;}
-       case 5:{Stack  = Stack + "5"; break;}
-       case 6:{Stack  = Stack + "6"; break;}
-       case 7:{Stack  = Stack + "7"; break;}
-       case 8:{Stack  = Stack + "8"; break;}
-       case 9:{Stack  = Stack + "9"; break;}
-       case 10:{Stack = Stack + "A"; break;}
-       case 11:{Stack = Stack + "B"; break;}
-       case 12:{Stack = Stack + "C"; break;}
-       case 13:{Stack = Stack + "D"; break;}
-       case 14:{Stack = Stack + "E"; break;}
-       case 15:{Stack = Stack + "F"; break;}
+      case 0:{Stack  = Stack + "0"; break;}
+      case 1:{Stack  = Stack + "1"; break;}
+      case 2:{Stack  = Stack + "2"; break;}
+      case 3:{Stack  = Stack + "3"; break;}
+      case 4:{Stack  = Stack + "4"; break;}
+      case 5:{Stack  = Stack + "5"; break;}
+      case 6:{Stack  = Stack + "6"; break;}
+      case 7:{Stack  = Stack + "7"; break;}
+      case 8:{Stack  = Stack + "8"; break;}
+      case 9:{Stack  = Stack + "9"; break;}
+      case 10:{Stack = Stack + "A"; break;}
+      case 11:{Stack = Stack + "B"; break;}
+      case 12:{Stack = Stack + "C"; break;}
+      case 13:{Stack = Stack + "D"; break;}
+      case 14:{Stack = Stack + "E"; break;}
+      case 15:{Stack = Stack + "F"; break;}
    }
    Div = Dec % 16;
    switch (Div) {
-       case 0:{Stack  = Stack + "0"; break;}
-       case 1:{Stack  = Stack + "1"; break;}
-       case 2:{Stack  = Stack + "2"; break;}
-       case 3:{Stack  = Stack + "3"; break;}
-       case 4:{Stack  = Stack + "4"; break;}
-       case 5:{Stack  = Stack + "5"; break;}
-       case 6:{Stack  = Stack + "6"; break;}
-       case 7:{Stack  = Stack + "7"; break;}
-       case 8:{Stack  = Stack + "8"; break;}
-       case 9:{Stack  = Stack + "9"; break;}
-       case 10:{Stack = Stack + "A"; break;}
-       case 11:{Stack = Stack + "B"; break;}
-       case 12:{Stack = Stack + "C"; break;}
-       case 13:{Stack = Stack + "D"; break;}
-       case 14:{Stack = Stack + "E"; break;}
-       case 15:{Stack = Stack + "F"; break;}
+      case 0:{Stack  = Stack + "0"; break;}
+      case 1:{Stack  = Stack + "1"; break;}
+      case 2:{Stack  = Stack + "2"; break;}
+      case 3:{Stack  = Stack + "3"; break;}
+      case 4:{Stack  = Stack + "4"; break;}
+      case 5:{Stack  = Stack + "5"; break;}
+      case 6:{Stack  = Stack + "6"; break;}
+      case 7:{Stack  = Stack + "7"; break;}
+      case 8:{Stack  = Stack + "8"; break;}
+      case 9:{Stack  = Stack + "9"; break;}
+      case 10:{Stack = Stack + "A"; break;}
+      case 11:{Stack = Stack + "B"; break;}
+      case 12:{Stack = Stack + "C"; break;}
+      case 13:{Stack = Stack + "D"; break;}
+      case 14:{Stack = Stack + "E"; break;}
+      case 15:{Stack = Stack + "F"; break;}
    }
    return Stack;
 }
 //---------------------------------------------------------------------------
 void Tf_Memory::CreateLine(void)
 {
-  String BasePrefix;
-  int BaseId, WidthHex;
-  String BinData, HexData, InstrucText, InstrucCode;
-  TInstruc* Instruc;
+   String BasePrefix;
+   int BaseId, WidthHex;
+   String BinData, HexData, InstrucText, InstrucCode;
+   TInstruc* Instruc;
 
-  Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
-  WidthHex   = Instruc->DataWidth/4;
+   Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+   WidthHex = Instruc->DataWidth/4;
 
-  if(this->rb_Bin->Checked) {
-     BasePrefix = "0b";
-     BaseId     = 0;
-     while(BinData.Length() < Instruc->DataWidth)
-        BinData = "0" + BinData;
-     BinData    = this->e_Data->Text.SubString(this->e_Data->Text.Length()-Instruc->DataWidth+1, Instruc->DataWidth);
-  } else if (this->rb_Dec->Checked) {
-     BasePrefix = "0d";
-     BaseId     = 1;
-     this->e_Data->Text = this->e_Data->Text.UpperCase();
-     HexData    = DecToHex(this->e_Data->Text);
-     while(HexData.Length() < WidthHex)
-        HexData = "0" + HexData;     
-     HexData    = HexData.SubString(HexData.Length()-WidthHex+1, WidthHex);
-     for (int i=1; i<=WidthHex; i++)
-        BinData = BinData + HexToBin(HexData.SubString(i,1));
-  } else {
-     BasePrefix = "0x";
-     BaseId     = 2;
-     this->e_Data->Text = this->e_Data->Text.UpperCase();
-     HexData    = this->e_Data->Text;
-     while(HexData.Length() < WidthHex)
-        HexData = "0" + HexData;   
-     HexData    = HexData.SubString(HexData.Length()-WidthHex+1, WidthHex);
-     for (int i=1; i<=WidthHex; i++)
-        BinData = BinData + HexToBin(HexData.SubString(i,1));
-  }
-
-  this->cds_MemOpCode->AsInteger   = this->cb_OpCode->ItemIndex;
-  this->cds_MemMnemonic->AsString  = Instruc->HeadMnemo;
-  this->cds_MemData->AsString      = this->e_Data->Text;
-  this->cds_MemComment->AsString   = this->e_Comment->Text;
-  this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
-  this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
-  this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
-  this->cds_MemDataType->AsInteger = BaseId;
-  this->cds_MemBreakPoint->AsBoolean = false;
-
-  InstrucText = Instruc->Name + Instruc->HeadSuffix;
-  if (Instruc->NbParam > 0) {
-     InstrucText = InstrucText + Instruc->Param1Type;
-     if (Instruc->Param1Source == "B")
-       InstrucText = InstrucText + this->cb_B->Text + Instruc->Param1Suffix;
-     else if (Instruc->Param1Source == "C")
-       InstrucText = InstrucText + this->cb_C->Text + Instruc->Param1Suffix;
-     else if (Instruc->Param1Source == "D")
-       InstrucText = InstrucText + this->cb_D->Text + Instruc->Param1Suffix;
-     else if (Instruc->Param1Source == "Data")
-       InstrucText = InstrucText + BasePrefix + this->e_Data->Text + Instruc->Param1Suffix;
-
-     if (Instruc->NbParam > 1) {
-        InstrucText = InstrucText + Instruc->Param2Type;
-        if (Instruc->Param2Source == "B")
-          InstrucText = InstrucText + this->cb_B->Text + Instruc->Param2Suffix;
-        else if (Instruc->Param2Source == "C")
-          InstrucText = InstrucText + this->cb_C->Text + Instruc->Param2Suffix;
-        else if (Instruc->Param2Source == "D")
-          InstrucText = InstrucText + this->cb_D->Text + Instruc->Param2Suffix;
-        else if (Instruc->Param2Source == "Data")
-          InstrucText = InstrucText + BasePrefix + this->e_Data->Text + Instruc->Param2Suffix;
-
-        if (Instruc->NbParam > 2) {
-           InstrucText = InstrucText + Instruc->Param3Type;
-           if (Instruc->Param3Source == "B")
-             InstrucText = InstrucText + this->cb_B->Text + Instruc->Param3Suffix;
-           else if (Instruc->Param3Source == "C")
-             InstrucText = InstrucText + this->cb_C->Text + Instruc->Param3Suffix;
-           else if (Instruc->Param3Source == "D")
-             InstrucText = InstrucText + this->cb_D->Text + Instruc->Param3Suffix;
-           else if (Instruc->Param3Source == "Data")
-             InstrucText = InstrucText + BasePrefix + this->e_Data->Text + Instruc->Param3Suffix;
-        }
+   if (this->rb_Bin->Checked) {
+      BasePrefix = "0b";
+      BaseId     = 0;
+      while (BinData.Length() < Instruc->DataWidth) {
+         BinData = "0" + BinData;
+      }
+      BinData    = this->e_Data->Text.SubString(this->e_Data->Text.Length()-Instruc->DataWidth+1, Instruc->DataWidth);
+   } else if (this->rb_Dec->Checked) {
+      BasePrefix = "0d";
+      BaseId     = 1;
+      this->e_Data->Text = this->e_Data->Text.UpperCase();
+      HexData    = DecToHex(this->e_Data->Text);
+      while (HexData.Length() < WidthHex) {
+         HexData = "0" + HexData;
+      }
+      HexData    = HexData.SubString(HexData.Length()-WidthHex+1, WidthHex);
+      for (int i=1; i<=WidthHex; i++) {
+         BinData = BinData + HexToBin(HexData.SubString(i,1));
      }
-  }
-  this->cds_MemHumData->AsString = InstrucText;
+   } else {
+      BasePrefix = "0x";
+      BaseId     = 2;
+      this->e_Data->Text = this->e_Data->Text.UpperCase();
+      HexData    = this->e_Data->Text;
+      while (HexData.Length() < WidthHex) {
+         HexData = "0" + HexData;
+      }
+      HexData    = HexData.SubString(HexData.Length()-WidthHex+1, WidthHex);
+      for (int i=1; i<=WidthHex; i++) {
+         BinData = BinData + HexToBin(HexData.SubString(i,1));
+      }
+   }
 
-  InstrucCode = "";
-  if (Instruc->BlockAFix)
-    InstrucCode = Instruc->BlockAVal;
-  else if (Instruc->BlockASource == "B")
-    InstrucCode = HexToBin(this->cb_B->Text);
-  else if (Instruc->BlockASource == "C")
-    InstrucCode = HexToBin(this->cb_C->Text);
-  else if (Instruc->BlockASource == "D")
-    InstrucCode = HexToBin(this->cb_D->Text);
-  else if (Instruc->BlockASource == "Data")
-    InstrucCode = BinData;
+   this->cds_MemOpCode->AsInteger   = this->cb_OpCode->ItemIndex;
+   this->cds_MemMnemonic->AsString  = Instruc->HeadMnemo;
+   this->cds_MemData->AsString      = this->e_Data->Text;
+   this->cds_MemComment->AsString   = this->e_Comment->Text;
+   this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
+   this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
+   this->cds_MemRD->AsInteger       = StrToInt(this->cb_D->ItemIndex);
+   this->cds_MemDataType->AsInteger = BaseId;
+   this->cds_MemBreakPoint->AsBoolean = false;
 
-  if (Instruc->BlockBFix)
-    InstrucCode = InstrucCode + Instruc->BlockBVal;
-  else if (Instruc->BlockBSource == "B")
-    InstrucCode = InstrucCode + HexToBin(this->cb_B->Text);
-  else if (Instruc->BlockBSource == "C")
-    InstrucCode = InstrucCode + HexToBin(this->cb_C->Text);
-  else if (Instruc->BlockBSource == "D")
-    InstrucCode = InstrucCode + HexToBin(this->cb_D->Text);
-  else if (Instruc->BlockBSource == "Data")
-    InstrucCode = InstrucCode + BinData;
+   InstrucText = Instruc->Name + Instruc->HeadSuffix;
+   if (Instruc->NbParam > 0) {
+      InstrucText = InstrucText + Instruc->Param1Type;
+      if (Instruc->Param1Source == "B") {
+         InstrucText = InstrucText + this->cb_B->Text + Instruc->Param1Suffix;
+      } else if (Instruc->Param1Source == "C") {
+         InstrucText = InstrucText + this->cb_C->Text + Instruc->Param1Suffix;
+      } else if (Instruc->Param1Source == "D") {
+         InstrucText = InstrucText + this->cb_D->Text + Instruc->Param1Suffix;
+      } else if (Instruc->Param1Source == "Data") {
+         InstrucText = InstrucText + BasePrefix + this->e_Data->Text + Instruc->Param1Suffix;
+      }
 
-  if (Instruc->BlockCFix)
-    InstrucCode = InstrucCode + Instruc->BlockCVal;
-  else if (Instruc->BlockCSource == "B")
-    InstrucCode = InstrucCode + HexToBin(this->cb_B->Text);
-  else if (Instruc->BlockCSource == "C")
-    InstrucCode = InstrucCode + HexToBin(this->cb_C->Text);
-  else if (Instruc->BlockCSource == "D")
-    InstrucCode = InstrucCode + HexToBin(this->cb_D->Text);
-  else if (Instruc->BlockCSource == "Data")
-    InstrucCode = InstrucCode + BinData;
+      if (Instruc->NbParam > 1) {
+         InstrucText = InstrucText + Instruc->Param2Type;
+         if (Instruc->Param2Source == "B") {
+            InstrucText = InstrucText + this->cb_B->Text + Instruc->Param2Suffix;
+         } else if (Instruc->Param2Source == "C") {
+            InstrucText = InstrucText + this->cb_C->Text + Instruc->Param2Suffix;
+         } else if (Instruc->Param2Source == "D"){
+            InstrucText = InstrucText + this->cb_D->Text + Instruc->Param2Suffix;
+         } else if (Instruc->Param2Source == "Data") {
+            InstrucText = InstrucText + BasePrefix + this->e_Data->Text + Instruc->Param2Suffix;
+         }
 
-  if (Instruc->BlockDFix)
-    InstrucCode = InstrucCode + Instruc->BlockDVal;
-  else if (Instruc->BlockDSource == "B")
-    InstrucCode = InstrucCode + HexToBin(this->cb_B->Text);
-  else if (Instruc->BlockDSource == "C")
-    InstrucCode = InstrucCode + HexToBin(this->cb_C->Text);
-  else if (Instruc->BlockDSource == "D")
-    InstrucCode = InstrucCode + HexToBin(this->cb_D->Text);
-  else if (Instruc->BlockDSource == "Data")
-    InstrucCode = InstrucCode + BinData;
+         if (Instruc->NbParam > 2) {
+            InstrucText = InstrucText + Instruc->Param3Type;
+            if (Instruc->Param3Source == "B") {
+               InstrucText = InstrucText + this->cb_B->Text + Instruc->Param3Suffix;
+            } else if (Instruc->Param3Source == "C") {
+               InstrucText = InstrucText + this->cb_C->Text + Instruc->Param3Suffix;
+            } else if (Instruc->Param3Source == "D") {
+               InstrucText = InstrucText + this->cb_D->Text + Instruc->Param3Suffix;
+            } else if (Instruc->Param3Source == "Data") {
+               InstrucText = InstrucText + BasePrefix + this->e_Data->Text + Instruc->Param3Suffix;
+            }
+         }
+      }
+   }
+   this->cds_MemHumData->AsString = InstrucText;
 
-  this->cds_MemCode->AsString     = InstrucCode;
-  this->cds_MemCodeHex->AsString  = BinToHex(InstrucCode.SubString(1,4)) + BinToHex(InstrucCode.SubString(5,4)) +
-                                    BinToHex(InstrucCode.SubString(9,4)) + BinToHex(InstrucCode.SubString(13,4));
+   InstrucCode = "";
+   if (Instruc->BlockAFix) {
+      InstrucCode = Instruc->BlockAVal;
+   } else if (Instruc->BlockASource == "B") {
+      InstrucCode = HexToBin(this->cb_B->Text);
+   } else if (Instruc->BlockASource == "C") {
+      InstrucCode = HexToBin(this->cb_C->Text);
+   } else if (Instruc->BlockASource == "D") {
+      InstrucCode = HexToBin(this->cb_D->Text);
+   } else if (Instruc->BlockASource == "Data") {
+      InstrucCode = BinData;
+   }
+
+   if (Instruc->BlockBFix) {
+      InstrucCode = InstrucCode + Instruc->BlockBVal;
+   } else if (Instruc->BlockBSource == "B") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_B->Text);
+   } else if (Instruc->BlockBSource == "C") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_C->Text);
+   } else if (Instruc->BlockBSource == "D") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_D->Text);
+   } else if (Instruc->BlockBSource == "Data") {
+      InstrucCode = InstrucCode + BinData;
+   }
+
+   if (Instruc->BlockCFix) {
+      InstrucCode = InstrucCode + Instruc->BlockCVal;
+   } else if (Instruc->BlockCSource == "B") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_B->Text);
+   } else if (Instruc->BlockCSource == "C") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_C->Text);
+   } else if (Instruc->BlockCSource == "D") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_D->Text);
+   } else if (Instruc->BlockCSource == "Data") {
+      InstrucCode = InstrucCode + BinData;
+   }
+
+   if (Instruc->BlockDFix) {
+      InstrucCode = InstrucCode + Instruc->BlockDVal;
+   } else if (Instruc->BlockDSource == "B") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_B->Text);
+   } else if (Instruc->BlockDSource == "C") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_C->Text);
+   } else if (Instruc->BlockDSource == "D") {
+      InstrucCode = InstrucCode + HexToBin(this->cb_D->Text);
+   } else if (Instruc->BlockDSource == "Data") {
+      InstrucCode = InstrucCode + BinData;
+   }
+
+   this->cds_MemCode->AsString     = InstrucCode;
+   this->cds_MemCodeHex->AsString  = BinToHex(InstrucCode.SubString(1,4)) + BinToHex(InstrucCode.SubString(5,4)) +
+                                     BinToHex(InstrucCode.SubString(9,4)) + BinToHex(InstrucCode.SubString(13,4));
 
 }
 //---------------------------------------------------------------------------
@@ -451,8 +465,7 @@ void __fastcall Tf_Memory::b_InsertClick(TObject *Sender)
 
   this->cds_Mem->DisableControls();
   CurrAddr = this->cds_Mem->GetBookmark();
-  while(!cds_Mem->Eof)
-  {
+  while (!cds_Mem->Eof) {
     this->cds_Mem->Edit();
     SaveSortVal += 1;
     this->cds_MemSort->AsInteger = SaveSortVal;
@@ -477,10 +490,10 @@ void __fastcall Tf_Memory::b_EditClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::ds_MemDataChange(TObject *Sender, TField *Field)
 {
-  (void)Sender;
-  (void)Field;
+   (void)Sender;
+   (void)Field;
 
-  if (this->cds_Mem->State == dsBrowse) {
+   if (this->cds_Mem->State == dsBrowse) {
       //this->e_Sort->Text         = this->cds_MemSort->AsString;
       //this->e_Sort->Enabled      = true;
       this->cb_OpCode->ItemIndex = this->cds_MemOpCode->AsInteger;
@@ -489,148 +502,161 @@ void __fastcall Tf_Memory::ds_MemDataChange(TObject *Sender, TField *Field)
       this->cb_C->ItemIndex      = this->cds_MemRC->AsInteger;
       this->cb_D->ItemIndex      = this->cds_MemRD->AsInteger;
       switch (this->cds_MemDataType->AsInteger) {
-        case 0: {
-          this->rb_Bin->Checked = true; break;
-        }
-        case 1: {
-          this->rb_Dec->Checked = true; break;
-        }
-        case 2: {
-          this->rb_Hex->Checked = true; break;
-        }
+         case 0: {
+            this->rb_Bin->Checked = true;
+            break;
+         }
+         case 1: {
+            this->rb_Dec->Checked = true;
+            break;
+         }
+         case 2: {
+            this->rb_Hex->Checked = true;
+            break;
+         }
       }
       this->e_Data->Text         = this->cds_MemData->AsString;
-      if (this->cb_OpCode->Items->Count != 0)
+      if (this->cb_OpCode->Items->Count != 0) {
          this->cb_OpCodeChange(Sender);
-  }
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_DeleteClick(TObject *Sender)
 {
    (void)Sender;
 
-   if(this->cds_Mem->RecordCount > 1) {
-      if (Application->MessageBox( L"Delete Instruction ?", L"Instruction Node", MB_YESNO) == mrYes)
+   if (this->cds_Mem->RecordCount > 1) {
+      if (Application->MessageBox( L"Delete Instruction ?", L"Instruction Node", MB_YESNO) == mrYes) {
          this->cds_Mem->Delete();
+      }
    }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::e_DataKeyPress(TObject *Sender, char &Key)
 {
-  (void)Sender;
+   (void)Sender;
 
-  if (Key != VK_RETURN && Key != VK_TAB && Key != VK_LEFT && Key != VK_RIGHT && Key != VK_BACK && Key != VK_CLEAR &&
-      Key != VK_ESCAPE && Key != VK_DELETE  && Key != VK_HOME && Key != VK_END && Key != VK_INSERT && Key != VK_CANCEL) {
+   if (Key != VK_RETURN && Key != VK_TAB && Key != VK_LEFT && Key != VK_RIGHT && Key != VK_BACK && Key != VK_CLEAR &&
+       Key != VK_ESCAPE && Key != VK_DELETE  && Key != VK_HOME && Key != VK_END && Key != VK_INSERT && Key != VK_CANCEL) {
       if (this->rb_Bin->Checked) {
-         if ( Key != '0' && Key != '1')
+         if ( Key != '0' && Key != '1') {
             Key = 0;
+         }
       } else if (this->rb_Dec->Checked) {
          if ( Key != '0' && Key != '1' && Key != '2' && Key != '3' && Key != '4' && Key != '5' && Key != '6' && Key != '7' &&
-              Key != '8' && Key != '9')
+              Key != '8' && Key != '9') {
             Key = 0;
+              }
       } else {
          if ( Key != '0' && Key != '1' && Key != '2' && Key != '3' && Key != '4' && Key != '5' && Key != '6' && Key != '7' &&
               Key != '8' && Key != '9' && Key != 'A' && Key != 'B' && Key != 'C' && Key != 'D' && Key != 'E' && Key != 'F' &&
-              Key != 'a' && Key != 'b' && Key != 'c' && Key != 'd' && Key != 'e' && Key != 'f')
+              Key != 'a' && Key != 'b' && Key != 'c' && Key != 'd' && Key != 'e' && Key != 'f') {
             Key = 0;
+         }
       }
-  }
+   }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_Memory::rb_BinClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  int WidthHex;
-  String BinData;
-  TInstruc* Instruc;
+   int WidthHex;
+   String BinData;
+   TInstruc* Instruc;
 
-  if (this->cb_OpCode->ItemIndex >= 0) {
-     Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
-     WidthHex = Instruc->DataWidth/4;
+   if (this->cb_OpCode->ItemIndex >= 0) {
+      Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+      WidthHex = Instruc->DataWidth/4;
   
-     if (this->e_Data->Text != "") {
-       if (this->LastDataType == 1) {
-          this->e_Data->Text = this->e_Data->Text.UpperCase();
-          this->e_Data->Text = DecToHex(this->e_Data->Text);
-          while (this->e_Data->Text.Length() < WidthHex)
-             this->e_Data->Text = "0" + this->e_Data->Text;
-          for (int i=1; i<=WidthHex; i++)
-             BinData = BinData + HexToBin(this->e_Data->Text.SubString(i,1));
-          this->e_Data->Text = BinData;
-       } else if (this->LastDataType == 2) {
-          this->e_Data->Text = this->e_Data->Text.UpperCase();
-          for (int i=1; i<=WidthHex; i++)
-             BinData = BinData + HexToBin(this->e_Data->Text.SubString(i,1));
-          this->e_Data->Text = BinData;
-       }
-     }
-     this->LastDataType = 0;
-  }
+      if (this->e_Data->Text != "") {
+         if (this->LastDataType == 1) {
+            this->e_Data->Text = this->e_Data->Text.UpperCase();
+            this->e_Data->Text = DecToHex(this->e_Data->Text);
+            while (this->e_Data->Text.Length() < WidthHex) {
+               this->e_Data->Text = "0" + this->e_Data->Text;
+            }
+            for (int i=1; i<=WidthHex; i++) {
+               BinData = BinData + HexToBin(this->e_Data->Text.SubString(i,1));
+            }
+            this->e_Data->Text = BinData;
+         } else if (this->LastDataType == 2) {
+            this->e_Data->Text = this->e_Data->Text.UpperCase();
+            for (int i=1; i<=WidthHex; i++) {
+               BinData = BinData + HexToBin(this->e_Data->Text.SubString(i,1));
+            }
+            this->e_Data->Text = BinData;
+         }
+      }
+      this->LastDataType = 0;
+   }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_Memory::rb_DecClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  int WidthHex, DecData = 0, Muliplier;
-  String BinData, HexData;
-  TInstruc* Instruc;
+   int WidthHex, DecData = 0, Muliplier;
+   String BinData, HexData;
+   TInstruc* Instruc;
 
-  if (this->cb_OpCode->ItemIndex >= 0) {
-     Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
-     WidthHex = Instruc->DataWidth/4;
+   if (this->cb_OpCode->ItemIndex >= 0) {
+      Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+      WidthHex = Instruc->DataWidth/4;
 
-     if (this->e_Data->Text != "") {
-       if (this->LastDataType == 0) {
-         for (int i=1; i<=Instruc->DataWidth; i+=4)
-           HexData = HexData + BinToHex(this->e_Data->Text.SubString(i,4));
-         this->e_Data->Text = HexData;
-         for (int i=1; i<=WidthHex; i++) {
-            Muliplier = WidthHex==3?(i==1?256:i==2?16:1):WidthHex==2?(i==1?16:1):1;
-            DecData = DecData + (StrToInt(HexToDec(this->e_Data->Text.SubString(i,1))) * Muliplier );
+      if (this->e_Data->Text != "") {
+         if (this->LastDataType == 0) {
+            for (int i=1; i<=Instruc->DataWidth; i+=4) {
+               HexData = HexData + BinToHex(this->e_Data->Text.SubString(i,4));
+            }
+            this->e_Data->Text = HexData;
+            for (int i=1; i<=WidthHex; i++) {
+               Muliplier = WidthHex==3?(i==1?256:i==2?16:1):WidthHex==2?(i==1?16:1):1;
+               DecData = DecData + (StrToInt(HexToDec(this->e_Data->Text.SubString(i,1))) * Muliplier );
+            }
+            this->e_Data->Text = IntToStr(DecData);
+         } else if (this->LastDataType == 2) {
+            this->e_Data->Text = this->e_Data->Text.UpperCase();
+            for (int i=1; i<=WidthHex; i++) {
+               Muliplier = WidthHex==3?(i==1?256:i==2?16:1):WidthHex==2?(i==1?16:1):1;
+               DecData = DecData + (StrToInt(HexToDec(this->e_Data->Text.SubString(i,1))) * Muliplier );
+            }
+            this->e_Data->Text = IntToStr(DecData);
          }
-         this->e_Data->Text = IntToStr(DecData);
-       } else if (this->LastDataType == 2) {
-         this->e_Data->Text = this->e_Data->Text.UpperCase();
-         for (int i=1; i<=WidthHex; i++) {
-            Muliplier = WidthHex==3?(i==1?256:i==2?16:1):WidthHex==2?(i==1?16:1):1;
-            DecData = DecData + (StrToInt(HexToDec(this->e_Data->Text.SubString(i,1))) * Muliplier );
-         }
-         this->e_Data->Text = IntToStr(DecData);
-       }
-     }
-     this->LastDataType = 1;
-  }
+      }
+      this->LastDataType = 1;
+   }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_Memory::rb_HexClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  String HexData;
-  TInstruc* Instruc;
+   String HexData;
+   TInstruc* Instruc;
 
-  if (this->cb_OpCode->ItemIndex >= 0) {
-     Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+   if (this->cb_OpCode->ItemIndex >= 0) {
+      Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
 
-     if (this->e_Data->Text != "") {
-       if (this->LastDataType == 0) {
-         for (int i=1; i<=Instruc->DataWidth; i+=4)
-           HexData = HexData + BinToHex(this->e_Data->Text.SubString(i,4));
-         this->e_Data->Text = HexData;
-       }
-       else if (this->LastDataType == 1) {
-         this->e_Data->Text = DecToHex(this->e_Data->Text);
-         while (this->e_Data->Text.Length() < (Instruc->DataWidth/4))
-           this->e_Data->Text = "0" + this->e_Data->Text;
-       }
-     }
-     this->LastDataType = 2;
-  }
+      if (this->e_Data->Text != "") {
+         if (this->LastDataType == 0) {
+            for (int i=1; i<=Instruc->DataWidth; i+=4) {
+               HexData = HexData + BinToHex(this->e_Data->Text.SubString(i,4));
+            }
+            this->e_Data->Text = HexData;
+         } else if (this->LastDataType == 1) {
+            this->e_Data->Text = DecToHex(this->e_Data->Text);
+            while (this->e_Data->Text.Length() < (Instruc->DataWidth/4)) {
+               this->e_Data->Text = "0" + this->e_Data->Text;
+            }
+         }
+      }
+      this->LastDataType = 2;
+   }
 }
 //---------------------------------------------------------------------------
 
@@ -704,13 +730,15 @@ void Tf_Memory::MoveAddrByDelta(int Delta)
    this->cds_Mem->First();
 
    if (this->cds_Mem->RecordCount > 1 ) {
-       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target)
-           this->cds_Mem->Next();
+      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target) {
+         this->cds_Mem->Next();
+      }
    }
 
    TByteDynArray Location = cds_Mem->GetBookmark();
-   if (cds_Mem->BookmarkValid(Location))
+   if (cds_Mem->BookmarkValid(Location)) {
       cds_Mem->GotoBookmark(Location);
+   }
    cds_Mem->FreeBookmark(Location);
 
    this->cds_Mem->EnableControls();
@@ -731,14 +759,15 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
    this->cds_Mem->First();
 
    if (this->cds_Mem->RecordCount > 1 ) {
-       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr) {
-           this->cds_Mem->Next();
-       }
+      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr) {
+         this->cds_Mem->Next();
+      }
    }
 
    TByteDynArray Location = cds_Mem->GetBookmark();
-   if (cds_Mem->BookmarkValid(Location))
+   if (cds_Mem->BookmarkValid(Location)) {
       cds_Mem->GotoBookmark(Location);
+   }
    cds_Mem->FreeBookmark(Location);
 
    this->cds_Mem->EnableControls();
@@ -746,11 +775,11 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
    f_GraphIO->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(this->ExecCmp);
 
    if (this->cds_MemBreakPoint->AsBoolean) {
-     f_GraphIO->Pin29->Checked = true;
-     b_Next->Enabled = true;
-     if (!f_CPUNode->cb_ActiveDraw->Checked) {
-        f_CPUNode->CallDrawArea(1);
-     }
+      f_GraphIO->Pin29->Checked = true;
+      b_Next->Enabled = true;
+      if (!f_CPUNode->cb_ActiveDraw->Checked) {
+         f_CPUNode->CallDrawArea(1);
+      }
    }
 }
 //---------------------------------------------------------------------------
@@ -758,37 +787,37 @@ void __fastcall Tf_Memory::b_SaveClick(TObject *Sender)
 {
    (void)Sender;
 
-  if (this->sd_Mem->Execute()) {
-    if (this->sd_Mem->FileName != "") {
-      TBookmark CurrAddr;
+   if (this->sd_Mem->Execute()) {
+      if (this->sd_Mem->FileName != "") {
+         TBookmark CurrAddr;
 
-	   this->cds_Mem->MergeChangeLog();
-      //this->cds_Save->FieldDefs = this->cds_Mem->FieldDefs;
-	   //this->cds_Save->co
-	   this->cds_Mem->LogChanges = false;
+         this->cds_Mem->MergeChangeLog();
+         //this->cds_Save->FieldDefs = this->cds_Mem->FieldDefs;
+         //this->cds_Save->co
+         this->cds_Mem->LogChanges = false;
 
-      this->cds_Mem->DisableControls();
-      CurrAddr = this->cds_Mem->GetBookmark();
-      this->cds_Mem->First();
-      while (!this->cds_Mem->Eof) {
-        this->cds_Mem->Edit();
-        //this->cds_MemAddrDelta->AsInteger = this->cds_Mem->RecNo;
-        this->cds_MemSort->AsInteger = this->cds_Mem->RecNo;
-        this->cds_Mem->Post();
-        this->cds_Mem->Next();
+         this->cds_Mem->DisableControls();
+         CurrAddr = this->cds_Mem->GetBookmark();
+         this->cds_Mem->First();
+         while (!this->cds_Mem->Eof) {
+            this->cds_Mem->Edit();
+            //this->cds_MemAddrDelta->AsInteger = this->cds_Mem->RecNo;
+            this->cds_MemSort->AsInteger = this->cds_Mem->RecNo;
+            this->cds_Mem->Post();
+            this->cds_Mem->Next();
+         }
+         this->cds_Mem->GotoBookmark(CurrAddr);
+         this->cds_Mem->First();
+
+         //this->cds_Mem->ApplyUpdates(0);
+         this->cds_Mem->MergeChangeLog();
+         this->cds_Mem->LogChanges = false;
+
+         this->cds_Mem->SaveToFile(this->sd_Mem->FileName, dfXML);
+         this->cds_Mem->LogChanges = false;
+         this->cds_Mem->EnableControls();
       }
-      this->cds_Mem->GotoBookmark(CurrAddr);
-      this->cds_Mem->First();
-
-	   //this->cds_Mem->ApplyUpdates(0);
-	   this->cds_Mem->MergeChangeLog();
-	   this->cds_Mem->LogChanges = false;
-
-	   this->cds_Mem->SaveToFile(this->sd_Mem->FileName, dfXML);
-	   this->cds_Mem->LogChanges = false;
-      this->cds_Mem->EnableControls();
-    }
-  }
+   }
 }
 //---------------------------------------------------------------------------
 
@@ -820,26 +849,31 @@ void __fastcall Tf_Memory::e_DataExit(TObject *Sender)
    Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
    WidthHex   = Instruc->DataWidth/4;
    MaxDecimal = (2<<(Instruc->DataWidth-1))-1;
-    if (this->rb_Bin->Checked) {
-      if (Data.Length() < Instruc->DataWidth) {
-         while (Data.Length() < Instruc->DataWidth)
-             Data = "0" + Data;
-      } else
-         Data = Data.SubString(Data.Length()-Instruc->DataWidth+1, Instruc->DataWidth);
-         //Data = Data.SubString(1,Instruc->DataWidth);
+      if (this->rb_Bin->Checked) {
+         if (Data.Length() < Instruc->DataWidth) {
+            while (Data.Length() < Instruc->DataWidth) {
+               Data = "0" + Data;
+            }
+         } else {
+            Data = Data.SubString(Data.Length()-Instruc->DataWidth+1, Instruc->DataWidth);
+            //Data = Data.SubString(1,Instruc->DataWidth);
+         }
    } else if (this->rb_Dec->Checked) {
       Data = Data.SubString(1,WidthHex+1); // 16, 256, 4096
-      if(Data == "")
+      if (Data == "") {
          Data = "0";
-      else if (StrToInt(Data) > MaxDecimal)
+      } else if (StrToInt(Data) > MaxDecimal) {
          Data = MaxDecimal;
+      }
    } else {
       if (Data.Length() < WidthHex) {
-         while (Data.Length() < WidthHex)
+         while (Data.Length() < WidthHex) {
              Data = "0" + Data;
-      } else
+         }
+      } else {
          Data = Data.SubString(Data.Length()-WidthHex+1, WidthHex);
          //Data = Data.SubString(1,2);
+      }
    }
    this->e_Data->Text = Data;
 }
@@ -1014,9 +1048,9 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
          // from #INCLUDE "exemple.asm" to exemple.asm
          Line = Line.SubString(11,Line.Length()-11);
          //Remove comment
-            if (Line.Pos(";")>0) {
-               Line = Line.SubString(1,Line.Pos(";")-1);
-            }
+         if (Line.Pos(";")>0) {
+            Line = Line.SubString(1,Line.Pos(";")-1);
+         }
          Line = Line.Trim();
 
          if (FileExists(ExtractFilePath(this->od_Assembler->FileName) + Line)) {
@@ -1096,10 +1130,11 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
             Line = Line.TrimRight();
 
             //Extract Label
-            if (Line.Pos("/"))
+            if (Line.Pos("/")) {
                LineLbl  = Line.SubString(1, Line.Pos("/")-1);
-            else
+            } else {
                LineLbl  = Line.SubString(1,24);
+            }
             LineLbl  = LineLbl.Trim();
 
             //Process Label
@@ -1133,8 +1168,9 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
             //Looking for Macro end tag ], otherwise, keep the line in memory for later when called
             if (Line.SubString(1,1) == "]" ) {
                FoundEnd = true;
-            } else
+            } else {
                MacroLine->Add(Line);
+            }
 
             //Line from Macro are removed from the main file, but kept in MacroLine for when it's called
             pASMFile->Delete(i);

@@ -177,6 +177,12 @@
             <BuildOrder>-1</BuildOrder>
             <BuildOrder>1</BuildOrder>
         </ResFiles>
+        <CppCompile Include="ErrorList.cpp">
+            <Form>f_ErrorList</Form>
+            <FormType>dfm</FormType>
+            <DependentOn>ErrorList.h</DependentOn>
+            <BuildOrder>7</BuildOrder>
+        </CppCompile>
         <CppCompile Include="GraphEdit.cpp">
             <BuildOrder>4</BuildOrder>
             <Form>f_GraphEdit</Form>
@@ -211,6 +217,7 @@
         <FormResources Include="Ram.dfm"/>
         <FormResources Include="GraphIO.dfm"/>
         <FormResources Include="GraphEdit.dfm"/>
+        <FormResources Include="ErrorList.dfm"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -730,13 +737,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <ModelSupport>False</ModelSupport>
         </BorlandProject>

@@ -110,7 +110,6 @@ SINTL - SetInteruptL(BC)           // Set Interupt Goto absolute address (Low) u
 SERRH - SetErrorH(BC)              // Set Error Handler Goto absolute address (High) using a fixed value, done by writing to $F with Set(BC)
 SERTL - SetErrorL(BC)              // Set Error Handler Goto absolute address (Low) using a fixed value,  done by writing to $D with Set(BC)
 
-
 Special Registers:
  Resisters $0 to $A are general purpose registers
  Register $B behaves just as others general purpose registers but also controls the current RAM page (and can be used to seed the LFSH random number generator with SetRngSeed() )
@@ -133,7 +132,6 @@ Interupts:
 
 
 ToDo/Idea:
-Improve error detection in Import, (Param counter, line counter)
 Remove RSTAR - ResetAllReg() ?
 Remove CFLG  - CarryFlg() ?
 Annotation editor

@@ -228,22 +228,22 @@ void __fastcall Tf_GraphIO::b_ResetClick(TObject *Sender)
 //---------------------------------------------------------------------------
 char Tf_GraphIO::BinToHex(bool p1, bool p2, bool p3, bool p4 )
 {
-   if     (!p1 && !p2 && !p3 && !p4) { return '0'; }
-   else if( p1 && !p2 && !p3 && !p4) { return '1'; }
-   else if(!p1 &&  p2 && !p3 && !p4) { return '2'; }
-   else if( p1 &&  p2 && !p3 && !p4) { return '3'; }
-   else if(!p1 && !p2 &&  p3 && !p4) { return '4'; }
-   else if( p1 && !p2 &&  p3 && !p4) { return '5'; }
-   else if(!p1 &&  p2 &&  p3 && !p4) { return '6'; }
-   else if( p1 &&  p2 &&  p3 && !p4) { return '7'; }
-   else if(!p1 && !p2 && !p3 &&  p4) { return '8'; }
-   else if( p1 && !p2 && !p3 &&  p4) { return '9'; }
-   else if(!p1 &&  p2 && !p3 &&  p4) { return 'A'; }
-   else if( p1 &&  p2 && !p3 &&  p4) { return 'B'; }
-   else if(!p1 && !p2 &&  p3 &&  p4) { return 'C'; }
-   else if( p1 && !p2 &&  p3 &&  p4) { return 'D'; }
-   else if(!p1 &&  p2 &&  p3 &&  p4) { return 'E'; }
-   else if( p1 &&  p2 &&  p3 &&  p4) { return 'F'; }
+        if (!p1 && !p2 && !p3 && !p4) { return '0'; }
+   else if ( p1 && !p2 && !p3 && !p4) { return '1'; }
+   else if (!p1 &&  p2 && !p3 && !p4) { return '2'; }
+   else if ( p1 &&  p2 && !p3 && !p4) { return '3'; }
+   else if (!p1 && !p2 &&  p3 && !p4) { return '4'; }
+   else if ( p1 && !p2 &&  p3 && !p4) { return '5'; }
+   else if (!p1 &&  p2 &&  p3 && !p4) { return '6'; }
+   else if ( p1 &&  p2 &&  p3 && !p4) { return '7'; }
+   else if (!p1 && !p2 && !p3 &&  p4) { return '8'; }
+   else if ( p1 && !p2 && !p3 &&  p4) { return '9'; }
+   else if (!p1 &&  p2 && !p3 &&  p4) { return 'A'; }
+   else if ( p1 &&  p2 && !p3 &&  p4) { return 'B'; }
+   else if (!p1 && !p2 &&  p3 &&  p4) { return 'C'; }
+   else if ( p1 && !p2 &&  p3 &&  p4) { return 'D'; }
+   else if (!p1 &&  p2 &&  p3 &&  p4) { return 'E'; }
+   else if ( p1 &&  p2 &&  p3 &&  p4) { return 'F'; }
    else { return 0; } // =^.^= here's a kitty
 }
 //---------------------------------------------------------------------------

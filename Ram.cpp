@@ -719,59 +719,63 @@ void Tf_Ram::SwapPage(String Current, String New)
 
 void __fastcall Tf_Ram::b_ImportClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  ifstream FileId;
-  String Buffer;  //65536
-  String Byte;
-  char fBuffer[512];
-  int  LengthLeft;
-  int  FirstI;
-  int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1,1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2,1)));
-  bool FirstPage = true;
+   ifstream FileId;
+   String Buffer;  //65536
+   String Byte;
+   char fBuffer[512];
+   int  LengthLeft;
+   int  FirstI;
+   int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1,1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2,1)));
+   bool FirstPage = true;
 
-  if (od_Import->Execute()) {
-	if (od_Import->FileName != "") {
-	  FileId.open(od_Import->FileName.c_str());
-	  if(!FileId.fail() && !FileId.bad()) {
-		 this->rb_Hex->Checked = true;
-	    while (!FileId.eof() && NbPage<256){
-		   FileId.getline(fBuffer, 512);
-		   Buffer = fBuffer;
+   if (od_Import->Execute()) {
+      if (od_Import->FileName != "") {
+         FileId.open(od_Import->FileName.c_str());
+         if (!FileId.fail() && !FileId.bad()) {
+            this->rb_Hex->Checked = true;
+            while (!FileId.eof() && NbPage<256) {
+               FileId.getline(fBuffer, 512);
+               Buffer = fBuffer;
 
-		   if (!FirstPage) { //I know...
-		     this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage) ));
-			  this->sg_Ram->Row=1;
-           this->sg_Ram->Col=1;
-		   }
+               if (!FirstPage) { //I know...
+                  this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage) ));
+                  this->sg_Ram->Row=1;
+                  this->sg_Ram->Col=1;
+               }
 
-		   FirstI = this->sg_Ram->Row;
-		   for (int j=this->sg_Ram->Col;j<=8;j++) {
-			  for (int i=FirstI;i<=32;i++) {
-				 if (Buffer.Length() == 1 )
-				   Buffer = Buffer + "0";
+               FirstI = this->sg_Ram->Row;
+               for (int j=this->sg_Ram->Col;j<=8;j++) {
+                  for (int i=FirstI;i<=32;i++) {
+                     if (Buffer.Length() == 1 ) {
+                        Buffer = Buffer + "0";
+                     }
 
-				 Byte = Buffer.SubString(0, 2);
-				 if (Byte != "  ")
-				   this->sg_Ram->Cells[j][i] = Byte;
-				 Buffer = Buffer.SubString(3, Buffer.Length());
+                     Byte = Buffer.SubString(0, 2);
+                     if (Byte != "  ") {
+                        this->sg_Ram->Cells[j][i] = Byte;
+                     }
+                     Buffer = Buffer.SubString(3, Buffer.Length());
 
-				 if (Buffer.Length() == 0 )
-				   break;
-			  }
-			  if (Buffer.Length() == 0 )
-				 break;
-			  else
-				 FirstI = 1;
-		   }
-		   NbPage++;
-		   FirstPage = false;
-		 }//While
-		 //this->rb_Hex->Checked = true;
-	  }
-	  FileId.close();
-	}
-  }
+                     if (Buffer.Length() == 0 ) {
+                        break;
+                     }
+                  }
+                  if (Buffer.Length() == 0 ) {
+                     break;
+                  } else {
+                     FirstI = 1;
+                  }
+               }
+               NbPage++;
+               FirstPage = false;
+            }//While
+            //this->rb_Hex->Checked = true;
+         }
+         FileId.close();
+      }
+   }
 }
 //---------------------------------------------------------------------------
 
@@ -782,7 +786,7 @@ void __fastcall Tf_Ram::ud_PageClick(TObject *Sender, TUDBtnType Button)
    int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1,1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2,1)));
    if (Button == btNext && NbPage < 255) {
       this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage+1) ));
-   } else if(Button == btPrev && NbPage > 0) {
+   } else if (Button == btPrev && NbPage > 0) {
       this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage-1) ));
    }
 }

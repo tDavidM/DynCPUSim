@@ -61,54 +61,54 @@ enum NodeUses: int { N_NORMAL, N_INPUT, N_OUTPUT};
 class TNode
 {
 private:
-  NodeTypes type;
+   NodeTypes type;
 
-  int PinInUp, PinInDown, PinOutUp, PinOutDown;
-  TNode /* *InUp, *InDown,*/ *NodeOutUp, *NodeOutDown;
-  int  ActiveDelay;
-  bool Active;
-  bool InUpAct, InDownAct, InActiveUp, InActiveDown;
-  //bool OutUpAct, OutDownAct;
+   int PinInUp, PinInDown, PinOutUp, PinOutDown;
+   TNode /* *InUp, *InDown,*/ *NodeOutUp, *NodeOutDown;
+   int  ActiveDelay;
+   bool Active;
+   bool InUpAct, InDownAct, InActiveUp, InActiveDown;
+   //bool OutUpAct, OutDownAct;
 
 public:
-  int X, Y;
+   int X, Y;
 
-  String Name;
-  String NameOutUp;
-  String NameOutDown;
+   String Name;
+   String NameOutUp;
+   String NameOutDown;
 
-  int  IDNodeOutUp, IDNodeOutDown;
+   int  IDNodeOutUp, IDNodeOutDown;
 
-  int  InternalID;
-  bool DeleteFlag;
-  bool TagFlag;
+   int  InternalID;
+   bool DeleteFlag;
+   bool TagFlag;
 
-  void Send(void);
-  void Receive(bool pAct);
-  void Work(void);
+   void Send(void);
+   void Receive(bool pAct);
+   void Work(void);
 
-  void SetInUp(int pPin/*, TNode *pID*/);
-  void SetInDown(int pPin/*, TNode *pID*/);
-  void SetOutUp(int pPin, TNode *pID);
-  void SetOutDown(int pPin, TNode *pID);
+   void SetInUp(int pPin/*, TNode *pID*/);
+   void SetInDown(int pPin/*, TNode *pID*/);
+   void SetOutUp(int pPin, TNode *pID);
+   void SetOutDown(int pPin, TNode *pID);
 
-  void Reset(void);
+   void Reset(void);
   
-  int GetPin_InUp(void);
-  int GetPin_InDown(void);
-  int GetPin_OutUp(void);
-  int GetPin_OutDown(void);
+   int GetPin_InUp(void);
+   int GetPin_InDown(void);
+   int GetPin_OutUp(void);
+   int GetPin_OutDown(void);
 
-  NodeTypes  GetType(void);
-  void SetType(NodeTypes pType);
+   NodeTypes  GetType(void);
+   void SetType(NodeTypes pType);
 
-  bool GetActive(void);
-  NodeUses GetInOutType(void);
+   bool GetActive(void);
+   NodeUses GetInOutType(void);
 
-  TNode * GetNodeOutUp(void);
-  TNode * GetNodeOutDown(void);
+   TNode * GetNodeOutUp(void);
+   TNode * GetNodeOutDown(void);
 
-  TNode(int pIntID, int pX, int pY, NodeTypes pType, String pName);
+   TNode(int pIntID, int pX, int pY, NodeTypes pType, String pName);
 };
 
 class Tf_CPUNode : public TForm

@@ -21,8 +21,8 @@ TNode::TNode(int pIntID, int pX, int pY, NodeTypes pType, String pName)
     this->X = pX;
     this->Y = pY;
     this->type = pType;
-     this->DeleteFlag = false;
-     this->TagFlag = false;
+    this->DeleteFlag = false;
+    this->TagFlag = false;
 
     //Each Node has 2 input and 2 output (exept for NOT which only eval Up)
     this->PinInUp    = 0;
@@ -256,42 +256,42 @@ __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
 {
-  (void)Sender;
+   (void)Sender;
 
-  TNode* Node;
-  TNode* NodeCible;
-  int X, Y;
-  NodeTypes type;
-  int ListNodeCount, LinkCount, NodeTypeCount;
-  String Name, FileType;
-  TStringList* StrDelete;
+   TNode* Node;
+   TNode* NodeCible;
+   int X, Y;
+   NodeTypes type;
+   int ListNodeCount, LinkCount, NodeTypeCount;
+   String Name, FileType;
+   TStringList* StrDelete;
 
-  int ID, IDOutUp, IDOutDown;
-  int PinInUp, PinInDown, PinOutUp, PinOutDown;
-  String NameInUp, NameInDown, NameOutUp, NameOutDown;
+   int ID, IDOutUp, IDOutDown;
+   int PinInUp, PinInDown, PinOutUp, PinOutDown;
+   String NameInUp, NameInDown, NameOutUp, NameOutDown;
 
-  this->sb_Main->Panels->Items[0]->Text = HELP_BAR_TEXT_HOWTO;
+   this->sb_Main->Panels->Items[0]->Text = HELP_BAR_TEXT_HOWTO;
 
    if (this->NodeOpenDialog->Execute()) {
 
-     //Flush all nodes...if any
-     for (int i = 0; i<this->NodeCmp; i++) {
-        Node = (TNode*)this->NodeList->Items[i];
-        delete Node;
-     }
-     //Flush all nodes...if any
-     for (int i = 0; i<this->AnnotationList->Count; i++) {
-        StrDelete = (TStringList*)this->AnnotationList->Items[i];
-        delete StrDelete;
-     }
+      //Flush all nodes...if any
+      for (int i = 0; i<this->NodeCmp; i++) {
+         Node = (TNode*)this->NodeList->Items[i];
+         delete Node;
+      }
+      //Flush all nodes...if any
+      for (int i = 0; i<this->AnnotationList->Count; i++) {
+         StrDelete = (TStringList*)this->AnnotationList->Items[i];
+         delete StrDelete;
+      }
 
-     this->NodeList->Clear();
+      this->NodeList->Clear();
 
-     this->NodeSelect = NULL;
-     this->NodeType = N_OR;
-     this->NodeCmp = 0;
-     this->NodeMaxID = 0;
-     this->pgLoading->Position = 0;
+      this->NodeSelect = NULL;
+      this->NodeType = N_OR;
+      this->NodeCmp = 0;
+      this->NodeMaxID = 0;
+      this->pgLoading->Position = 0;
 
       try {
          this->XMLDoc->FileName = this->NodeOpenDialog->FileName;
@@ -335,8 +335,9 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
             this->pgLoading->Max = ListNodeCount*2;
 
             _di_IXMLNodeList AllNode = NodeState->ChildNodes;
-            if (ListNodeCount != AllNode->Count)
+            if (ListNodeCount != AllNode->Count) {
                ShowMessage("Error NodeCount");
+            }
 
             for(int i = 0; i < AllNode->Count; i++) {
                ID   = AllNode->Get(i)->GetAttribute("ID");
@@ -364,20 +365,25 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
                PinOutDown = NodePinOut->GetAttribute("NbDown");
                //NodePinOut->Text;
 
-               if (this->NodeMaxID < ID)
+               if (this->NodeMaxID < ID) {
                   this->NodeMaxID = ID;
+               }
 
                Node = new TNode(ID, X, Y, type, Name);
                this->NodeList->Add(Node);
 
-               if (PinInUp    != 0)
+               if (PinInUp    != 0) {
                   Node->SetInUp(PinInUp);
-               if (PinInDown  != 0)
+               }
+               if (PinInDown  != 0) {
                   Node->SetInDown(PinInDown);
-               if (PinOutUp   != 0)
+               }
+               if (PinOutUp   != 0) {
                   Node->SetOutUp(PinOutUp, NULL);
-               if (PinOutDown != 0)
+               }
+               if (PinOutDown != 0) {
                   Node->SetOutDown(PinOutDown, NULL);
+               }
 
                if (IDOutUp != -1) {
                  Node->IDNodeOutUp = IDOutUp;
@@ -391,18 +397,21 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
                  //Node->SetOutDown(0,NodeCible);
                }
 
-               if(NameOutUp   != "")
+               if (NameOutUp   != "") {
                   Node->NameOutUp   = NameOutUp;
-               if(NameOutDown != "")
+               }
+               if (NameOutDown != "") {
                   Node->NameOutDown = NameOutDown;
+               }
                this->NodeCmp++;
 
                NameOutUp = "";
                NameOutDown = "";
                this->pgLoading->Position++;
             }
-         } else
-           ShowMessage("Error Invalid File");
+         } else {
+            ShowMessage("Error Invalid File");
+         }
          this->XMLDoc->Active = false;
 
          Node = NULL;
@@ -410,48 +419,50 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
          for (int i = 0; i<this->NodeCmp; i++) {
             Node = (TNode*)this->NodeList->Items[i];
             if (Node->IDNodeOutUp != -1) {
-               for(int j = 0; j<NodeCmp; j++) {
+               for (int j = 0; j<NodeCmp; j++) {
                   NodeCible = (TNode*)this->NodeList->Items[j];
                   if (Node->IDNodeOutUp == NodeCible->InternalID) {
 
                      if (NodeCible->Name == Node->NameOutUp) {
                         Node->SetOutUp(0,NodeCible);
-                     } else
+                     } else {
                         ShowMessage("NodeID:"+IntToStr(Node->InternalID)+"("+Node->Name+") Error[Up]["+NodeCible->Name+"]:"+
                                       IntToStr(Node->IDNodeOutUp)+"("+NodeCible->Name+")"); //throw;
+                     }
                   }
                }
             }
             if (Node->IDNodeOutDown != -1) {
-               for(int j = 0; j<NodeCmp; j++) {
+               for (int j = 0; j<NodeCmp; j++) {
                   NodeCible = (TNode*)this->NodeList->Items[j];
                   if (Node->IDNodeOutDown == NodeCible->InternalID) {
 
                      if (NodeCible->Name == Node->NameOutDown) {
                         Node->SetOutDown(0,NodeCible);
-                     } else
+                     } else {
                         ShowMessage("NodeID:"+IntToStr(Node->InternalID)+"("+Node->Name+") Error[Up]["+NodeCible->Name+"]:"+
                                       IntToStr(Node->IDNodeOutUp)+"("+NodeCible->Name+")"); //throw;
+                     }
                   }
                }
             }
             this->pgLoading->Position++;
          }
-     }
-	  catch (Exception &E) {
-		  Application->MessageBox( L"Invalid File", L"Loading Error", MB_OK | MB_ICONINFORMATION);
-     }
+      }
+      catch (Exception &E) {
+         Application->MessageBox( L"Invalid File", L"Loading Error", MB_OK | MB_ICONINFORMATION);
+      }
 
-     //Update internal state for Not gates
-     for (int i = 0; i<NodeCmp; i++) {
-        Node = (TNode*)this->NodeList->Items[i];
-        Node->Work();
-     }
-     //Update internal state for Not gates, must be done in 2 loops
-     for (int i = 0; i<NodeCmp; i++) {
-        Node = (TNode*)this->NodeList->Items[i];
-        Node->Send();
-     }
+      //Update internal state for Not gates
+      for (int i = 0; i<NodeCmp; i++) {
+         Node = (TNode*)this->NodeList->Items[i];
+         Node->Work();
+      }
+      //Update internal state for Not gates, must be done in 2 loops
+      for (int i = 0; i<NodeCmp; i++) {
+         Node = (TNode*)this->NodeList->Items[i];
+         Node->Send();
+      }
    }
 
    this->pgLoading->Position = 0;
@@ -497,36 +508,38 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
    this->pgLoading->Position = 0;
 
    if (this->NodeCmp > 0 && this->NodeSaveDialog->Execute() == true) {
-     _di_IXMLDocument XmlRoot = NewXMLDocument();
-     XmlRoot->Options = TXMLDocOptions() << doNodeAutoIndent;
+      _di_IXMLDocument XmlRoot = NewXMLDocument();
+      XmlRoot->Options = TXMLDocOptions() << doNodeAutoIndent;
 
-	  _di_IXMLNode FileType = XmlRoot->CreateElement("FileType", "");
-     XmlRoot->ChildNodes->Add(FileType);
-	  FileType->SetAttribute("Type", (String)"Dyn CPU Sim");
+      _di_IXMLNode FileType = XmlRoot->CreateElement("FileType", "");
+      XmlRoot->ChildNodes->Add(FileType);
+      FileType->SetAttribute("Type", (String)"Dyn CPU Sim");
 
-     FileType->ChildNodes->Add(this->InstructionSetXML);
+      FileType->ChildNodes->Add(this->InstructionSetXML);
 
-     FileType->ChildNodes->Add(this->AnnotationXML);
+      FileType->ChildNodes->Add(this->AnnotationXML);
 
-     for (int i = 0; i<this->NodeCmp; i++) {
-        NodeCurr = (TNode*)this->NodeList->Items[i];
-        if (! NodeCurr->DeleteFlag) {
-           CountNode++;
-           if(NodeCurr->NameOutUp != "")
-              CountLink++;
-           if(NodeCurr->NameOutDown != "")
-              CountLink++;
+      for (int i = 0; i<this->NodeCmp; i++) {
+         NodeCurr = (TNode*)this->NodeList->Items[i];
+         if (! NodeCurr->DeleteFlag) {
+            CountNode++;
+            if (NodeCurr->NameOutUp != "") {
+               CountLink++;
+            }
+            if (NodeCurr->NameOutDown != "") {
+               CountLink++;
+            }
 
-           switch(NodeCurr->GetType()) {
-             case 0:{CountOr++;   break; }
-             case 1:{CountAnd++;  break; }
-             case 2:{CountNor++;  break; }
-             case 3:{CountNand++; break; }
-             case 4:{CountXor++;  break; }
-             case 5:{CountNot++;  break; }
-           }
-        }
-     }
+            switch (NodeCurr->GetType()) {
+              case 0:{CountOr++;   break; }
+              case 1:{CountAnd++;  break; }
+              case 2:{CountNor++;  break; }
+              case 3:{CountNand++; break; }
+              case 4:{CountXor++;  break; }
+              case 5:{CountNot++;  break; }
+            }
+         }
+      }
 
         _di_IXMLNode Param = XmlRoot->CreateElement("Param", "");
         FileType->ChildNodes->Add(Param);
@@ -568,16 +581,14 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
         _di_IXMLNode PinIn;
         _di_IXMLNode PinOut;
 
-     this->pgLoading->Max = this->NodeCmp;
-     for (int i = 0; i<this->NodeCmp; i++)
-     {
-        NodeCurr = (TNode*)this->NodeList->Items[i];
-        if(! NodeCurr->DeleteFlag)
-        {
-           _di_IXMLNode Node = XmlRoot->CreateElement("Node", "");
-           NodeState->ChildNodes->Add(Node);
-           Node->SetAttribute("ID",  (int) NodeCurr->InternalID);
-           Node->SetAttribute("Name",(String) NodeCurr->Name);
+      this->pgLoading->Max = this->NodeCmp;
+      for (int i = 0; i<this->NodeCmp; i++) {
+         NodeCurr = (TNode*)this->NodeList->Items[i];
+         if (! NodeCurr->DeleteFlag) {
+            _di_IXMLNode Node = XmlRoot->CreateElement("Node", "");
+            NodeState->ChildNodes->Add(Node);
+            Node->SetAttribute("ID",  (int) NodeCurr->InternalID);
+            Node->SetAttribute("Name",(String) NodeCurr->Name);
 
               _di_IXMLNode Type = XmlRoot->CreateElement("Type", "");
               Node->ChildNodes->Add(Type);
@@ -613,12 +624,12 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
               PinOut->SetAttribute("NbUp",  (int) NodeCurr->GetPin_OutUp());
               PinOut->SetAttribute("NbDown",(int) NodeCurr->GetPin_OutDown());
               PinOut->Text = NodeCurr->GetPin_OutUp()==0 && NodeCurr->GetPin_OutDown()==0 ? "False" : "True";
-        }
-        this->pgLoading->Position++;
-     }
-     this->ItsUpdated = false;
-     XmlRoot->SaveToFile(this->NodeSaveDialog->FileName);
-     this->pgLoading->Position = 0;
+         }
+         this->pgLoading->Position++;
+      }
+      this->ItsUpdated = false;
+      XmlRoot->SaveToFile(this->NodeSaveDialog->FileName);
+      this->pgLoading->Position = 0;
    }
 }
 //---------------------------------------------------------------------------
@@ -675,10 +686,11 @@ void __fastcall Tf_CPUNode::b_StartClick(TObject *Sender)
    this->t_Draw->Interval = this->DrawTimerSpeed;
    this->t_Work->Enabled  = !this->t_Work->Enabled;
    this->t_Draw->Enabled  = this->t_Work->Enabled;
-   if (this->t_Work->Enabled)
+   if (this->t_Work->Enabled) {
       this->b_Start->Caption = "Pause";
-   else
+   } else {
       this->b_Start->Caption = "Start";
+   }
 }
 
 //---------------------------------------------------------------------------
@@ -704,7 +716,7 @@ void __fastcall Tf_CPUNode::t_WorkTimer(TObject *Sender)
       //Update internal state
       for (int i = 0; i<this->NodeCmp; i++) {
          nodeCurr = (TNode*)this->NodeList->Items[i];
-         if(! nodeCurr->DeleteFlag) {
+         if (! nodeCurr->DeleteFlag) {
             nodeCurr->Work();
          }
       }
@@ -719,384 +731,404 @@ void __fastcall Tf_CPUNode::t_DrawTimer(TObject *Sender)
 {
    (void)Sender;
 
-   if(this->cb_ActiveDraw->Checked)
+   if (this->cb_ActiveDraw->Checked) {
       this->CallDrawArea(REFRESH_BUFFER);
+   }
 }
 //---------------------------------------------------------------------------
 
 void Tf_CPUNode::ResetAllNode(void)
 {
-  TNode* NodeCurr;
+   TNode* NodeCurr;
 
-  for (int i = 0; i<this->NodeCmp; i++) {
-    NodeCurr = (TNode*)this->NodeList->Items[i];
-    NodeCurr->Reset();
-  }
-
-  //Update internal state for Not gates
-  for (int i = 0; i<this->NodeCmp; i++) {
+   for (int i = 0; i<this->NodeCmp; i++) {
      NodeCurr = (TNode*)this->NodeList->Items[i];
-     NodeCurr->Work();
-  }
-  //Update internal state for Not gates
-  for (int i = 0; i<this->NodeCmp; i++) {
-     NodeCurr = (TNode*)this->NodeList->Items[i];
-     NodeCurr->Send();
-  }
+     NodeCurr->Reset();
+   }
 
-  //Draw
-  this->CallDrawArea(REFRESH_BUFFER);
+   //Update internal state for Not gates
+   for (int i = 0; i<this->NodeCmp; i++) {
+      NodeCurr = (TNode*)this->NodeList->Items[i];
+      NodeCurr->Work();
+   }
+   //Update internal state for Not gates
+   for (int i = 0; i<this->NodeCmp; i++) {
+      NodeCurr = (TNode*)this->NodeList->Items[i];
+      NodeCurr->Send();
+   }
+
+   //Draw
+   this->CallDrawArea(REFRESH_BUFFER);
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::ReadInput(void)
 {
-  TNode* NodeCurr;
-  TCheckBox * CurrPin;
-  int IDUp, IDDown;
+   TNode* NodeCurr;
+   TCheckBox * CurrPin;
+   int IDUp, IDDown;
 
-  //Scan for Node with Input Pin ID
-  for (int i = 0; i<NodeCmp; i++) {
-    NodeCurr = (TNode*)this->NodeList->Items[i];
-    IDUp = NodeCurr->GetPin_InUp();
-    IDDown = NodeCurr->GetPin_InDown();
+   //Scan for Node with Input Pin ID
+   for (int i = 0; i<NodeCmp; i++) {
+      NodeCurr = (TNode*)this->NodeList->Items[i];
+      IDUp = NodeCurr->GetPin_InUp();
+      IDDown = NodeCurr->GetPin_InDown();
 
-    if (! NodeCurr->DeleteFlag) {
-        //Pin connected to Input Up
-        if (IDUp > 0) {
-          CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDUp));
-          if (CurrPin != NULL)
-            NodeCurr->Receive(CurrPin->Checked);
-        }
+      if (! NodeCurr->DeleteFlag) {
+         //Pin connected to Input Up
+         if (IDUp > 0) {
+            CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDUp));
+            if (CurrPin != NULL) {
+               NodeCurr->Receive(CurrPin->Checked);
+            }
+         }
 
-        //Pin connected to Input Down
-        if (IDDown > 0) {
-          CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDDown));
-          if (CurrPin != NULL)
-            NodeCurr->Receive(CurrPin->Checked);
-        }
-    }
-  }
+         //Pin connected to Input Down
+         if (IDDown > 0) {
+            CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDDown));
+            if (CurrPin != NULL) {
+               NodeCurr->Receive(CurrPin->Checked);
+            }
+         }
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::WriteOutput(void)
 {
-  TNode* NodeCurr;
-  TCheckBox * CurrPin;
-  int IDUp, IDDown;
+   TNode* NodeCurr;
+   TCheckBox * CurrPin;
+   int IDUp, IDDown;
 
-  //Scan for Node with Output Pin ID
-  for (int i = 0; i<NodeCmp; i++) {
-    NodeCurr = (TNode*)this->NodeList->Items[i];
-    IDUp = NodeCurr->GetPin_OutUp();
-    IDDown = NodeCurr->GetPin_OutDown();
+   //Scan for Node with Output Pin ID
+   for (int i = 0; i<NodeCmp; i++) {
+      NodeCurr = (TNode*)this->NodeList->Items[i];
+      IDUp = NodeCurr->GetPin_OutUp();
+      IDDown = NodeCurr->GetPin_OutDown();
 
-    if (! NodeCurr->DeleteFlag) {
-        //Pin connected to Output Up
-        if (IDUp > 0) {
-          CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDUp));
-          if (CurrPin != NULL)
-            CurrPin->Checked = NodeCurr->GetActive();
-        }
+      if (! NodeCurr->DeleteFlag) {
+         //Pin connected to Output Up
+         if (IDUp > 0) {
+            CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDUp));
+            if (CurrPin != NULL) {
+               CurrPin->Checked = NodeCurr->GetActive();
+            }
+         }
 
-        //Pin connected to Output Down
-        if (IDDown > 0) {
-          CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDDown));
-          if (CurrPin != NULL)
-            CurrPin->Checked = NodeCurr->GetActive();
-        }
-     }
-  }
+         //Pin connected to Output Down
+         if (IDDown > 0) {
+            CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(IDDown));
+            if (CurrPin != NULL) {
+               CurrPin->Checked = NodeCurr->GetActive();
+            }
+         }
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::CallDrawArea(int pMode)
 {
-  TBitmap* Buffer = new TBitmap;
-  TRect  SrcRect, DestRect;
+   TBitmap* Buffer = new TBitmap;
+   TRect  SrcRect, DestRect;
 
-  DrawCmpItem = 0;
-  DrawCmpLine = 0;
-  //t_DrawMulti1Timer(this);
-  //t_DrawMulti2Timer(this);
-  //t_DrawMulti3Timer(this);
-  //this->DrawArea(0);
-  this->p_DrawCmp->Caption = "Draw: " + IntToStr(DrawCmpItem) + " - " + IntToStr(DrawCmpLine);
+   DrawCmpItem = 0;
+   DrawCmpLine = 0;
+   //t_DrawMulti1Timer(this);
+   //t_DrawMulti2Timer(this);
+   //t_DrawMulti3Timer(this);
+   //this->DrawArea(0);
+   this->p_DrawCmp->Caption = "Draw: " + IntToStr(DrawCmpItem) + " - " + IntToStr(DrawCmpLine);
 
-  if (pMode == 1)
-     this->DrawBuffer(0);
+   if (pMode == 1) {
+      this->DrawBuffer(0);
+   }
 
-  SrcRect.init(OffSetX, OffSetY, OffSetX + this->p_Area->Width, OffSetY + this->p_Area->Height);
-  DestRect.init(0, 0, this->p_Area->Width, this->p_Area->Height);
+   SrcRect.init(OffSetX, OffSetY, OffSetX + this->p_Area->Width, OffSetY + this->p_Area->Height);
+   DestRect.init(0, 0, this->p_Area->Width, this->p_Area->Height);
 
-  Buffer->Height = this->p_Area->Height;
-  Buffer->Width  = this->p_Area->Width ;
-  Buffer->HandleType = bmDIB; // allows use of ScanLine
-  Buffer->PixelFormat = pf24bit;
+   Buffer->Height = this->p_Area->Height;
+   Buffer->Width  = this->p_Area->Width ;
+   Buffer->HandleType = bmDIB; // allows use of ScanLine
+   Buffer->PixelFormat = pf24bit;
 
-  Buffer->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+   Buffer->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
 
-  this->Canvas->Draw(this->p_Area->Left, this->p_Area->Top, Buffer);
+   this->Canvas->Draw(this->p_Area->Left, this->p_Area->Top, Buffer);
 
-  Buffer->Free();
+   Buffer->Free();
 }
 //---------------------------------------------------------------------------
 
 void Tf_CPUNode::DrawBuffer(int NbDraw)
 {
-  TNode* NodeCurr;
-  TNode* NodeUp;
-  TNode* NodeDown;
+   TNode* NodeCurr;
+   TNode* NodeUp;
+   TNode* NodeDown;
 
-  TPoint Triangle[3];
+   TPoint Triangle[3];
 
-  this->MainCanvas->Canvas->Brush->Color  = clWhite;
-  this->MainCanvas->Canvas->Pen->Color    = clBlue;
-  this->MainCanvas->Canvas->Rectangle(0, 0, (800*this->GridSize)+10, (300*this->GridSize)+10);
+   this->MainCanvas->Canvas->Brush->Color  = clWhite;
+   this->MainCanvas->Canvas->Pen->Color    = clBlue;
+   this->MainCanvas->Canvas->Rectangle(0, 0, (800*this->GridSize)+10, (300*this->GridSize)+10);
 
-  this->MainCanvas->Canvas->Brush->Color = clBtnFace;
-  this->MainCanvas->Canvas->Pen->Color   = clBlack;
-  //this->MainCanvas->Canvas->FillRect(ClientRect);
+   this->MainCanvas->Canvas->Brush->Color = clBtnFace;
+   this->MainCanvas->Canvas->Pen->Color   = clBlack;
+   //this->MainCanvas->Canvas->FillRect(ClientRect);
 
-  for (int i = 0; i<NodeCmp; i++) {
-	 //if (i%4 == NbDraw) {
-		 //Node, Black Inactive, Red Active
-		 NodeCurr = (TNode*)this->NodeList->Items[i];
+   for (int i = 0; i<NodeCmp; i++) {
+      //if (i%4 == NbDraw) {
+      //Node, Black Inactive, Red Active
+      NodeCurr = (TNode*)this->NodeList->Items[i];
 
-		 if (NodeCurr->TagFlag)
-		   this->MainCanvas->Canvas->Brush->Color = clGray;
-		 else
-		   this->MainCanvas->Canvas->Brush->Color = clBlack;
-		 this->MainCanvas->Canvas->Pen->Color   = clBlack;
+      if (NodeCurr->TagFlag) {
+         this->MainCanvas->Canvas->Brush->Color = clGray;
+      } else {
+         this->MainCanvas->Canvas->Brush->Color = clBlack;
+      }
+      this->MainCanvas->Canvas->Pen->Color   = clBlack;
 
-		 if (! NodeCurr->DeleteFlag) {
+      if (! NodeCurr->DeleteFlag) {
 
-			 if(NodeCurr == NodeSelect)
-				 this->MainCanvas->Canvas->Brush->Color = clWhite;
-			 else if(NodeCurr->GetInOutType() == N_NORMAL && NodeCurr->GetActive()) {
-				 if (NodeCurr->TagFlag)
-				   this->MainCanvas->Canvas->Brush->Color = clLtGray;
-				 else
-				   this->MainCanvas->Canvas->Brush->Color = clRed;
-			 } else if(NodeCurr->GetInOutType() == N_INPUT) {
-          //Input, Green/Yellow
-			   if (NodeCurr->GetActive())
-				 this->MainCanvas->Canvas->Brush->Color = clYellow;
-			   else
-				 this->MainCanvas->Canvas->Brush->Color = clGreen;
-			 } else if(NodeCurr->GetInOutType() == N_OUTPUT) {
-          //Output, Blue/Purple
-			   if (NodeCurr->GetActive())
-				 this->MainCanvas->Canvas->Brush->Color = clPurple;
-			   else
-				 this->MainCanvas->Canvas->Brush->Color = clBlue;
-			 }
+         if (NodeCurr == NodeSelect) {
+            this->MainCanvas->Canvas->Brush->Color = clWhite;
+         } else if (NodeCurr->GetInOutType() == N_NORMAL && NodeCurr->GetActive()) {
+            if (NodeCurr->TagFlag) {
+               this->MainCanvas->Canvas->Brush->Color = clLtGray;
+            } else {
+               this->MainCanvas->Canvas->Brush->Color = clRed;
+            }
+         } else if (NodeCurr->GetInOutType() == N_INPUT) {
+         //Input, Green/Yellow
+            if (NodeCurr->GetActive()) {
+               this->MainCanvas->Canvas->Brush->Color = clYellow;
+            } else {
+               this->MainCanvas->Canvas->Brush->Color = clGreen;
+            }
+         } else if (NodeCurr->GetInOutType() == N_OUTPUT) {
+         //Output, Blue/Purple
+            if (NodeCurr->GetActive()) {
+               this->MainCanvas->Canvas->Brush->Color = clPurple;
+            } else {
+               this->MainCanvas->Canvas->Brush->Color = clBlue;
+            }
+         }
 
-			 switch(NodeCurr->GetType()) {
-			   case N_OR: { //OR Circle
-				   this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
-										                    NodeCurr->Y * GridSize,
+         switch(NodeCurr->GetType()) {
+            case N_OR: { //OR Circle
+               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
+                                                  NodeCurr->Y * GridSize,
                                                  (NodeCurr->X * GridSize) + ObjSize,
-										                   (NodeCurr->Y * GridSize) + ObjSize);
-				   break;
-			   }
-			   case N_AND: { //AND Square
-				   this->MainCanvas->Canvas->Rectangle( NodeCurr->X * GridSize,
-										                      NodeCurr->Y * GridSize,
-										                     (NodeCurr->X * GridSize) + ObjSize,
-										                     (NodeCurr->Y * GridSize) + ObjSize);
-				   break;
-			   }
-			   case N_NOR: { //NOR Circle with a Point
-				   this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
-										                    NodeCurr->Y * GridSize,
+                                                 (NodeCurr->Y * GridSize) + ObjSize);
+               break;
+            }
+            case N_AND: { //AND Square
+               this->MainCanvas->Canvas->Rectangle( NodeCurr->X * GridSize,
+                                                    NodeCurr->Y * GridSize,
+                                                   (NodeCurr->X * GridSize) + ObjSize,
+                                                   (NodeCurr->Y * GridSize) + ObjSize);
+               break;
+            }
+            case N_NOR: { //NOR Circle with a Point
+               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
+                                                  NodeCurr->Y * GridSize,
                                                  (NodeCurr->X * GridSize) + ObjSize,
                                                  (NodeCurr->Y * GridSize) + ObjSize);
 
-				   //this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
-				   Triangle[0] = Point((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
-				   Triangle[1] = Point((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) + ObjSize);
-				   Triangle[2] = Point((NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->Polygon(Triangle, 2);
-				   break;
-			   }
-			   case N_NAND: { //NAND Square with a Point
-				   this->MainCanvas->Canvas->Rectangle( NodeCurr->X * GridSize,
-										                      NodeCurr->Y * GridSize,
-										                     (NodeCurr->X * GridSize) + ObjSize,
+               //this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
+               Triangle[0] = Point((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
+               Triangle[1] = Point((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) + ObjSize);
+               Triangle[2] = Point((NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->Polygon(Triangle, 2);
+
+               break;
+            }
+            case N_NAND: { //NAND Square with a Point
+               this->MainCanvas->Canvas->Rectangle( NodeCurr->X * GridSize,
+                                                    NodeCurr->Y * GridSize,
+                                                   (NodeCurr->X * GridSize) + ObjSize,
                                                    (NodeCurr->Y * GridSize) + ObjSize);
 
-				   //this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
-				   Triangle[0] = Point((NodeCurr->X * GridSize) + (ObjSize/2),  (NodeCurr->Y * GridSize));
-				   Triangle[1] = Point((NodeCurr->X * GridSize) + (ObjSize/2),  (NodeCurr->Y * GridSize) + ObjSize);
-				   Triangle[2] = Point((NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->Polygon(Triangle, 2);
-				   break;
-			   }
-			   case N_XOR: { //XOR Circle with a White +
-				   this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
-                                                  NodeCurr->Y * GridSize,
-										                   (NodeCurr->X * GridSize) + ObjSize,
-										                   (NodeCurr->Y * GridSize) + ObjSize);
+               //this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
+               Triangle[0] = Point((NodeCurr->X * GridSize) + (ObjSize/2),  (NodeCurr->Y * GridSize));
+               Triangle[1] = Point((NodeCurr->X * GridSize) + (ObjSize/2),  (NodeCurr->Y * GridSize) + ObjSize);
+               Triangle[2] = Point((NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->Polygon(Triangle, 2);
 
-				   if(NodeCurr == NodeSelect)
-					 this->MainCanvas->Canvas->Pen->Color = clBlack;
-				   else
-					 this->MainCanvas->Canvas->Pen->Color = clWhite;
-				   this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) );
-				   this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) + ObjSize );
-				   this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize)              , (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + ObjSize    , (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->Pen->Color = clBlack;
-				   break;
-			   }
-			   case N_NOT: { //NOT Triangle
-				   //this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize),  (NodeCurr->Y * GridSize));
-				   Triangle[0] = Point( (NodeCurr->X * GridSize), (NodeCurr->Y * GridSize));
-				   Triangle[1] = Point( (NodeCurr->X * GridSize), (NodeCurr->Y * GridSize) + ObjSize);
-				   Triangle[2] = Point( (NodeCurr->X * GridSize) + ObjSize, (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->Polygon(Triangle, 2);
-				   break;
-			   }
-            case N_LINK: { //LINK Line
-				   if (NodeCurr == NodeSelect)
-					   this->MainCanvas->Canvas->Pen->Color = clWhite;
-               else if (NodeCurr->GetActive()) {
-				      if (NodeCurr->TagFlag)
-				         this->MainCanvas->Canvas->Pen->Color = clLtGray;
-				      else
-				         this->MainCanvas->Canvas->Pen->Color = clRed;
-			      } else
-					   this->MainCanvas->Canvas->Pen->Color = clBlack;
-
-				   this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize)           , (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + ObjSize , (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				   this->MainCanvas->Canvas->Pen->Color = clBlack;
-				   break;
+               break;
             }
-			 }
+            case N_XOR: { //XOR Circle with a White +
+               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
+                                                  NodeCurr->Y * GridSize,
+                                                 (NodeCurr->X * GridSize) + ObjSize,
+                                                 (NodeCurr->Y * GridSize) + ObjSize);
 
-		   this->MainCanvas->Canvas->Brush->Color = clBlack;
-		   if (NodeCurr->GetActive()) {
-			   if (NodeCurr->TagFlag)
-				 this->MainCanvas->Canvas->Pen->Color = clYellow;
-			   else
-				 this->MainCanvas->Canvas->Pen->Color = clRed;
-		   } else {
-			   if (NodeCurr->TagFlag)
-				 this->MainCanvas->Canvas->Pen->Color = clSilver;
-			   else
-				 this->MainCanvas->Canvas->Pen->Color = clBlack;
-		   }
+               if (NodeCurr == NodeSelect) {
+                  this->MainCanvas->Canvas->Pen->Color = clBlack;
+               } else {
+                  this->MainCanvas->Canvas->Pen->Color = clWhite;
+               }
+               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) );
+               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) + ObjSize );
+               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize)              , (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + ObjSize    , (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->Pen->Color = clBlack;
 
-		   //Line Out Up
-		   NodeUp = NodeCurr->GetNodeOutUp();
-		   if (NodeUp != NULL) {
-				 this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) +  ObjSize,
-									                   (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				 this->MainCanvas->Canvas->LineTo((NodeUp->X * GridSize),
-									                   (NodeUp->Y * GridSize) + (ObjSize/2) );
-		   }
+               break;
+            }
+            case N_NOT: { //NOT Triangle
+               //this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize),  (NodeCurr->Y * GridSize));
+               Triangle[0] = Point( (NodeCurr->X * GridSize), (NodeCurr->Y * GridSize));
+               Triangle[1] = Point( (NodeCurr->X * GridSize), (NodeCurr->Y * GridSize) + ObjSize);
+               Triangle[2] = Point( (NodeCurr->X * GridSize) + ObjSize, (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->Polygon(Triangle, 2);
 
-		   //Line Out Down
-		   NodeDown = NodeCurr->GetNodeOutDown();
-		   if (NodeDown != NULL) {
-				 this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) +  ObjSize,
-									                   (NodeCurr->Y * GridSize) + (ObjSize/2) );
-				 this->MainCanvas->Canvas->LineTo((NodeDown->X * GridSize),
-									                   (NodeDown->Y * GridSize) + (ObjSize/2) );
-		   }
-		 }
-	  //}//if modulo
-  }
+               break;
+            }
+            case N_LINK: { //LINK Line
+               if (NodeCurr == NodeSelect) {
+                  this->MainCanvas->Canvas->Pen->Color = clWhite;
+               } else if (NodeCurr->GetActive()) {
+                  if (NodeCurr->TagFlag) {
+                     this->MainCanvas->Canvas->Pen->Color = clLtGray;
+                  } else {
+                     this->MainCanvas->Canvas->Pen->Color = clRed;
+                  }
+               } else {
+                  this->MainCanvas->Canvas->Pen->Color = clBlack;
+               }
 
-  if ( DrawAllAnnotation ) {
-     DoDrawAllAnnotation();
-  }
+               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize)           , (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + ObjSize , (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->Pen->Color = clBlack;
+
+               break;
+            }
+         }
+
+         this->MainCanvas->Canvas->Brush->Color = clBlack;
+         if (NodeCurr->GetActive()) {
+            if (NodeCurr->TagFlag) {
+               this->MainCanvas->Canvas->Pen->Color = clYellow;
+            } else {
+               this->MainCanvas->Canvas->Pen->Color = clRed;
+            }
+         } else {
+            if (NodeCurr->TagFlag) {
+               this->MainCanvas->Canvas->Pen->Color = clSilver;
+            } else {
+               this->MainCanvas->Canvas->Pen->Color = clBlack;
+            }
+         }
+
+         //Line Out Up
+         NodeUp = NodeCurr->GetNodeOutUp();
+         if (NodeUp != NULL) {
+            this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) +  ObjSize,
+                                             (NodeCurr->Y * GridSize) + (ObjSize/2) );
+            this->MainCanvas->Canvas->LineTo((NodeUp->X * GridSize),
+                                          (NodeUp->Y * GridSize) + (ObjSize/2) );
+         }
+
+         //Line Out Down
+         NodeDown = NodeCurr->GetNodeOutDown();
+         if (NodeDown != NULL) {
+            this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) +  ObjSize,
+                                             (NodeCurr->Y * GridSize) + (ObjSize/2) );
+            this->MainCanvas->Canvas->LineTo((NodeDown->X * GridSize),
+                                             (NodeDown->Y * GridSize) + (ObjSize/2) );
+         }
+      }
+      //}//if modulo
+   }
+
+   if ( DrawAllAnnotation ) {
+      DoDrawAllAnnotation();
+   }
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::DoDrawAllAnnotation(void)
 {
-  TStringList *AnnotationSelect;
-  TRect  SrcRect, DestRect;
-  String PointA, PointB, DrawFlag, Hue;
-  int UpLX, UpLY, DownRX, DownRY;
-  int Height, Width;
-  TBitmap* AnnotationCanvas;
-  TColor SelectPixel;
-  float ColorR, ColorG, ColorB;
-  int ColorInt;
-  String ColR, ColG, ColB;
-  Byte *pyx;
+   TStringList *AnnotationSelect;
+   TRect  SrcRect, DestRect;
+   String PointA, PointB, DrawFlag, Hue;
+   int UpLX, UpLY, DownRX, DownRY;
+   int Height, Width;
+   TBitmap* AnnotationCanvas;
+   TColor SelectPixel;
+   float ColorR, ColorG, ColorB;
+   int ColorInt;
+   String ColR, ColG, ColB;
+   Byte *pyx;
 
-  for (int i = 0; i<AnnotationList->Count ; i++) {
-     AnnotationSelect = (TStringList*)AnnotationList->Items[i];
-     Hue    = AnnotationSelect->Strings[2];
-     PointA = AnnotationSelect->Strings[3];
-     PointB = AnnotationSelect->Strings[4];
+   for (int i = 0; i<AnnotationList->Count ; i++) {
+      AnnotationSelect = (TStringList*)AnnotationList->Items[i];
+      Hue    = AnnotationSelect->Strings[2];
+      PointA = AnnotationSelect->Strings[3];
+      PointB = AnnotationSelect->Strings[4];
 
-     UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
-     UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
-     DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
-     DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
+      UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
+      UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
+      DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
+      DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
 
-     UpLX   = UpLX * GridSize            ;
-     UpLY   = UpLY * GridSize            ;
-     DownRX = DownRX * GridSize + ObjSize;
-     DownRY = DownRY * GridSize + ObjSize;
+      UpLX   = UpLX * GridSize            ;
+      UpLY   = UpLY * GridSize            ;
+      DownRX = DownRX * GridSize + ObjSize;
+      DownRY = DownRY * GridSize + ObjSize;
 
-     AnnotationCanvas = new TBitmap;
+      AnnotationCanvas = new TBitmap;
 
-     Height = DownRY-UpLY;
-     Width  = DownRX-UpLX;
-     SrcRect.init(UpLX, UpLY, DownRX, DownRY);
-     DestRect.init(0, 0, Width, Height);
+      Height = DownRY-UpLY;
+      Width  = DownRX-UpLX;
+      SrcRect.init(UpLX, UpLY, DownRX, DownRY);
+      DestRect.init(0, 0, Width, Height);
 
-     AnnotationCanvas->Height = Height;
-     AnnotationCanvas->Width  = Width ;
-     AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
-     AnnotationCanvas->PixelFormat = pf24bit;
-     AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+      AnnotationCanvas->Height = Height;
+      AnnotationCanvas->Width  = Width ;
+      AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+      AnnotationCanvas->PixelFormat = pf24bit;
+      AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
 
-     ColR = Hue.SubString(7,Hue.Pos(",")-7);
-     ColG = Hue.SubString(Hue.Pos(",")+3,Hue.Pos(".")-Hue.Pos(",")-3);
-     ColB = Hue.SubString(Hue.Pos(".")+3,Hue.Length());
+      ColR = Hue.SubString(7,Hue.Pos(",")-7);
+      ColG = Hue.SubString(Hue.Pos(",")+3,Hue.Pos(".")-Hue.Pos(",")-3);
+      ColB = Hue.SubString(Hue.Pos(".")+3,Hue.Length());
 
-     ColorR = 1.0-(StrToInt(ColR)/200.0);
-     ColorG = 1.0-(StrToInt(ColG)/200.0);
-     ColorB = 1.0-(StrToInt(ColB)/200.0);
+      ColorR = 1.0-(StrToInt(ColR)/200.0);
+      ColorG = 1.0-(StrToInt(ColG)/200.0);
+      ColorB = 1.0-(StrToInt(ColB)/200.0);
 
-     for (int y = 0; y < Height; y++) {
-        pyx=(Byte *)AnnotationCanvas->ScanLine[y];
-        for (int x = 0; x < Width; x++) {
-           ColorInt = (pyx[x*3] * ColorG) * ColorR ; // Blue
-           if (ColorInt > 255) {
-              pyx[x*3] = 255;
-           } else {
-              pyx[x*3] = ColorInt;
-           }
+      for (int y = 0; y < Height; y++) {
+         pyx=(Byte *)AnnotationCanvas->ScanLine[y];
+         for (int x = 0; x < Width; x++) {
+            ColorInt = (pyx[x*3] * ColorG) * ColorR ; // Blue
+            if (ColorInt > 255) {
+               pyx[x*3] = 255;
+            } else {
+               pyx[x*3] = ColorInt;
+            }
 
-           ColorInt = (pyx[x*3 + 1] * ColorR) * ColorB ; //Green
-           if (ColorInt > 255) {
-              pyx[x*3 + 1] = 255;
-           } else {
-              pyx[x*3 + 1] = ColorInt;
-           }
+            ColorInt = (pyx[x*3 + 1] * ColorR) * ColorB ; //Green
+            if (ColorInt > 255) {
+               pyx[x*3 + 1] = 255;
+            } else {
+               pyx[x*3 + 1] = ColorInt;
+            }
 
-           ColorInt = (pyx[x*3 + 2] * ColorB) * ColorG ; //Red
-           if (ColorInt > 255) {
-              pyx[x*3 + 2] = 255;
-           } else {
-              pyx[x*3 + 2] = ColorInt;
-           }
-        }
-     }
+            ColorInt = (pyx[x*3 + 2] * ColorB) * ColorG ; //Red
+            if (ColorInt > 255) {
+               pyx[x*3 + 2] = 255;
+            } else {
+               pyx[x*3 + 2] = ColorInt;
+            }
+         }
+      }
 
-     this->MainCanvas->Canvas->Draw(UpLX, UpLY, AnnotationCanvas);
-     this->MainCanvas->Canvas->Brush->Color = clBtnFace;
-     this->MainCanvas->Canvas->Pen->Color = clBlack;
-     this->MainCanvas->Canvas->TextOutA(UpLX + 10, UpLY + 10, AnnotationSelect->Strings[0]);
+      this->MainCanvas->Canvas->Draw(UpLX, UpLY, AnnotationCanvas);
+      this->MainCanvas->Canvas->Brush->Color = clBtnFace;
+      this->MainCanvas->Canvas->Pen->Color = clBlack;
+      this->MainCanvas->Canvas->TextOutA(UpLX + 10, UpLY + 10, AnnotationSelect->Strings[0]);
 
-     AnnotationCanvas->Free();
-  }
+      AnnotationCanvas->Free();
+   }
 
 }
 
@@ -1114,112 +1146,112 @@ void __fastcall Tf_CPUNode::b_StepClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void Tf_CPUNode::UpdateNode(void)
 {
-  //TNode* Node;
-  TNode* NodeCible;
+   //TNode* Node;
+   TNode* NodeCible;
 
-  this->ItsUpdated = true;
-  TagFollowList(this->NodeSelect, 10, false);
+   this->ItsUpdated = true;
+   TagFollowList(this->NodeSelect, 10, false);
 
-  //Read data from Edit Window and Update the selected Node
-  NodeSelect->Name = f_GraphEdit->e_Name->Text;
-  NodeSelect->X = StrToInt(f_GraphEdit->e_PosX->Text);
-  NodeSelect->Y = StrToInt(f_GraphEdit->e_PosY->Text);
-  NodeSelect->SetType(f_GraphEdit->cb_Type->ItemIndex);
-  NodeSelect->NameOutUp   = f_GraphEdit->e_NameOutUp->Text;
-  NodeSelect->NameOutDown = f_GraphEdit->e_NameOutDown->Text;
+   //Read data from Edit Window and Update the selected Node
+   NodeSelect->Name = f_GraphEdit->e_Name->Text;
+   NodeSelect->X = StrToInt(f_GraphEdit->e_PosX->Text);
+   NodeSelect->Y = StrToInt(f_GraphEdit->e_PosY->Text);
+   NodeSelect->SetType(f_GraphEdit->cb_Type->ItemIndex);
+   NodeSelect->NameOutUp   = f_GraphEdit->e_NameOutUp->Text;
+   NodeSelect->NameOutDown = f_GraphEdit->e_NameOutDown->Text;
 
-  NodeSelect->SetInUp(StrToInt(f_GraphEdit->e_PinIDInUp->Text));
-  NodeSelect->SetInDown(StrToInt(f_GraphEdit->e_PinIDInDown->Text));
+   NodeSelect->SetInUp(StrToInt(f_GraphEdit->e_PinIDInUp->Text));
+   NodeSelect->SetInDown(StrToInt(f_GraphEdit->e_PinIDInDown->Text));
 
-  NodeSelect->DeleteFlag = f_GraphEdit->cb_Delete->Checked;
+   NodeSelect->DeleteFlag = f_GraphEdit->cb_Delete->Checked;
 
-  if (NodeSelect->DeleteFlag) {
-    NodeSelect->SetInUp(0);
-    NodeSelect->SetInDown(0);
-    NodeSelect->Name = NodeSelect->Name + "DELETEDELETEDELETEDELETEDELETE" ;
-  }
+   if (NodeSelect->DeleteFlag) {
+      NodeSelect->SetInUp(0);
+      NodeSelect->SetInDown(0);
+      NodeSelect->Name = NodeSelect->Name + "DELETEDELETEDELETEDELETEDELETE" ;
+   }
 
-  //If Node Name changed or deleted, update Nodes conneted to it "Upstream"
-  for (int i = 0; i<NodeCmp; i++) {
-    NodeCible = (TNode*)this->NodeList->Items[i];
-    if (f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutUp) {
-	    if (NodeSelect->DeleteFlag) {
-          NodeCible->NameOutUp = "";
-          NodeCible->SetOutUp(0, NULL);
-       } else if (f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text) {
-          NodeCible->NameOutUp = f_GraphEdit->e_Name->Text;
-       }
-    }
-    if (f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutDown) {
-       if (NodeSelect->DeleteFlag) {
-          NodeCible->NameOutDown = "";
-          NodeCible->SetOutDown(0, NULL);
-       } else if (f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text) {
-          NodeCible->NameOutDown = f_GraphEdit->e_Name->Text;
-       }
-    }
-  }
-  //If Output Node Up Changed / Removed
-  if (f_GraphEdit->e_NameOutUp->Text != f_GraphEdit->l_NameOutUp->Caption || NodeSelect->DeleteFlag) {
-    if (NodeSelect->NameOutUp != "") {
-       int i = 0;
-       while (i<NodeCmp) {
-          NodeCible = (TNode*)this->NodeList->Items[i];
-          if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutUp) {
-            NodeSelect->SetOutUp(0,NodeCible);
-            i = NodeCmp;
-          }
-          i++;
-       }
-    } else {
-       NodeSelect->SetOutUp(0,NULL);
-    }
-  }
-  //If Output Node Down Changed / Removed
-  if (f_GraphEdit->e_NameOutDown->Text != f_GraphEdit->l_NameOutDown->Caption || NodeSelect->DeleteFlag) {
-    if (NodeSelect->NameOutDown != "") {
-       int i = 0;
-       while (i<NodeCmp) {
-          NodeCible = (TNode*)this->NodeList->Items[i];
-          if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutDown) {
-            NodeSelect->SetOutDown(0,NodeCible);
-            i = NodeCmp;
-          }
-          i++;
-       }
-    } else {
-       NodeSelect->SetOutDown(0,NULL);
-    }
-  }
+   //If Node Name changed or deleted, update Nodes conneted to it "Upstream"
+   for (int i = 0; i<NodeCmp; i++) {
+      NodeCible = (TNode*)this->NodeList->Items[i];
+      if (f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutUp) {
+         if (NodeSelect->DeleteFlag) {
+            NodeCible->NameOutUp = "";
+            NodeCible->SetOutUp(0, NULL);
+         } else if (f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text) {
+            NodeCible->NameOutUp = f_GraphEdit->e_Name->Text;
+         }
+      }
+      if (f_GraphEdit->l_SaveName->Caption == NodeCible->NameOutDown) {
+         if (NodeSelect->DeleteFlag) {
+            NodeCible->NameOutDown = "";
+            NodeCible->SetOutDown(0, NULL);
+         } else if (f_GraphEdit->l_SaveName->Caption != f_GraphEdit->e_Name->Text) {
+            NodeCible->NameOutDown = f_GraphEdit->e_Name->Text;
+         }
+      }
+   }
+   //If Output Node Up Changed / Removed
+   if (f_GraphEdit->e_NameOutUp->Text != f_GraphEdit->l_NameOutUp->Caption || NodeSelect->DeleteFlag) {
+      if (NodeSelect->NameOutUp != "") {
+         int i = 0;
+         while (i<NodeCmp) {
+            NodeCible = (TNode*)this->NodeList->Items[i];
+            if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutUp) {
+               NodeSelect->SetOutUp(0,NodeCible);
+               i = NodeCmp;
+            }
+            i++;
+         }
+      } else {
+         NodeSelect->SetOutUp(0,NULL);
+      }
+   }
+   //If Output Node Down Changed / Removed
+   if (f_GraphEdit->e_NameOutDown->Text != f_GraphEdit->l_NameOutDown->Caption || NodeSelect->DeleteFlag) {
+      if (NodeSelect->NameOutDown != "") {
+         int i = 0;
+         while (i<NodeCmp) {
+            NodeCible = (TNode*)this->NodeList->Items[i];
+            if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutDown) {
+               NodeSelect->SetOutDown(0,NodeCible);
+               i = NodeCmp;
+            }
+            i++;
+         }
+      } else {
+         NodeSelect->SetOutDown(0,NULL);
+      }
+   }
 
-  //Update Output if Removed
-  if (f_GraphEdit->e_NameOutUp->Text == "") {
-     NodeSelect->SetOutUp(StrToInt(f_GraphEdit->e_PinIDOutUp->Text), NULL);
-  }
+   //Update Output if Removed
+   if (f_GraphEdit->e_NameOutUp->Text == "") {
+      NodeSelect->SetOutUp(StrToInt(f_GraphEdit->e_PinIDOutUp->Text), NULL);
+   }
 
-  if (f_GraphEdit->e_NameOutDown->Text == "") {
-     NodeSelect->SetOutDown(StrToInt(f_GraphEdit->e_PinIDOutDown->Text), NULL);
-  }
+   if (f_GraphEdit->e_NameOutDown->Text == "") {
+      NodeSelect->SetOutDown(StrToInt(f_GraphEdit->e_PinIDOutDown->Text), NULL);
+   }
 
-  if (NodeSelect->DeleteFlag) {
-     NodeSelect->SetOutUp(0,   NULL);
-     NodeSelect->SetOutDown(0, NULL);
-  }
+   if (NodeSelect->DeleteFlag) {
+      NodeSelect->SetOutUp(0,   NULL);
+      NodeSelect->SetOutDown(0, NULL);
+   }
 
-  if (!NodeSelect->DeleteFlag) {
-     if(this->cb_ColorLine->Checked) {
-        TagFollowList(this->NodeSelect, 10, true);
-     }
-  }
+   if (!NodeSelect->DeleteFlag) {
+      if (this->cb_ColorLine->Checked) {
+         TagFollowList(this->NodeSelect, 10, true);
+      }
+   }
 
-  //Reset Stored "Previous" names
-  f_GraphEdit->l_SaveName->Caption    = NodeSelect->Name;
-  f_GraphEdit->l_NameOutUp->Caption   = NodeSelect->NameOutUp;
-  f_GraphEdit->l_NameOutDown->Caption = NodeSelect->NameOutDown;
+   //Reset Stored "Previous" names
+   f_GraphEdit->l_SaveName->Caption    = NodeSelect->Name;
+   f_GraphEdit->l_NameOutUp->Caption   = NodeSelect->NameOutUp;
+   f_GraphEdit->l_NameOutDown->Caption = NodeSelect->NameOutDown;
 
-  //Draw
-  this->Invalidate();
-  this->CallDrawArea(REFRESH_BUFFER);
+   //Draw
+   this->Invalidate();
+   this->CallDrawArea(REFRESH_BUFFER);
 }
 //---------------------------------------------------------------------------
 //Set a button font to Bold
@@ -1260,166 +1292,161 @@ bool Tf_CPUNode::NodeNameExists(String pName)
 void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
       TShiftState Shift, int X, int Y)
 {
-  (void)Sender;
+   (void)Sender;
 
-  TNode* NodeCurr;
-  int pX, pY, Type;
-  String Name;
+   TNode* NodeCurr;
+   int pX, pY, Type;
+   String Name;
 
-  bool Found;
+   bool Found;
 
-  this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink";
+   this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink";
 
-  //Left Click = Select
-  if (Button == mbLeft && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))) {
-     this->SelectList->Clear();
+   //Left Click = Select
+   if (Button == mbLeft && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))) {
+      this->SelectList->Clear();
 
-     this->MouseDownX = X;
-     this->MouseDownY = Y;
-     for (int i = 0; i<NodeCmp; i++) {
+      this->MouseDownX = X;
+      this->MouseDownY = Y;
+      for (int i = 0; i<NodeCmp; i++) {
          NodeCurr = (TNode*)this->NodeList->Items[i];
          if (! NodeCurr->DeleteFlag) {
-             if(   X >= ( (NodeCurr->X * GridSize)            - OffSetX) + this->p_Area->Left
+            if (   X >= ( (NodeCurr->X * GridSize)            - OffSetX) + this->p_Area->Left
                 && X <  (((NodeCurr->X * GridSize) + ObjSize) - OffSetX) + this->p_Area->Left
                 && Y >= ( (NodeCurr->Y * GridSize)            - OffSetY) + this->p_Area->Top
                 && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY) + this->p_Area->Top ) {
 
-                if(this->cb_ColorLine->Checked)
-                   TagFollowList(this->NodeSelect, 10, false);
-                this->NodeSelect = NodeCurr;
+               if (this->cb_ColorLine->Checked) {
+                  TagFollowList(this->NodeSelect, 10, false);
+               }
+               this->NodeSelect = NodeCurr;
 
-                if(this->cb_ColorLine->Checked)
+               if (this->cb_ColorLine->Checked) {
                    TagFollowList(this->NodeSelect, 10, true);
-                this->CallDrawArea(REFRESH_BUFFER);
+               }
+               this->CallDrawArea(REFRESH_BUFFER);
 
-                f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
-                f_GraphEdit->e_Name->Text = NodeCurr->Name;
-                f_GraphEdit->cb_Delete->Checked = NodeCurr->DeleteFlag;
-                f_GraphEdit->l_SaveName->Caption = NodeCurr->Name;
-                f_GraphEdit->e_PosX->Text = IntToStr(NodeCurr->X);
-                f_GraphEdit->e_PosY->Text = IntToStr(NodeCurr->Y);
-                f_GraphEdit->cb_Type->ItemIndex = NodeCurr->GetType();
+               f_GraphEdit->l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
+               f_GraphEdit->e_Name->Text = NodeCurr->Name;
+               f_GraphEdit->cb_Delete->Checked = NodeCurr->DeleteFlag;
+               f_GraphEdit->l_SaveName->Caption = NodeCurr->Name;
+               f_GraphEdit->e_PosX->Text = IntToStr(NodeCurr->X);
+               f_GraphEdit->e_PosY->Text = IntToStr(NodeCurr->Y);
+               f_GraphEdit->cb_Type->ItemIndex = NodeCurr->GetType();
 
-                f_GraphEdit->e_NameOutUp->Text = NodeCurr->NameOutUp;
-                f_GraphEdit->e_NameOutDown->Text = NodeCurr->NameOutDown;
-                f_GraphEdit->l_NameOutUp->Caption = NodeCurr->NameOutUp;
-                f_GraphEdit->l_NameOutDown->Caption = NodeCurr->NameOutDown;
+               f_GraphEdit->e_NameOutUp->Text = NodeCurr->NameOutUp;
+               f_GraphEdit->e_NameOutDown->Text = NodeCurr->NameOutDown;
+               f_GraphEdit->l_NameOutUp->Caption = NodeCurr->NameOutUp;
+               f_GraphEdit->l_NameOutDown->Caption = NodeCurr->NameOutDown;
 
-                f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
-                f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
-                f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
-                f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
+               f_GraphEdit->e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
+               f_GraphEdit->e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
+               f_GraphEdit->e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
+               f_GraphEdit->e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
 
-                f_GraphEdit->Visible = true;
-                i = NodeCmp;
-             }
+               f_GraphEdit->Visible = true;
+               i = NodeCmp;
+            }
          }
       }
-  }
-  //Right Click = Move Selected
-  else if(Button == mbRight && NodeSelect != NULL) {
-    this->SelectList->Clear();
-    this->ItsUpdated = true;
+   } else if(Button == mbRight && NodeSelect != NULL) {
+   //Right Click = Move Selected
+      this->SelectList->Clear();
+      this->ItsUpdated = true;
 
-	 NodeSelect->X = ((X + OffSetX) - this->p_Area->Left) / GridSize;
-    NodeSelect->Y = ((Y + OffSetY) - this->p_Area->Top) / GridSize;
-    f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
-    f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
+      NodeSelect->X = ((X + OffSetX) - this->p_Area->Left) / GridSize;
+      NodeSelect->Y = ((Y + OffSetY) - this->p_Area->Top) / GridSize;
+      f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
+      f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
 
-    //Draw
-    this->Invalidate();
-    this->CallDrawArea(REFRESH_BUFFER);
-  }
-  //Middle Click = Create
-  else if(Button == mbMiddle)
-  {
-    this->SelectList->Clear();
-    this->ItsUpdated = true;
+      //Draw
+      this->Invalidate();
+      this->CallDrawArea(REFRESH_BUFFER);
+   } else if(Button == mbMiddle) {
+   //Middle Click = Create
+      this->SelectList->Clear();
+      this->ItsUpdated = true;
 
-    pX = ((X + OffSetX) - this->p_Area->Left) / GridSize;
-    pY = ((Y + OffSetY) - this->p_Area->Top) / GridSize;
+      pX = ((X + OffSetX) - this->p_Area->Left) / GridSize;
+      pY = ((Y + OffSetY) - this->p_Area->Top) / GridSize;
 
-    if(this->FlagNewNode)
-       ShowMessage("Double Node");
-    else {
-       this->NodeMaxID++;
-       Name = "Node" + IntToStr(this->NodeMaxID);
-       while (NodeNameExists(Name)) {
+      if (this->FlagNewNode) {
+         ShowMessage("Double Node");
+      } else {
          this->NodeMaxID++;
          Name = "Node" + IntToStr(this->NodeMaxID);
-       }
+         while (NodeNameExists(Name)) {
+            this->NodeMaxID++;
+            Name = "Node" + IntToStr(this->NodeMaxID);
+         }
 
-       NodeCurr = new TNode(this->NodeMaxID, pX, pY, NodeType, Name);
-       NodeCmp++;
+         NodeCurr = new TNode(this->NodeMaxID, pX, pY, NodeType, Name);
+         NodeCmp++;
 
-       this->NodeList->Add(NodeCurr);
-       this->FlagNewNode = false;
-       TagFollowList(this->NodeSelect, 10, false);
-       this->NodeSelect = NodeCurr;
-    }
+         this->NodeList->Add(NodeCurr);
+         this->FlagNewNode = false;
+         TagFollowList(this->NodeSelect, 10, false);
+         this->NodeSelect = NodeCurr;
+      }
 
-    //Draw
-    this->CallDrawArea(REFRESH_BUFFER);
-  }
-  //Left Click + Shift or Ctlr = Link Selected
-  else if (Button == mbLeft && (Shift.Contains(ssCtrl) || Shift.Contains(ssShift))) {
+      //Draw
+      this->CallDrawArea(REFRESH_BUFFER);
+   } else if (Button == mbLeft && (Shift.Contains(ssCtrl) || Shift.Contains(ssShift))) {
+   //Left Click + Shift or Ctlr = Link Selected
       this->MouseDownX = X;
       this->MouseDownY = Y;
 
       if (NodeSelect != NULL) {
-          Found = false;
+         Found = false;
 
-          for (int i = 0; i<NodeCmp; i++) {
-             NodeCurr = (TNode*)this->NodeList->Items[i];
-             if (! NodeCurr->DeleteFlag) {
-                 if(   X >= ( (NodeCurr->X * GridSize)            - OffSetX) + this->p_Area->Left
-                    && X <  (((NodeCurr->X * GridSize) + ObjSize) - OffSetX) + this->p_Area->Left
-                    && Y >= ( (NodeCurr->Y * GridSize)            - OffSetY) + this->p_Area->Top
-                    && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY) + this->p_Area->Top)
-                 {
-                    //this->NodeSelect = NodeCurr;
-                    if (Shift.Contains(ssShift))
+         for (int i = 0; i<NodeCmp; i++) {
+            NodeCurr = (TNode*)this->NodeList->Items[i];
+            if (! NodeCurr->DeleteFlag) {
+               if (   X >= ( (NodeCurr->X * GridSize)            - OffSetX) + this->p_Area->Left
+                   && X <  (((NodeCurr->X * GridSize) + ObjSize) - OffSetX) + this->p_Area->Left
+                   && Y >= ( (NodeCurr->Y * GridSize)            - OffSetY) + this->p_Area->Top
+                   && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY) + this->p_Area->Top){
+                  //this->NodeSelect = NodeCurr;
+                  if (Shift.Contains(ssShift)) {
                       f_GraphEdit->e_NameOutUp->Text = NodeCurr->Name;
-                    else if(Shift.Contains(ssCtrl))
+                  } else if (Shift.Contains(ssCtrl)) {
                       f_GraphEdit->e_NameOutDown->Text = NodeCurr->Name;
+                  }
+                  f_GraphEdit->Visible = true;
+                  Found = true;
+                  i = NodeCmp;
+               }
+            }
+         }
+         if (Found) {
+            this->SelectList->Clear();
 
-                    f_GraphEdit->Visible = true;
-                    Found = true;
-                    i = NodeCmp;
-                 }
-             }
-          }
-          if(Found) {
-              this->SelectList->Clear();
-
-              UpdateNode();
-              if (Shift.Contains(ssShift))
+            UpdateNode();
+            if (Shift.Contains(ssShift)) {
                 f_GraphEdit->l_NameOutUp->Caption = NodeCurr->Name;
-              else if(Shift.Contains(ssCtrl))
+            } else if (Shift.Contains(ssCtrl)) {
                 f_GraphEdit->l_NameOutDown->Caption = NodeCurr->Name;
-
-              //Draw
-              this->CallDrawArea(REFRESH_BUFFER);
-          }
+            }
+            //Draw
+            this->CallDrawArea(REFRESH_BUFFER);
+         }
       }
-  }
-  //Left Click + Alt = Link Remove
-  else if (Button == mbLeft && Shift.Contains(ssAlt))
-  {
-     this->SelectList->Clear();
+   } else if (Button == mbLeft && Shift.Contains(ssAlt)) {
+   //Left Click + Alt = Link Remove
+      this->SelectList->Clear();
 
-     this->MouseDownX = X;
-     this->MouseDownY = Y;
-     for (int i = 0; i<NodeCmp; i++) {
-        NodeCurr = (TNode*)this->NodeList->Items[i];
-        if (! NodeCurr->DeleteFlag) {
-            if(   X >=  ( (NodeCurr->X * GridSize)            - OffSetX) + this->p_Area->Left
+      this->MouseDownX = X;
+      this->MouseDownY = Y;
+      for (int i = 0; i<NodeCmp; i++) {
+         NodeCurr = (TNode*)this->NodeList->Items[i];
+         if (! NodeCurr->DeleteFlag) {
+            if (   X >=  ( (NodeCurr->X * GridSize)            - OffSetX) + this->p_Area->Left
                 && X <  (((NodeCurr->X * GridSize) + ObjSize) - OffSetX) + this->p_Area->Left
                 && Y >= ( (NodeCurr->Y * GridSize)            - OffSetY) + this->p_Area->Top
                 && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY) + this->p_Area->Top) {
 
-				   TagFollowList(this->NodeSelect, 10, false);
-				   this->NodeSelect = NodeCurr;
+               TagFollowList(this->NodeSelect, 10, false);
+               this->NodeSelect = NodeCurr;
 
                this->NodeSelect->NameOutUp = "";
                this->NodeSelect->SetOutUp(0, NULL);
@@ -1533,9 +1560,9 @@ void __fastcall Tf_CPUNode::FormMouseWheel(TObject *Sender, TShiftState Shift,
 
    //Mouse Wheel update Zoom
    if ( WheelDelta > 0) {
-     this->tb_Size->Position--;
+      this->tb_Size->Position--;
    } else {
-     this->tb_Size->Position++;
+      this->tb_Size->Position++;
    }
 
    Handled = true;
@@ -1543,72 +1570,77 @@ void __fastcall Tf_CPUNode::FormMouseWheel(TObject *Sender, TShiftState Shift,
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::AppMessage(TMsg& PassedMsg, bool& Handled)
 {
-  if (PassedMsg.message == WM_KEYDOWN ) {
-	  // add support for SelectList ??? :p
-	  
-	  if (Screen->ActiveForm == f_CPUNode) {
-		  //Catch arrows for mouvment
-		  switch (PassedMsg.wParam) {
-			case VK_UP:
-			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
-				 NodeSelect->Y--;
-				 f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
-			  } else
-				 this->OffSetY += (GridSize * ((tb_Size->Position + 1) * 10) );
-			  Handled = true;
-			  this->Invalidate();
-			  this->CallDrawArea(REFRESH_BUFFER);
-			  break;
-			}
-			case VK_DOWN:
-			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
-				 NodeSelect->Y++;
-				 f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
-			  } else
-				 this->OffSetY -= (GridSize * ((tb_Size->Position + 1) * 10) );
-			  Handled = true;
-			  this->Invalidate();
-			  this->CallDrawArea(REFRESH_BUFFER);
-			  break;
-			}
-			case VK_LEFT:
-			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
-				 NodeSelect->X--;
-				 f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
-			  } else
-				 this->OffSetX += (GridSize * ((tb_Size->Position + 1) * 10) );
-			  Handled = true;
-			  this->Invalidate();
-			  this->CallDrawArea(REFRESH_BUFFER);
-			  break;
-			}
-			case VK_RIGHT:
-			{
-			  if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
-				 NodeSelect->X++;
-				 f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
-			  } else
-			   	this->OffSetX -= (GridSize * ((tb_Size->Position + 1) * 10) );
-			  Handled = true;
-			  this->Invalidate();
-			  this->CallDrawArea(REFRESH_BUFFER);
-			  break;
-			}
-			case VK_SPACE:
-			{
-			  this->OffSetX = 0;
-			  this->OffSetY = 0;
-			  Handled = true;
-			  this->Invalidate();
-			  this->CallDrawArea(REFRESH_BUFFER);
-			  break;
-			}
-		  }
-	  }
-  }
+   if (PassedMsg.message == WM_KEYDOWN ) {
+   // add support for SelectList ??? :p
+
+
+      if (Screen->ActiveForm == f_CPUNode) {
+         //Catch arrows for mouvment
+         switch (PassedMsg.wParam) {
+            case VK_UP: {
+               if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+                  NodeSelect->Y--;
+                  f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
+               } else {
+                  this->OffSetY += (GridSize * ((tb_Size->Position + 1) * 10) );
+               }
+               Handled = true;
+               this->Invalidate();
+               this->CallDrawArea(REFRESH_BUFFER);
+
+               break;
+            }
+            case VK_DOWN: {
+               if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+                  NodeSelect->Y++;
+                  f_GraphEdit->e_PosY->Text = IntToStr(NodeSelect->Y);
+               } else {
+                  this->OffSetY -= (GridSize * ((tb_Size->Position + 1) * 10) );
+               }
+               Handled = true;
+               this->Invalidate();
+               this->CallDrawArea(REFRESH_BUFFER);
+
+               break;
+            }
+            case VK_LEFT: {
+               if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+                  NodeSelect->X--;
+                  f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
+               } else {
+                  this->OffSetX += (GridSize * ((tb_Size->Position + 1) * 10) );
+               }
+               Handled = true;
+               this->Invalidate();
+               this->CallDrawArea(REFRESH_BUFFER);
+
+               break;
+            }
+            case VK_RIGHT: {
+               if (this->cb_QuickEdit->Checked && NodeSelect != NULL) {
+                  NodeSelect->X++;
+                  f_GraphEdit->e_PosX->Text = IntToStr(NodeSelect->X);
+               } else {
+                  this->OffSetX -= (GridSize * ((tb_Size->Position + 1) * 10) );
+               }
+               Handled = true;
+               this->Invalidate();
+               this->CallDrawArea(REFRESH_BUFFER);
+
+               break;
+            }
+            case VK_SPACE: {
+               this->OffSetX = 0;
+               this->OffSetY = 0;
+               Handled = true;
+               this->Invalidate();
+               this->CallDrawArea(REFRESH_BUFFER);
+
+               break;
+            }
+         }
+      }
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
@@ -1688,31 +1720,31 @@ void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
 void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       int X, int Y)
 {
-  (void)Sender;
+   (void)Sender;
 
-  TNode* NodeCurr;
-  String Name;
-  NodeTypes type;
+   TNode* NodeCurr;
+   String Name;
+   NodeTypes type;
 
-  TStringList *AnnotationSelect;
-  TRect  SrcRect, DestRect;
-  String PointA, PointB, DrawFlag, Hue;
-  int UpLX, UpLY, DownRX, DownRY;
-  int Height, Width;
-  bool AnnotationFound = false;
-  TBitmap* AnnotationCanvas;
-  TColor SelectPixel;
-  float ColorR, ColorG, ColorB;
-  int ColorInt;
-  String ColR, ColG, ColB;
-  Byte *pyx;
+   TStringList *AnnotationSelect;
+   TRect  SrcRect, DestRect;
+   String PointA, PointB, DrawFlag, Hue;
+   int UpLX, UpLY, DownRX, DownRY;
+   int Height, Width;
+   bool AnnotationFound = false;
+   TBitmap* AnnotationCanvas;
+   TColor SelectPixel;
+   float ColorR, ColorG, ColorB;
+   int ColorInt;
+   String ColR, ColG, ColB;
+   Byte *pyx;
 
-  int UpdateOffSetX;
-  int UpdateOffSetY;
+   int UpdateOffSetX;
+   int UpdateOffSetY;
 
-  //Catch cursor mouvment when "drag & drop" of the Canvas
-  if(Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))
-     && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) )
+   //Catch cursor mouvment when "drag & drop" of the Canvas
+   if (   Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))
+       && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) )
    {
    //Move view
       this->OffSetX -= X - this->MouseDownX;
@@ -1727,13 +1759,13 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->CallDrawArea(FROM_BUFFER);
 
       this->sb_Main->Panels->Items[0]->Text = HELP_BAR_TEXT_HOWTO;
-  } else if (Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
-  //Select (Shift)
-	  this->SelectList->Clear();
+   } else if (Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
+   //Select (Shift)
+      this->SelectList->Clear();
       for (int i = 0; i<NodeCmp; i++) {
-          NodeCurr = (TNode*)this->NodeList->Items[i];
-          if(! NodeCurr->DeleteFlag) {
-             if(  (  (   this->MouseDownX < X
+         NodeCurr = (TNode*)this->NodeList->Items[i];
+         if (! NodeCurr->DeleteFlag) {
+            if (  (  (   this->MouseDownX < X
                       && ((NodeCurr->X*GridSize)-OffSetX)+this->p_Area->Left >= this->MouseDownX
                       && ((NodeCurr->X*GridSize)-OffSetX)+this->p_Area->Left <= X)
                    ||(   this->MouseDownX > X
@@ -1745,9 +1777,9 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                    ||(   this->MouseDownY > Y
                       && ((NodeCurr->Y*GridSize)-OffSetY)+this->p_Area->Top  <= this->MouseDownY
                       && ((NodeCurr->Y*GridSize)-OffSetY)+this->p_Area->Top >= Y) ) ) {
-				    this->SelectList->Add(NodeCurr);
-             }
-          }
+               this->SelectList->Add(NodeCurr);
+            }
+         }
       }
       //Draw
       //this->Invalidate();
@@ -1763,8 +1795,8 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->Canvas->LineTo(this->MouseDownX, this->MouseDownY);
       this->Canvas->Pen->Width = 1;
 
-  } else if (Shift.Contains(ssLeft) && Shift.Contains(ssAlt) && !Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
-  //Make Annotation
+   } else if (Shift.Contains(ssLeft) && Shift.Contains(ssAlt) && !Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
+   //Make Annotation
       this->CallDrawArea(FROM_BUFFER);
 
       this->Canvas->Brush->Color = clBtnFace;
@@ -1782,20 +1814,20 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->Canvas->TextOutA(X-25, Y-15,
                              "X:"  + IntToStr((((X)+this->OffSetX-this->p_Area->Left)-ObjSize) / GridSize) +
                              ",Y:" + IntToStr((((Y)+this->OffSetY-this->p_Area->Top) -(ObjSize/2)) / GridSize));
-  } else if(Shift.Contains(ssLeft) && !Shift.Contains(ssShift) && Shift.Contains(ssCtrl)
-            && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize))
-  {
-  //Move Selection (Ctrl)
+   } else if(   Shift.Contains(ssLeft) && !Shift.Contains(ssShift) && Shift.Contains(ssCtrl)
+             && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize))
+   {
+   //Move Selection (Ctrl)
       UpdateOffSetX = (X - this->MouseDownX) / GridSize ;
       UpdateOffSetY = (Y - this->MouseDownY) / GridSize ;
       this->MouseDownX = X;
       this->MouseDownY = Y;
-      
+
       for (int i = 0; i<this->SelectList->Count; i++) {
-          NodeCurr = (TNode*)this->SelectList->Items[i];
-          NodeCurr->X += UpdateOffSetX;
-          NodeCurr->Y += UpdateOffSetY;
-          this->ItsUpdated = true;
+         NodeCurr = (TNode*)this->SelectList->Items[i];
+         NodeCurr->X += UpdateOffSetX;
+         NodeCurr->Y += UpdateOffSetY;
+         this->ItsUpdated = true;
       }
       //Draw
       //this->Invalidate();
@@ -1803,27 +1835,26 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->Canvas->Pen->Color = clBlack;
       this->Canvas->FillRect(ClientRect);
       this->CallDrawArea(REFRESH_BUFFER);
-  } else {
-  //Update status bar Info for Node Name/Type
+   } else {
+   //Update status bar Info for Node Name/Type
       for (int i = 0; i<NodeCmp; i++) {
          NodeCurr = (TNode*)this->NodeList->Items[i];
          if (! NodeCurr->DeleteFlag) {
-             if(   X >= ( (NodeCurr->X * GridSize)            - OffSetX)+this->p_Area->Left
+            if (   X >= ( (NodeCurr->X * GridSize)            - OffSetX)+this->p_Area->Left
                 && X <  (((NodeCurr->X * GridSize) + ObjSize) - OffSetX)+this->p_Area->Left
                 && Y >= ( (NodeCurr->Y * GridSize)            - OffSetY)+this->p_Area->Top
-                && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY)+this->p_Area->Top )
-             {
-                //type = NodeCurr->GetType();
-                Name = NodeCurr->Name;
-                type = NodeCurr->GetType();
+                && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY)+this->p_Area->Top ) {
+               //type = NodeCurr->GetType();
+               Name = NodeCurr->Name;
+               type = NodeCurr->GetType();
 
-                this->sb_Main->Panels->Items[0]->Text = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[type] +
-                                                        "] -> X:" + IntToStr(NodeCurr->X) + " Y:" + IntToStr(NodeCurr->Y);
-                //this->Hint = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[type] + "]";
-                //f_CPUNode->Hint
+               this->sb_Main->Panels->Items[0]->Text = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[type] +
+                                                       "] -> X:" + IntToStr(NodeCurr->X) + " Y:" + IntToStr(NodeCurr->Y);
+               //this->Hint = Name + " [" + f_GraphEdit->cb_Type->Items->Strings[type] + "]";
+               //f_CPUNode->Hint
 
-                i = NodeCmp;
-             }
+               i = NodeCmp;
+            }
          }
       }
 
@@ -1846,10 +1877,10 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
                DownRX = (((DownRX * GridSize ) + ObjSize) + OffSetX)+this->p_Area->Left;
                DownRY = (((DownRY * GridSize ) + ObjSize) + OffSetY)+this->p_Area->Top;
 
-               if(!(   X >= UpLX
-                    && X <  DownRX
-                    && Y >= UpLY
-                    && Y <  DownRY) )
+               if (!(   X >= UpLX
+                     && X <  DownRX
+                     && Y >= UpLY
+                     && Y <  DownRY) )
                {
                   AnnotationSelect->Strings[5] = "Draw=False";
 
@@ -2010,7 +2041,7 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
          }
 
       }
-  }
+   }
 }
 //---------------------------------------------------------------------------
 
@@ -2057,7 +2088,7 @@ void __fastcall Tf_CPUNode::b_ResetClick(TObject *Sender)
    this->ResetAllNode();
    this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
 
-   for(int i=0; i<=80; i++) {
+   for (int i=0; i<=80; i++) {
       CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(i));
       if (CurrPin != NULL) {
          CurrPin->Checked = false;

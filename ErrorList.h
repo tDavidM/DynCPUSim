@@ -11,12 +11,12 @@
 class Tf_ErrorList : public TForm
 {
 __published:
-    TButton *bOk;
-    TMemo *mLog;
+   TButton *bOk;
+   TMemo *mLog;
 private:
 public:
-    void __fastcall InitList(TStringList* pErrorList);
-    __fastcall Tf_ErrorList(TComponent* Owner);
+   void __fastcall InitList(TStringList* pErrorList);
+   __fastcall Tf_ErrorList(TComponent* Owner);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_ErrorList *f_ErrorList;
