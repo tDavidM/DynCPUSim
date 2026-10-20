@@ -1285,80 +1285,93 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
 
 void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
-   String Line, LineLbl, LbLName, LineData, LineComment;
-   int LineCount = 1;
+   int lineCount = 1;
 
    //Main loop
    for (int i = 0; i<pASMFile->Count ; i++) {
-      Line = pASMFile->Strings[i];
-      LineComment = "";
+      String line = pASMFile->Strings[i];
+      String lineData;
+      String lineComment = "";
 
       //Extract Comment
-      if (Line.Pos(";") > 0) {
-         LineComment = Line.SubString(Line.Pos(";")+1, Line.Length()-Line.Pos(";"));
-         LineData    = Line.SubString(1, Line.Pos(";")-1);
+      if (line.Pos(";") > 0) {
+         lineComment = line.SubString(line.Pos(";")+1, line.Length()-line.Pos(";"));
+         lineData    = line.SubString(1, line.Pos(";")-1);
 
          //If double semicolon, the comment line is kept with an NOP instruction placeholder
-         if (LineComment.Pos(";;") == 1) {
-            LineData = " /NOP  ;" + LineComment;
+         if (lineComment.Pos(";;") == 1) {
+            lineData = " /NOP  ;";
          }
-         Line = LineData;
       } else {
-         LineData = Line;
+         lineData = line;
       }
       //Remove blank lines
-      if (LineData.Trim() == "") {
+      if (lineData.Trim() == "") {
          pASMFile->Delete(i);
          pMetaASMFile->Delete(i);
          i--;
+         continue;
+      }
+      String lineLabel;
+
+      //Extract Label
+      if (lineData.Pos("/")) {
+         lineLabel = lineData.SubString(1, lineData.Pos("/")-1);
+         lineData  = lineData.SubString(lineData.Pos("/")+1, lineData.Length()-lineData.Pos("/"));
       } else {
+         lineLabel = lineData.SubString(1, 24);
+         lineData  = lineData.SubString(25, lineData.Length()-24);
+      }
+      lineLabel  = lineLabel.Trim();
+      lineData   = lineData.Trim();
+      line       = lineData + "  ;";
 
-         //Extract Label
-         if (LineData.Pos("/")) {
-            LineLbl  = LineData.SubString(1, LineData.Pos("/")-1);
-            LineData = LineData.SubString(LineData.Pos("/")+1,LineData.Length()-LineData.Pos("/"));
+      //Process Label
+      if ( lineLabel.SubString(1,1) == ":" ) {
+         String labelName;
+
+         //First Label
+         lineLabel = lineLabel + " ";
+         labelName = lineLabel.SubString(2, lineLabel.Pos(" ")-2);
+         lineLabel = lineLabel.SubString(lineLabel.Pos(" "), lineLabel.Length()-lineLabel.Pos(" "));
+         lineLabel = lineLabel.Trim();
+         line      = line + ":" + labelName + " ";
+
+         //Test if already defined
+         if (pLabelList->IndexOfName(labelName.UpperCase()) < 0) {
+            pLabelList->Add(labelName.UpperCase() + "=" + IntToStr(lineCount));
          } else {
-            LineLbl  = LineData.SubString(1,24);
-            LineData = LineData.SubString(25,LineData.Length()-24);
+            pErrorList->Add(ERR_REDEFINED_LABEL + labelName + pMetaASMFile->Strings[i]);
          }
-         LineLbl  = LineLbl.Trim();
-         LineData = LineData.Trim();
-         Line     = LineData + "  ;";
 
-         //Process Label
-         if ( LineLbl.SubString(1,1) == ":" ) {
-            //First Label
-            LineLbl = LineLbl + " ";
-            LbLName = LineLbl.SubString(2,LineLbl.Pos(" ")-2);
-            LineLbl = LineLbl.SubString(LineLbl.Pos(" "), LineLbl.Length()-LineLbl.Pos(" "));
-            LineLbl = LineLbl.Trim();
-            Line    = Line + ":" + LbLName + " ";
+         //Second Label
+         if (lineLabel.SubString(1,1) == ":" ) {
+            labelName = lineLabel.SubString(2, lineLabel.Length());
+            line    = line + ":" + labelName + " ";
 
             //Test if already defined
-            if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0) {
-               pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
+            if (pLabelList->IndexOfName(labelName.UpperCase()) < 0) {
+               pLabelList->Add(labelName.UpperCase() + "=" + IntToStr(lineCount));
             } else {
-               pErrorList->Add(ERR_REDEFINED_LABEL + LbLName + pMetaASMFile->Strings[i]);
-            }
-
-            //Second Label
-            if (LineLbl.SubString(1,1) == ":" ) {
-               LbLName = LineLbl.SubString(2, LineLbl.Length());
-               Line    = Line + ":" + LbLName + " ";
-
-               //Test if already defined
-               if (pLabelList->IndexOfName(LbLName.UpperCase()) < 0) {
-                  pLabelList->Add(LbLName.UpperCase() + "=" + IntToStr(LineCount));
-               } else {
-                  pErrorList->Add(ERR_REDEFINED_LABEL + LbLName + pMetaASMFile->Strings[i]);
-               }
+               pErrorList->Add(ERR_REDEFINED_LABEL + labelName + pMetaASMFile->Strings[i]);
             }
          }
-         //Output instruction + comment
-         Line = Line + LineComment;
-         pASMFile->Strings[i] = Line;
-         LineCount++;
       }
+
+      //If the label was on a empty line (no instruction)
+      if (lineData == "") {
+         pASMFile->Delete(i);
+         pMetaASMFile->Delete(i);
+         i--;
+         continue;
+      }
+
+
+      //Output instruction + comment
+      line = line + lineComment;
+      pASMFile->Strings[i] = line;
+      lineCount++;
+      
    }
 }
 //---------------------------------------------------------------------------
@@ -1436,21 +1449,22 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       //Remove Special chars
       lineData = StringReplace(lineData, "GOTO", " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "->",   ", ", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "<-",   ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "-",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, ">>",   ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, ">",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "<<",   ", ", TReplaceFlags() << rfReplaceAll );
-      lineData = StringReplace(lineData, "<",    " ",  TReplaceFlags() << rfReplaceAll );
-      lineData = StringReplace(lineData, "+",    " ,", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "<",    ", ", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "+",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "|",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "&",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "^",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "?",    ", ", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "==",   ", ", TReplaceFlags() << rfReplaceAll );
+      lineData = StringReplace(lineData, "=",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "!",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "@",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "#",    " ",  TReplaceFlags() << rfReplaceAll );
-      lineData = StringReplace(lineData, "==",   ", ", TReplaceFlags() << rfReplaceAll );
-      lineData = StringReplace(lineData, "=",    ", ", TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "(",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, ")",    " ",  TReplaceFlags() << rfReplaceAll );
       lineData = StringReplace(lineData, "\"",   " ",  TReplaceFlags() << rfReplaceAll );
