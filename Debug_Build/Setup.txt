@@ -88,10 +88,10 @@ Op-Codes (A [B [C [D]]]) / Instructions:
 1111 1111 1111 0010 - SIFNC - SkipNotCarry()        // Skip the following instruction if carry flag not set
 1111 1111 1111 0011 - RSTAR - ResetAllReg()     *   // Set all Registers to 0x00
 1111 1111 1111 0100 - FLUSH - FlushStack()       // Set all values stored in the Stack to 0x00
-1111 1111 1111 0101 - INT   - Interupt()             // Trigger Interupt
-1111 1111 1111 0110 - RET   - Return()               // Return from Interupt
-1111 1111 1111 0111 - NOINT - NoInterupt()           // Disable Interupts
-1111 1111 1111 1000 - OKINT - OkInterupt()           // Enable Interupts
+1111 1111 1111 0101 - INT   - Interrupt()             // Trigger Interrupt
+1111 1111 1111 0110 - RET   - Return()               // Return from Interrupt
+1111 1111 1111 0111 - NOINT - NoInterrupt()           // Disable Interrupts
+1111 1111 1111 1000 - OKINT - OkInterrupt()           // Enable Interrupts
 1111 1111 1111 1001 - RAISE - Raise()                // Trigger Error Handler
 1111 1111 1111 1010 - GOBCK - GoBack()               // Return from Error Handler
 1111 1111 1111 1011 - SRNG  - SetRngSeed()           // Set RngSeed using the value of register B
@@ -105,8 +105,8 @@ Alias / Pseudo-Instructions:
 CPY   - Copy($C)->$D          // Copy the value from $C to $D, using OR($B,$C) where $B is the fixed value register 0x00000000
 RST   - Reset()->$D           // Set $D to 0x00, using XOR($B,$C) where $B and $C are the fixed value register 0x11111111
 CMP   - Compare($B?$C)->$D         // Compares 2 registers and set the difference in $D (carry flag set if $B<$C) using Subtract($B-$C)
-SINTH - SetInteruptH(BC)           // Set Interupt Goto absolute address (High) using a fixed value, done by writing to $E with Set(BC)
-SINTL - SetInteruptL(BC)           // Set Interupt Goto absolute address (Low) using a fixed value, done by writing to $C with Set(BC)
+SINTH - SetInterruptH(BC)           // Set Interrupt Goto absolute address (High) using a fixed value, done by writing to $E with Set(BC)
+SINTL - SetInterruptL(BC)           // Set Interrupt Goto absolute address (Low) using a fixed value, done by writing to $C with Set(BC)
 SERRH - SetErrorH(BC)              // Set Error Handler Goto absolute address (High) using a fixed value, done by writing to $F with Set(BC)
 SERTL - SetErrorL(BC)              // Set Error Handler Goto absolute address (Low) using a fixed value,  done by writing to $D with Set(BC)
 
@@ -116,10 +116,10 @@ Special Registers:
  Registers $C to $F always return the following values when read:
    $C=0x00 $D=0x01 $E=0xFF $F=0x80
    Writing to those register does no change the output value
-   Goto absolute address used by the Interupt and Error Handler can be set by writing to:
-     $C for Low bits / ROM address of the Interupt routine
+   Goto absolute address used by the Interrupt and Error Handler can be set by writing to:
+     $C for Low bits / ROM address of the Interrupt routine
      $D for Low bits / ROM address of the Error Handler routine
-     $E for High bits / ROM Page of the Interupt routine
+     $E for High bits / ROM Page of the Interrupt routine
      $F for High bits / ROM Page of the Error Handler routine
  
  
@@ -127,11 +127,13 @@ I/Os:
 
 
 
-Interupts:
+Interrupts:
 
 
 
 ToDo/Idea:
+Test CPU pin 49 RAM buzy
 Remove RSTAR - ResetAllReg() ?
 Remove CFLG  - CarryFlg() ?
 Annotation editor
+Regroup RAM I/O and Hardware I/O pin togetter

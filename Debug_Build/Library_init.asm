@@ -1,4 +1,4 @@
-#INCLUDE "Library_interupt_error.asm"
+#INCLUDE "Library_interrupt_error.asm"
 #INCLUDE "Library_stack.asm"
 
 #DEFINE RAM_PAGE $B

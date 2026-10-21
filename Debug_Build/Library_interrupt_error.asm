@@ -1,33 +1,33 @@
 ;Library with exemples of code and structure
 
-;Interupt and Error Handling
+;Interrupt and Error Handling
 
-;Interupt handling routine uses 1 slot of CPU stack
+;Interrupt handling routine uses 1 slot of CPU stack
 ;Error handling routine uses 1 slot of CPU stack
 
 
 ; =============================================================================
 ;Initialisation
 ; =============================================================================
-                        SINTH :*INTERUPT_HANDLING       ; Init the High bits of the Interupt handling routine
-                        SINTL :.INTERUPT_HANDLING       ; Init the Low bits of the Interupt handling routine
-                        SERRH :*ERROR_HANDLING          ; Init the High bits of the Error handling routine
-                        SERTL :.ERROR_HANDLING          ; Init the Low bits of the Error handling routine
+                        SINTH :*INTERRUPT_HANDLING       ; Init the High bits of the Interrupt handling routine
+                        SINTL :.INTERRUPT_HANDLING       ; Init the Low bits of the Interrupt handling routine
+                        SERRH :*ERROR_HANDLING           ; Init the High bits of the Error handling routine
+                        SERTL :.ERROR_HANDLING           ; Init the Low bits of the Error handling routine
 
-                        SET   :*INTERUPT_ERROR_DONE, $9 ; Skip over the Interupt and Error handling code
-                        WJMPV $9, :.INTERUPT_ERROR_DONE ;
+                        SET   :*INTERRUPT_ERROR_END, $9  ; Skip over the Interrupt and Error handling code
+                        WJMPV $9, :.INTERRUPT_ERROR_END  ;
 
 ; =============================================================================
-;Interupt handling routine
+;Interrupt handling routine
 ; =============================================================================
-:INTERUPT_HANDLING      NOINT                    ; Disable interupts
+:INTERRUPT_HANDLING      NOINT                    ; Disable interrupts
                         
                         
                         PUSH  $9                 ; Push that value in the CPU stack
                         NOP
                         POP   $9                 ; Push that value in the CPU stack
                         
-:INTERUPT_HANDLING_DONE OKINT                    ; Enable interputs
+:INTERRUPT_HANDLING_END OKINT                    ; Enable interputs
                         RET                      ; Returns 
 
 ; =============================================================================
@@ -57,4 +57,4 @@
                         GOBCK                      ; Return to the calling code
 
 
-:INTERUPT_ERROR_DONE    
+:INTERRUPT_ERROR_DONE    

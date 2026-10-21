@@ -984,7 +984,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin30Click
     end
     object Pin39: TCheckBox
-      Left = 170
+      Left = 154
       Top = 148
       Width = 126
       Height = 17
@@ -993,7 +993,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin39Click
     end
     object Pin40: TCheckBox
-      Left = 170
+      Left = 154
       Top = 60
       Width = 116
       Height = 17
@@ -1002,7 +1002,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin40Click
     end
     object Pin70: TCheckBox
-      Left = 170
+      Left = 154
       Top = 5
       Width = 86
       Height = 17
@@ -1013,7 +1013,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin70Click
     end
     object Pin60: TCheckBox
-      Left = 170
+      Left = 154
       Top = 90
       Width = 138
       Height = 17
@@ -1022,7 +1022,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin60Click
     end
     object Pin80: TCheckBox
-      Left = 170
+      Left = 154
       Top = 31
       Width = 86
       Height = 17
@@ -1030,12 +1030,13 @@ object f_GraphIO: Tf_GraphIO
       TabOrder = 7
     end
     object Pin19: TCheckBox
-      Left = 170
+      Left = 154
       Top = 119
-      Width = 146
+      Width = 126
       Height = 17
-      Caption = '19 (Interrupt Handled Out)'
+      Caption = '19 (Handled Out)'
       TabOrder = 8
+      OnClick = Pin19Click
     end
     object Pin20: TCheckBox
       Left = 14
@@ -1044,14 +1045,16 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '20 (I/O Ready Out)'
       TabOrder = 9
+      OnClick = Pin20Click
     end
     object Pin18: TCheckBox
       Left = 14
       Top = 119
-      Width = 150
+      Width = 132
       Height = 17
-      Caption = '18 (Hardware Interrput In)'
+      Caption = '18 (Interrput In)'
       TabOrder = 10
+      OnClick = Pin18Click
     end
     object Pin17: TCheckBox
       Left = 342
@@ -1062,11 +1065,11 @@ object f_GraphIO: Tf_GraphIO
       TabOrder = 11
     end
     object Pin49: TCheckBox
-      Left = 342
+      Left = 292
       Top = 60
-      Width = 37
+      Width = 100
       Height = 17
-      Caption = '49'
+      Caption = '49 (RAM Busy In)'
       TabOrder = 12
     end
     object Pin59: TCheckBox

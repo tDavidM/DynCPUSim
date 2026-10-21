@@ -56,6 +56,7 @@ __published:
    void __fastcall ud_PageClick(TObject *Sender, TUDBtnType Button);
    void __fastcall b_ClearPClick(TObject *Sender);
    void __fastcall FormShow(TObject *Sender);
+
 private:
    int LastDataType;
    int LastX, LastY;

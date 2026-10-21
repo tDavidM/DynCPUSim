@@ -116,6 +116,20 @@ void __fastcall Tf_Ram::sg_RamKeyPress(TObject *Sender, char &Key)
    }
 }
 //---------------------------------------------------------------------------
+
+void __fastcall Tf_Ram::sg_RamSelectCell(TObject *Sender, int ACol, int ARow,
+      bool &CanSelect)
+{
+   (void)Sender;
+   (void)CanSelect;
+
+   this->CleanUpData(this->LastX, this->LastY);
+
+   this->LastX = ACol;
+   this->LastY = ARow;
+}
+//---------------------------------------------------------------------------
+
 void __fastcall Tf_Ram::sg_RamExit(TObject *Sender)
 {
    (void)Sender;
@@ -159,7 +173,34 @@ void Tf_Ram::CleanUpData(int X, int Y)
             Data = Data.SubString(1, 2);
          }
       }
-      this->sg_Ram->Cells[X][Y] = Data;
+      this->sg_Ram->Cells[X][Y] = Data.UpperCase();
+
+      TLocateOptions SrOpt;
+      if (this->cds_Ram->Locate("Line", Y, SrOpt)) {
+         this->cds_Ram->Edit();
+      } else {
+         this->cds_Ram->Insert();
+         this->cds_RamLine->AsInteger = Y;
+         this->cds_RamPage->AsString = this->CurrentPage;
+      }
+
+      if (this->rb_Bin->Checked) {
+         Data = BinToHex(Data.SubString(1, 4)) + BinToHex(Data.SubString(5, 4));
+      } else if (this->rb_Dec->Checked) {
+         Data = DecToHex(Data);
+      }
+
+      switch(X) {
+         case 1: { this->cds_RamField01->AsString = Data; break;}
+         case 2: { this->cds_RamField23->AsString = Data; break;}
+         case 3: { this->cds_RamField45->AsString = Data; break;}
+         case 4: { this->cds_RamField67->AsString = Data; break;}
+         case 5: { this->cds_RamField89->AsString = Data; break;}
+         case 6: { this->cds_RamFieldAB->AsString = Data; break;}
+         case 7: { this->cds_RamFieldCD->AsString = Data; break;}
+         case 8: { this->cds_RamFieldEF->AsString = Data; break;}
+      }
+      this->cds_Ram->Post();
    }
 }
 //---------------------------------------------------------------------------
@@ -501,12 +542,17 @@ void Tf_Ram::Set(String Addr, String Value, String Page)
    }
 
    this->sg_Ram->Cells[X][Y] = Data;
+   this->CleanUpData(X, Y);
 }
 //---------------------------------------------------------------------------
 void Tf_Ram::Get(String Addr, char *Value, String Page)
 {
    int X, Y;
    String Data;
+
+   if (this->CurrentPage != Page) {
+      this->SwapPage(this->CurrentPage, Page);
+   }
 
    this->AddrToXY(Addr, X, Y);
    Data = this->sg_Ram->Cells[X][Y];
@@ -519,25 +565,7 @@ void Tf_Ram::Get(String Addr, char *Value, String Page)
       Data = HexToBin(Data.SubString(1, 1)) + HexToBin(Data.SubString(2, 1));
    }
 
-   if (this->CurrentPage != Page) {
-      this->SwapPage(this->CurrentPage, Page);
-   }
-
    strncpy(Value,AnsiString(Data).c_str(),8);
-}
-//---------------------------------------------------------------------------
-
-void __fastcall Tf_Ram::sg_RamSelectCell(TObject *Sender, int ACol, int ARow,
-      bool &CanSelect)
-{
-   (void)Sender;
-   (void)CanSelect;
-
-
-   this->CleanUpData(this->LastX, this->LastY);
-
-   this->LastX = ACol;
-   this->LastY = ARow;
 }
 //---------------------------------------------------------------------------
 

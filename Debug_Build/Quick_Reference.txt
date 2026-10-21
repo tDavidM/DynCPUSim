@@ -28,8 +28,8 @@ JMPR  - JumpReg( ) goto#$            // Goto a relative address stored in a Regi
 WJMP  - WideJump( ) goto#0000 + xxx  // Goto an absolute 12 bits address xxx (limited range, first 4K of ROM)
 WJMPV - WideJumpVal( ) goto#$H + xx  // Goto an absolute 16 bits address stored in a Register plus a given value xx (full 64K range)
 WJMPR - WideJumpReg( ) goto#$H + $L  // Goto an absolute 16 bits address stored in 2 Registers (full 64K range)
-INT   - Interupt( )                  // Trigger Interupt
-RET   - Return( )                    // Return from Interupt
+INT   - Interrupt( )                 // Trigger Interrupt
+RET   - Return( )                    // Return from Interrupt
 RAISE - Raise( )                     // Trigger Error Handler
 GOBCK - GoBack( )                    // Return from Error Handler
 
@@ -69,10 +69,10 @@ RIOA  - ReadIOA( ) -> $              // Read from HW I/O A and stores the value 
 RIOB  - ReadIOB( ) -> $              // Read from HW I/O B and stores the value in a Register
 WIOA  - WriteIOA( D )                // Write to I/O A using the value in a Register
 WIOB  - WriteIOB( D )                // Write to I/O B using the value in a Register
-NOINT - NoInterupt( )                // Disable Interupts
-OKINT - OkInterupt( )                // Enable Interupts
-SINTH - SetInteruptH( #Hx )          // * Alias to set Interupt Goto absolute address (High) with a fixed value
-SINTL - SetInteruptL( #Lx )          // * Alias to set Interupt Goto absolute address (Low) with a fixed value
+NOINT - NoInterrupt( )               // Disable Interrupts
+OKINT - OkInterrupt( )               // Enable Interrupts
+SINTH - SetInterruptH( #Hx )         // * Alias to set Interrupt Goto absolute address (High) with a fixed value
+SINTL - SetInterruptL( #Lx )         // * Alias to set Interrupt Goto absolute address (Low) with a fixed value
 SERRH - SetErrorH( #Hx )             // * Alias to set Error Handler Goto absolute address (High) with a fixed value
 SERTL - SetErrorL( #Lx )             // * Alias to set Error Handler Goto absolute address (Low) with a fixed value
 

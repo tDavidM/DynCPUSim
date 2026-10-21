@@ -21,6 +21,7 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
    char Instruction[17];
 
    f_Memory->cds_Mem->First();
+   f_Terminal->sbBoot->Down = this->Pin70->Checked;
 
    //CPU boot, load first instruction
    if (this->Pin49->Checked) {
@@ -52,6 +53,8 @@ void __fastcall Tf_GraphIO::Pin30Click(TObject *Sender)
 
    //CPU RAM write flag
    if (this->Pin30->Checked) {
+      this->Pin49->Checked = true;
+
       //21-28
       String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
       String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
@@ -68,6 +71,8 @@ void __fastcall Tf_GraphIO::Pin30Click(TObject *Sender)
       String Page = c2 + c1;
 
       f_Ram->Set(Addr, Value, Page);
+
+      this->Pin49->Checked = false;
    }
 }
 //---------------------------------------------------------------------------
@@ -78,6 +83,8 @@ void __fastcall Tf_GraphIO::Pin40Click(TObject *Sender)
 
    //CPU RAM write flag
    if (this->Pin40->Checked) {
+      this->Pin49->Checked = true;
+
       //21-28
       String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
       String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
@@ -100,6 +107,8 @@ void __fastcall Tf_GraphIO::Pin40Click(TObject *Sender)
       this->Pin46->Checked  = Value[2]  != '0';
       this->Pin47->Checked  = Value[1]  != '0';
       this->Pin48->Checked  = Value[0]  != '0';
+
+      this->Pin49->Checked = false;
    }
 }
 //---------------------------------------------------------------------------
@@ -341,6 +350,7 @@ void __fastcall Tf_GraphIO::Pin39Click(TObject *Sender)
    (void)Sender;
 
    f_Memory->dbg_Mem->Color = clWindow;
+   f_Terminal->sbHalt->Down = this->Pin39->Checked;
 }
 //---------------------------------------------------------------------------
 
@@ -432,7 +442,7 @@ void __fastcall Tf_GraphIO::Line12Click(TObject *Sender)
    (void)Sender;
 
    //121-128
-   String c1 = BinToHex(Pin121->Checked, Pin121->Checked, Pin123->Checked, Pin124->Checked);
+   String c1 = BinToHex(Pin121->Checked, Pin122->Checked, Pin123->Checked, Pin124->Checked);
    String c2 = BinToHex(Pin125->Checked, Pin126->Checked, Pin127->Checked, Pin128->Checked);
 
    l_Line12->Caption = "[0x" + c2 + c1 + "]";
@@ -445,6 +455,69 @@ void __fastcall Tf_GraphIO::FormShow(TObject *Sender)
 
    this->Left = Screen->Width - (this->Width + 9);
    this->Top = 5;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_GraphIO::Pin20Click(TObject *Sender)
+{
+   (void)Sender;
+
+   //CPU I/O Ready Out flag
+   if (this->Pin20->Checked) {
+      //113-120
+      String c1 = BinToHex(Pin113->Checked, Pin114->Checked, Pin115->Checked, Pin116->Checked);
+      String c2 = BinToHex(Pin117->Checked, Pin118->Checked, Pin119->Checked, Pin120->Checked);
+      String cmd = c2 + c1;
+
+      //121-128
+      c1 = BinToHex(Pin121->Checked, Pin122->Checked, Pin123->Checked, Pin124->Checked);
+      c2 = BinToHex(Pin125->Checked, Pin126->Checked, Pin127->Checked, Pin128->Checked);
+      String value = c2 + c1;
+
+      f_Terminal->IOOut(cmd, value);
+   }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_GraphIO::Pin19Click(TObject *Sender)
+{
+   this->Pin18->Checked = false;
+   f_Terminal->pInterrupt->Color = clGray;
+   //f_Terminal->lValue->Caption = "0x00 ( )";
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_GraphIO::Pin18Click(TObject *Sender)
+{
+   f_Terminal->pInterrupt->Color = clYellow;
+}
+//---------------------------------------------------------------------------
+
+void Tf_GraphIO::SetIO(char cmd, char value)
+{
+   //97-104
+   Pin97->Checked  = cmd & 0x01;
+   Pin98->Checked  = cmd & 0x02;
+   Pin99->Checked  = cmd & 0x04;
+   Pin100->Checked = cmd & 0x08;
+   Pin101->Checked = cmd & 0x10;
+   Pin102->Checked = cmd & 0x20;
+   Pin103->Checked = cmd & 0x40;
+   Pin104->Checked = cmd & 0x80;
+
+   l_Line9->Caption = "[0x" + IntToHex(cmd, 2) + "]";
+
+   //105-112
+   Pin105->Checked = value & 0x01;
+   Pin106->Checked = value & 0x02;
+   Pin107->Checked = value & 0x04;
+   Pin108->Checked = value & 0x08;
+   Pin109->Checked = value & 0x10;
+   Pin110->Checked = value & 0x20;
+   Pin111->Checked = value & 0x40;
+   Pin112->Checked = value & 0x80;
+
+   l_Line10->Caption = "[0x" + IntToHex(value, 2) + "]";
 }
 //---------------------------------------------------------------------------
 

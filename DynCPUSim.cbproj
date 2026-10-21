@@ -212,12 +212,19 @@
             <DependentOn>Ram.h</DependentOn>
             <BuildOrder>2</BuildOrder>
         </CppCompile>
+        <CppCompile Include="Terminal.cpp">
+            <Form>f_Terminal</Form>
+            <FormType>dfm</FormType>
+            <DependentOn>Terminal.h</DependentOn>
+            <BuildOrder>8</BuildOrder>
+        </CppCompile>
         <FormResources Include="Memory.dfm"/>
         <FormResources Include="NodeCPU.dfm"/>
         <FormResources Include="Ram.dfm"/>
         <FormResources Include="GraphIO.dfm"/>
         <FormResources Include="GraphEdit.dfm"/>
         <FormResources Include="ErrorList.dfm"/>
+        <FormResources Include="Terminal.dfm"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -8,11 +8,12 @@
 #include <Vcl.StdCtrls.hpp>
 #include <Vcl.Forms.hpp>
 #include <ExtCtrls.hpp>
+#include <Vcl.ComCtrls.hpp>
 //---------------------------------------------------------------------------
 #include "NodeCPU.h"
 #include "Memory.h"
 #include "Ram.h"
-#include <Vcl.ComCtrls.hpp>
+#include "Terminal.h"
 //---------------------------------------------------------------------------
 class Tf_GraphIO : public TForm
 {
@@ -203,11 +204,16 @@ __published:
    void __fastcall Line4Click(TObject *Sender);
    void __fastcall Line5Click(TObject *Sender);
    void __fastcall FormShow(TObject *Sender);
+    void __fastcall Pin20Click(TObject *Sender);
+    void __fastcall Pin19Click(TObject *Sender);
+    void __fastcall Pin18Click(TObject *Sender);
 private:
    char BinToHex(bool p1, bool p2, bool p3, bool p4 );
 
 public:
    __fastcall Tf_GraphIO(TComponent* Owner);
+   void SetIO(char cmd, char value);
+
    bool DebugOutState;
 };
 //---------------------------------------------------------------------------

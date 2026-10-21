@@ -37,7 +37,8 @@ void __fastcall Tf_Terminal::FormPaint(TObject *Sender)
 
    for (int x = 0; x < 51; x++) {
       for (int y = 0; y < 20; y++) {
-         this->Canvas->TextOut(screenRect.left+(x*11)+12, screenRect.top+(y*18)+12, this->screenArray[x][y]);
+         this->Canvas->TextOut(screenRect.left+(x*11)+12, screenRect.top+(y*18)+12,
+                               static_cast<char>(this->screenArray[x][y]));
       }
    }
 
@@ -45,38 +46,50 @@ void __fastcall Tf_Terminal::FormPaint(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::tRefreshTimer(TObject *Sender)
 {
+   (void)Sender;
+
+   RefreshScreen();
+}
+//---------------------------------------------------------------------------
+void Tf_Terminal::RefreshScreen(void)
+{
    for (int x = 0; x < 51; x++) {
       for (int y = 0; y < 20; y++) {
-         this->screenArray[x][y] = "";
+         this->screenArray[x][y] = 0;//"";
       }
    }
 
+   String filter = f_Ram->cds_Ram->Filter;
+   f_Ram->cds_Ram->Filter = "Page>'FB'";
    f_Ram->cds_Ram->First();
+
    while (!f_Ram->cds_Ram->Eof) {
       int page = HexToInt(f_Ram->cds_RamPage->AsString) - 252;
       if (page >= 0) {
          int line = f_Ram->cds_RamLine->AsInteger - 1;
-         String value[8];
+         String valueHex[8];
 
-         value[0] = f_Ram->cds_RamField01->AsString;
-         value[1] = f_Ram->cds_RamField23->AsString;
-         value[2] = f_Ram->cds_RamField45->AsString;
-         value[3] = f_Ram->cds_RamField67->AsString;
-         value[4] = f_Ram->cds_RamField89->AsString;
-         value[5] = f_Ram->cds_RamFieldAB->AsString;
-         value[6] = f_Ram->cds_RamFieldCD->AsString;
-         value[7] = f_Ram->cds_RamFieldEF->AsString;
+         valueHex[0] = f_Ram->cds_RamField01->AsString;
+         valueHex[1] = f_Ram->cds_RamField23->AsString;
+         valueHex[2] = f_Ram->cds_RamField45->AsString;
+         valueHex[3] = f_Ram->cds_RamField67->AsString;
+         valueHex[4] = f_Ram->cds_RamField89->AsString;
+         valueHex[5] = f_Ram->cds_RamFieldAB->AsString;
+         valueHex[6] = f_Ram->cds_RamFieldCD->AsString;
+         valueHex[7] = f_Ram->cds_RamFieldEF->AsString;
 
          for (int i = 0; i < 8; i++) {
-            if (value[i] >= 32) {
-               int offset = (i*32) + line + (page * 5) ;
-               screenArray[offset%50][offset/50].SetLength(1);
-               screenArray[offset%50][offset/50][1] = static_cast<char>(HexToInt(value[i]));
+            int value = HexToInt(valueHex[i]);
+
+            if (value >= 32) {
+               int offset = (i*32) + line + (page * 256) - page;
+               screenArray[offset%51][offset/51] = value;
             }
          }
       }
       f_Ram->cds_Ram->Next();
    }
+   f_Ram->cds_Ram->Filter = filter;
 
    this->Invalidate();
 }
@@ -136,3 +149,58 @@ int Tf_Terminal::HexToInt(String Hex)
    return OutVal;
 }
 //---------------------------------------------------------------------------
+void Tf_Terminal::IOOut(String cmdHex, String valueHex)
+{
+   int cmd   = HexToInt(cmdHex);
+   int value = HexToInt(valueHex);
+
+   if (cmd == 0x01) {
+      switch (value) {
+         case 0x00 : this->RefreshScreen(); break;
+         case 0x01 : this->pBuzy->Color = clLime; break;
+         case 0x02 : this->pBuzy->Color = clRed; break;
+      }
+   }
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_Terminal::sbBootClick(TObject *Sender)
+{
+   (void)Sender;
+
+   f_GraphIO->Pin70->Checked = this->sbBoot->Down;
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_Terminal::sbHaltClick(TObject *Sender)
+{
+   (void)Sender;
+
+   f_GraphIO->Pin39->Checked = this->sbHalt->Down;
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_Terminal::FormCreate(TObject *Sender)
+{
+   (void)Sender;
+
+   this->sbBoot->Down = true;
+   this->sbHalt->Down = false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Terminal::FormKeyPress(TObject *Sender, System::WideChar &Key)
+{
+   (void)Sender;
+
+   if (Key >= 0x20 && Key <= 0x7E) {
+      this->lValue->Caption = "0x" + IntToHex(Key, 2) + " (" + Key + ")";
+      this->pInterrupt->Color = clYellow;
+
+      char value = Key;
+
+      f_GraphIO->SetIO(0x01, value);
+      f_GraphIO->Pin18->Checked = true;
+
+      Key = 0;
+   }
+}
+//---------------------------------------------------------------------------
+

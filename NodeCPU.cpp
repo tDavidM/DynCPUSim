@@ -2088,7 +2088,7 @@ void __fastcall Tf_CPUNode::b_ResetClick(TObject *Sender)
    this->ResetAllNode();
    this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
 
-   for (int i=0; i<=80; i++) {
+   for (int i=0; i<=128; i++) {
       CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(i));
       if (CurrPin != NULL) {
          CurrPin->Checked = false;
