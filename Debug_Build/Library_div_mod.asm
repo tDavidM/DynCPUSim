@@ -15,15 +15,18 @@
 ;:DIVMOD_STK_U
 
 
-
+; =============================================================================
 ;Divide by zero handling routine
 ;TBD !!!
+; =============================================================================
 :DIVMOD_DIVZERO_ERR     SET   0xFF,   $2              ; Init quotient
                         SET   0xFF,   $3              ; Init remainder
 
 
+; =============================================================================
 ;Divide $0 / $1 -> $2 reminder $3 (uses $4, $5, $6, $7, $8 )
 ;Inline, Unsigned
+; =============================================================================
 [DIVMOD_INL_U
                         SIFNZ $1                      ; Check for 0 as divisor
                         NOP                           ; Divide by 0 handling, TBD!
@@ -54,8 +57,10 @@
                         JMPA  :LSHT_DIVMOD_INL_U      ;
 ]
 
+; =============================================================================
 ;Divide $0 / $1 -> $2 reminder $3 , return $4$5 (uses $6, $7, $8, $9, $A )
 ;Jump, Unsigned
+; =============================================================================
 :DIVMOD_JMP_U           SIFNZ $1                      ; Check for 0 as divisor
                         NOP                           ; Divide by 0 handling, TBD!
                         SET   0x00,   $2              ; Init quotient
@@ -85,9 +90,10 @@
                         JMPA  :LSHT_DIVMOD_JMP_U      ;
                         WJMPR $4,     $5
 
-
+; =============================================================================
 ;Divide $0 / $1 -> $2 reminder $3 , return Stack HL (uses $4, $5, $6, $7, $8 )
 ;Jump, Unsigned
+; =============================================================================
 :DIVMOD_STK_U           SIFNZ $1                      ; Check for 0 as divisor
                         NOP                           ; Divide by 0 handling, TBD!
                         SET   0x00,   $2              ; Init quotient

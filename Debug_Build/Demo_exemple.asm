@@ -3,10 +3,13 @@
 ; TEST Demo Loading from ASM File, shows a file that can successfully be parsed
 ; Comment lines and blank lines are removed by the assembler
 
-;; Comment lines with a double semicolon at the start are kept, adding a NOP instruction (visible in the ROM inspector)
+;; Comment on empty lines with a double semicolon at the start are kept, adding a NOP instruction (visible in the ROM inspector)
 
 ; The first 24 columns are for labels only, followed by 1 space, then 5 fixed columns for the instructio/opcode followed by a final 1 space
 ; A second label can be set on the same line if a space is left between
+
+#DEFINE CONST 0x01                                         ; Constant may be define this way, with a simple NAME VALUE structure, nothing more, no param
+#DEFINE TARGET_REG $D                                      ; Register ID may be used as well, a simple replace will be done using the name when found 
 
 :PROGRAM_START :BEGIN   SET   0xFF,  $0                    ; Comments at the end of an instruction line are kept after import (visible in the ROM inspector)
                         ; Unlike instructions, comments don't have to follow a precise position (but it looks nicer when all alligned)
@@ -28,25 +31,25 @@
 
 :LOOP_START             INC   $3                            
                         SIF   $3 == "0x09"                 ; In addition to the list of symbols that are replaced by , the following ( ) " # @ ! are discarded entirely 
-                        JMPA  #:LOOP_START:                ; Those characters may be used for readablity, the only reserved chars are $ : / * 
-                        SET   0b00000000->$3               ; Beside hexadecimal values prefixed with 0x (non significant zeros are optional)
-                        SET   255->$3                      ; The prefix 0b followed by a binary value may be used, ss well as decimal values
+                        JMPA  #:LOOP_START                 ; Those characters may be used for readablity, the only reserved chars are $ : / * 
+                        SET   "0b00000000"->$3             ; Beside hexadecimal values prefixed with 0x (non significant zeros are optional)
+                        SET   (255)->$3                    ; The prefix 0b followed by a binary value may be used, ss well as decimal values
 
 ; ######################
 
-                        JMPA  :RELATIVE_JMP:               ; When used (inside an instruction), a single : mean relative address (8 bits)
+                        JMPA  :RELATIVE_JMP                ; When used (inside an instruction), a single : mean relative address (8 bits)
                         NOP                                ; Those are limited to +/- 127 instructions forward or backward between source and destination
 :RELATIVE_JMP           NOP                                ; Under the hood, 0x80 points to the next line following the current instruction
                         NOP                                ; The assembler will replace the previous call to :RELATIVE_JMP in JMPA with 0x81 to jump forward by 2
                         NOP                                ; However, from this very line, 0x7E would be used to jump back by 2 to :RELATIVE_JMP 
                                                            ; Relative tags are easier to use for short range jump
 
-                        SET   ::ABSOLUTE_JMP1:, $0         ; To jump to a location further away, an absolute address (16 bits) is required (called WideJump)
-                        SET   :*ABSOLUTE_JMP1:, $1         ; But it's length requires 2 parts (8 bits each), a High and a Low value, respectively accessed by :: and :*
+                        SET   :*ABSOLUTE_JMP1 , $0         ; To jump to a location further away, an absolute address (16 bits) is required (called WideJump)
+                        SET   :.ABSOLUTE_JMP1 , $1         ; But it's length requires 2 parts (8 bits each), a High and a Low value, respectively accessed by :* and :.
                         WJMPR $0, $1                       ; Using :: provides the most significant bits and :* the least significant bits of an absolute addr
                         NOP
                         NOP
-:ABSOLUTE_JMP1          WJMP  #::ABSOLUTE_JMP2:            ; If an instruction (exemple WJMP) takes a wider data portion (12 bits for WJMP), :: outputs the full 12 bits
+:ABSOLUTE_JMP1          WJMP  #:.ABSOLUTE_JMP2             ; If an instruction (exemple WJMP) takes a wider data portion (12 bits for WJMP), :. outputs the lower 12 bits
                         NOP
                         NOP
 :ABSOLUTE_JMP2          NOP
@@ -66,17 +69,17 @@
 [MACRO_TEST                                                ; The definition starts with [NAME and end with ] each on their own empty line     
                         SET   5, $2                        ; 
 :MACRO_LOOP             DSIZ  $2                           ; Labels inside a macro should not be called from outside as they get renamed at import (for when the same macro is used multiple times)
-                        JMPA  :MACRO_LOOP:                 ; Every time a macro is used, the labels receive the suffix _MACRO_* where * starts at zero and is incremented each time
+                        JMPA  :MACRO_LOOP                  ; Every time a macro is used, the labels receive the suffix _MACRO_* where * starts at zero and is incremented each time
                         NOP                                   
                         %MACRO_EXEMPLE                     ; Calling a different Macro within a definition is valid
-                        SET   0x1, $1  
+                        SET   :%CONST, $1                  ; Using a constant requires the :% prefix
 ]
 ; ==========================================================
 
-                        %TESTMACRO 		
-		                  SEQ   $1 == $D                     ; On that CPU, the 4 last registers are readonly, they always return fixed values 
+                        %MACRO_TEST    
+                        SEQ   :%TARGET_REG == $D           ; On that CPU, the 4 last registers are readonly, they always return fixed values 
                         HALT                               ; $C->0x00  $D->0x01  $E->0xFF  $F->0X80 (0x80 is == 0b10000000)
-                        JMPA  :PROGRAM_START:              ; Unless something is done, at the very last instruction the CPU loops back to the very first                      
+                        JMPA  :PROGRAM_START               ; Unless something is done, at the very last instruction the CPU loops back to the very first                      
                                                            ; Included files are simply concatenated at that location
                                                            ; Making the very first instruction something inside the included files in this exemple
                                                            

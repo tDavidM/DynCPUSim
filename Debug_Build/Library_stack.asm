@@ -26,11 +26,13 @@
 ;Jump macro, ErrCD 0x02
 ;[POP_JMP_RAM
 
+#DEFINE STACK_PNT $A
+
 
 ; =============================================================================
 ;Initialisation
 ; =============================================================================
-                        SET   0xFF,   $A         ; Init the stack pointer
+                        SET   0xFF, :%STACK_PNT  ; Init the stack pointer
 
 
 ; =============================================================================
@@ -54,15 +56,15 @@
 ;Inline macro, ErrCD 0x01
 ; =============================================================================
 [PUSH_INLN_RAM
-                        PUSH  $B                 ; Stash current RAM page
-                        SET   0x00, $B           ; Switch to RAM page zero
-                        SETR  @$A,  $9           ; Write user value at stack pointer addr
-                        SEQ   $A,   $F           ; Check if stack pointer at limit 0x80
-                        JMPA  :STACK_OK_PUSH     ; When ok
-                        %STACK_FULL_ERR          ; Call the error handling macro
-                        JMPA  :STACK_DONE_PUSH   ; Skip the decrement
-:STACK_OK_PUSH          DEC   $A                 ; Decrement stack pointer
-:STACK_DONE_PUSH        POP   $B                 ; Reset RAM page
+                        PUSH  :%RAM_PAGE                  ; Stash current RAM page
+                        SET   0x00,          :%RAM_PAGE   ; Switch to RAM page zero
+                        SETR  @:%STACK_PNT,  $9           ; Write user value at stack pointer addr
+                        SEQ   :%STACK_PNT,   $F           ; Check if stack pointer at limit 0x80
+                        JMPA  :STACK_OK_PUSH              ; When ok
+                        %STACK_FULL_ERR                   ; Call the error handling macro
+                        JMPA  :STACK_DONE_PUSH            ; Skip the decrement
+:STACK_OK_PUSH          DEC   :%STACK_PNT                 ; Decrement stack pointer
+:STACK_DONE_PUSH        POP   :%RAM_PAGE                  ; Reset RAM page
 ]
 
 ; =============================================================================
@@ -70,16 +72,16 @@
 ;Inline macro, ErrCD 0x02
 ; =============================================================================
 [POP_INLN_RAM
-                        PUSH  $B                 ; Stash current RAM page
-                        SET   0x00, $B           ; Switch to RAM page zero
-                        SETR  $A,   $9           ; Write user value at stack pointer addr
-                        SEQ   $A,   $C           ; Check if stack pointer at starting value 0xFF
-                        JMPA  :STACK_OK_POP      ; When ok
-                        %STACK_EMPTY_ERR         ; Call the error handling macro
-                        JMPA  :STACK_DONE_POP    ; Skip the decrement
-:STACK_OK_POP           INC   $A                 ; Increment stack pointer
-                        GETR  @$A,    $9         ; Read value at stack pointer
-:STACK_DONE_POP         POP   $B                 ; Reset RAM page
+                        PUSH  :%RAM_PAGE                 ; Stash current RAM page
+                        SET   0x00,          :%RAM_PAGE  ; Switch to RAM page zero
+                        SETR  :%STACK_PNT,   $9          ; Write user value at stack pointer addr
+                        SEQ   :%STACK_PNT,   $C          ; Check if stack pointer at starting value 0xFF
+                        JMPA  :STACK_OK_POP              ; When ok
+                        %STACK_EMPTY_ERR                 ; Call the error handling macro
+                        JMPA  :STACK_DONE_POP            ; Skip the decrement
+:STACK_OK_POP           INC   :%STACK_PNT                ; Increment stack pointer
+                        GETR  @:%STACK_PNT,  $9          ; Read value at stack pointer
+:STACK_DONE_POP         POP   :%RAM_PAGE                 ; Reset RAM page
 ]
 
 ; =============================================================================
@@ -103,10 +105,10 @@
 ;Jump macro, ErrCD 0x01
 ; =============================================================================
 [PUSH_JMP_RAM
-                        SET   ::PUSH_JMP_RAM_RETURN, $7 ; Set Return H value
-                        SET   :*PUSH_JMP_RAM_RETURN, $8 ; Set Return L value
-                        SET   ::PUSH_JMP_RAM, $6        ; Set target L value
-                        WJMPV $6, :*PUSH_JMP_RAM        ;
+                        SET   :*PUSH_JMP_RAM_RETURN, $7 ; Set Return H value
+                        SET   :.PUSH_JMP_RAM_RETURN, $8 ; Set Return L value
+                        SET   :*PUSH_JMP_RAM, $6        ; Set target L value
+                        WJMPV $6, :.PUSH_JMP_RAM        ;
 :PUSH_JMP_RAM_RETURN
 ]
 
@@ -115,10 +117,10 @@
 ;Jump macro, ErrCD 0x02
 ; =============================================================================
 [POP_JMP_RAM
-                        SET   ::POP_JMP_RAM_RETURN, $7 ; Set Return H value
-                        SET   :*POP_JMP_RAM_RETURN, $8 ; Set Return L value
-                        SET   ::POP_JMP_RAM, $6        ; Set target L value
-                        WJMPV $6, :*POP_JMP_RAM        ; 
+                        SET   :*POP_JMP_RAM_RETURN, $7 ; Set Return H value
+                        SET   :.POP_JMP_RAM_RETURN, $8 ; Set Return L value
+                        SET   :*POP_JMP_RAM, $6        ; Set target L value
+                        WJMPV $6, :.POP_JMP_RAM        ; 
 :POP_JMP_RAM_RETURN
 ]
 

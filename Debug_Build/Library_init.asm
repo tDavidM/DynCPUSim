@@ -1,4 +1,11 @@
 #INCLUDE "Library_interupt_error.asm"
 #INCLUDE "Library_stack.asm"
 
-                        SET   0x00,   $B         ; Init the RAM page
+#DEFINE RAM_PAGE $B
+
+                        SET   0x00, :%RAM_PAGE   ; Init the RAM page
+                        
+#DEFINE REG_FIXVAL_00 $C
+#DEFINE REG_FIXVAL_01 $D
+#DEFINE REG_FIXVAL_FF $E
+#DEFINE REG_FIXVAL_80 $F

@@ -24,6 +24,7 @@
 #define ERR_UNKNOWN_FILE "File not found: "
 #define ERR_REDEFINED_MACRO "Macro redefined: "
 #define ERR_REDEFINED_LABEL "Label redefined: "
+#define ERR_REDEFINED_CONST "Constant redefined: "
 #define ERR_NO_ENDTAG_MACRO "No end tag for macro: "
 #define ERR_UNKNOWN_MACRO "Unknown macro: "
 
@@ -32,6 +33,8 @@
 #define ERR_OPCODE_PARAM_MANY "Too many parameters: "
 #define ERR_OPCODE_PARAM_COUNT "Wrong parameter count for opcode: "
 
+#define ERR_UNKNOWN_CONST "Unknown constant: "
+#define ERR_OPCODE_PARAM_TYPE "Wrong parameter type: "
 #define ERR_UNKNOWN_LABEL "Unknown label: "
 #define ERR_ABS_ADDR_FAR "Absolute Addr Out of Range : "
 #define ERR_REL_ADDR_FAR "Relative Addr Out of Range : "
@@ -152,7 +155,7 @@ private:
    String DecToHex(String pDec, int pMax=4095);
    String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile);
 
-   void Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
+   void Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList *pConstList, TStringList* pErrorList, TStringList* pMetaASMFile);
    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, String* pIncludes, TStringList* pErrorList, TStringList* pMetaASMFile);
    void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
 

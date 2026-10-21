@@ -9,13 +9,13 @@
 ; =============================================================================
 ;Initialisation
 ; =============================================================================
-                        SINTH ::INTERUPT_HANDLING       ; Init the High bits of the Interupt handling routine
-                        SINTL :*INTERUPT_HANDLING       ; Init the Low bits of the Interupt handling routine
-                        SERRH ::ERROR_HANDLING          ; Init the High bits of the Error handling routine
-                        SERTL :*ERROR_HANDLING          ; Init the Low bits of the Error handling routine
+                        SINTH :*INTERUPT_HANDLING       ; Init the High bits of the Interupt handling routine
+                        SINTL :.INTERUPT_HANDLING       ; Init the Low bits of the Interupt handling routine
+                        SERRH :*ERROR_HANDLING          ; Init the High bits of the Error handling routine
+                        SERTL :.ERROR_HANDLING          ; Init the Low bits of the Error handling routine
 
-                        SET   ::INTERUPT_ERROR_DONE, $9 ; Skip over the Interupt and Error handling code
-                        WJMPV $9, :*INTERUPT_ERROR_DONE ;
+                        SET   :*INTERUPT_ERROR_DONE, $9 ; Skip over the Interupt and Error handling code
+                        WJMPV $9, :.INTERUPT_ERROR_DONE ;
 
 ; =============================================================================
 ;Interupt handling routine
@@ -25,7 +25,7 @@
                         
                         PUSH  $9                 ; Push that value in the CPU stack
                         NOP
-                        POP  $9                  ; Push that value in the CPU stack
+                        POP   $9                 ; Push that value in the CPU stack
                         
 :INTERUPT_HANDLING_DONE OKINT                    ; Enable interputs
                         RET                      ; Returns 
@@ -53,7 +53,7 @@
 :ERROR_UNHANDLED        HALT                       ; Call the adult in the room
                                              
 
-:ERROR_HANDLING_DONE    POP  $9                    ; Push that value in the CPU stack
+:ERROR_HANDLING_DONE    POP   $9                   ; Push that value in the CPU stack
                         GOBCK                      ; Return to the calling code
 
 

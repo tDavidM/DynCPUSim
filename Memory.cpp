@@ -1060,7 +1060,7 @@ void Tf_Memory::Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacro
 
             ASMFileInclude = new TStringList;
             ASMFileInclude->LoadFromFile(ExtractFilePath(this->od_Assembler->FileName) + Line);
-            *pIncludes = *pIncludes + Line + " ";
+            *pIncludes = *pIncludes + Line + " , ";
 
             //Once opened, insert every line from the included file at that location
             for (int j = 0; j<ASMFileInclude->Count ; j++) {
@@ -1197,7 +1197,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
    //Main loop, line Count will vary with Insert and Delete made here
    for (int i = 0; i<pASMFile->Count ; i++) {
       Line = pASMFile->Strings[i];
-      Line = Line.TrimRight();
+      Line = Line.Trim();
 
       //Looking for Macro call tag
       if (Line.SubString(1,1) == "%" ) {
@@ -1283,7 +1283,7 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
 }
 //---------------------------------------------------------------------------
 
-void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList* pErrorList, TStringList* pMetaASMFile)
+void Tf_Memory::Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList *pConstList, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
    int lineCount = 1;
 
@@ -1312,6 +1312,32 @@ void Tf_Memory::Parse4LabelAndBlank(TStringList *pASMFile, TStringList *pLabelLi
          i--;
          continue;
       }
+
+      //Looking for define tag
+      if (lineData.SubString(1, 8) == "#DEFINE " ) {
+         lineData = lineData.SubString(8, lineData.Length());
+         lineData = lineData.Trim();
+
+         String lineConst = lineData.SubString(1, lineData.Pos(" ")-1);
+         String lineValue = lineData.SubString(lineData.Pos(" "), lineData.Length());
+         lineValue = lineValue.Trim();
+
+         //Test if already defined
+         if (pConstList->IndexOfName(lineConst.UpperCase()) < 0) {
+            pConstList->Add(lineConst.UpperCase() + "=" + lineValue);
+
+            //remove the line with #define
+            pASMFile->Delete(i);
+            pMetaASMFile->Delete(i);
+            //As #define was remove, line at i must be scanned again
+            i--;
+         } else {
+            pErrorList->Add(ERR_REDEFINED_CONST + lineConst + pMetaASMFile->Strings[i]);
+            pASMFile->Strings[i] = ";" + pASMFile->Strings[i];
+         }
+         continue;
+      }
+
       String lineLabel;
 
       //Extract Label
@@ -1383,6 +1409,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    String DataHex , DataLineText, DataLineCode, includes;
    TStringList *ASMFile   = new TStringList;
    TStringList *LabelList = new TStringList;
+   TStringList *constList = new TStringList;
    TList* MacroList       = new TList;
    TStringList *MacroUsageCmp = new TStringList;
    TList* MacroLabelList  = new TList;
@@ -1390,6 +1417,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    TStringList *metaASMFile = new TStringList;
    
    LabelList->NameValueSeparator = '=';
+   constList->NameValueSeparator = '=';
    MacroUsageCmp->NameValueSeparator = '=';
 
    if (! this->od_Assembler->Execute()) {
@@ -1428,7 +1456,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    //Second pass, replace calls for macros, and rename labels inside macros
    this->Parse4MacroUsage(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, errorList, metaASMFile);
    //Third pass, remove empty or blank lines, comment lines and list labels
-   this->Parse4LabelAndBlank(ASMFile, LabelList, errorList, metaASMFile);
+   this->Parse4LabelConstBlank(ASMFile, LabelList, constList, errorList, metaASMFile);
 
    //Fourth pass, process instruction lines and any comments at the end of a line
    for (int i = 0; i<ASMFile->Count ; i++) {
@@ -1542,7 +1570,21 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
          lineParam[1] = "0";
          lineParam[2] = "0";
       }
-            
+
+      //Constants
+      for (int j=0; j<3; j++) {
+         if (lineParam[j].SubString(1, 2) == ":%") {
+   
+            String constantName = lineParam[j].SubString(3, lineParam[j].Length()-2);
+            String constantVal  = constList->Values[constantName];
+            if (constantVal == "") {
+               errorList->Add(ERR_UNKNOWN_CONST + constantName + metaASMFile->Strings[i]);
+               constantVal = "0";
+            }
+            lineParam[j] = constantVal;
+         }
+      }
+
       //Print readable line
       String instrucText = instruc->HeadMnemo + instruc->HeadSuffix;
       String instrucTextParam[3] = {"", "", ""};
@@ -1557,6 +1599,10 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                }
                instrucTextParam[2] = instruc->Param3Type + DataLineText + instruc->Param3Suffix;
             } else if (instruc->Param3Source != "") {
+               if (lineParam[2].SubString(1, 1) != "$") {
+                  errorList->Add(ERR_OPCODE_PARAM_TYPE + lineParam[2] + metaASMFile->Strings[i]);
+                  lineParam[2] = "$0";
+               }
                instrucTextParam[2] = instruc->Param3Type + lineParam[2].SubString(2,1) + instruc->Param3Suffix;
             }
 
@@ -1569,6 +1615,10 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                }
                instrucTextParam[1] = instruc->Param2Type + DataLineText + instruc->Param2Suffix;
             } else if (instruc->Param2Source != "") {
+               if (lineParam[1].SubString(1, 1) != "$") {
+                  errorList->Add(ERR_OPCODE_PARAM_TYPE + lineParam[1] + metaASMFile->Strings[i]);
+                  lineParam[1] = "$0";
+               }
                instrucTextParam[1] = instruc->Param2Type + lineParam[1].SubString(2,1) + instruc->Param2Suffix;
             }
 
@@ -1581,6 +1631,10 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
                }
                instrucTextParam[0] = instruc->Param1Type + DataLineText + instruc->Param1Suffix;
             } else if (instruc->Param1Source != "") {
+               if (lineParam[0].SubString(1, 1) != "$") {
+                  errorList->Add(ERR_OPCODE_PARAM_TYPE + lineParam[0] + metaASMFile->Strings[i]);
+                  lineParam[0] = "$0";
+               }
                instrucTextParam[0] = instruc->Param1Type + lineParam[0].SubString(2,1) + instruc->Param1Suffix;
             }
 
@@ -1597,7 +1651,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       if (instruc->BlockAFix) {
          instrucCode = instruc->BlockAVal;
       } else if (instruc->BlockASource == "Data") {
-         instrucCode = DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         instrucCode = DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, NULL, NULL);
          currParam++;
       } else if (instruc->BlockASource != "") {
          instrucCode = HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
@@ -1607,7 +1661,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       if (instruc->BlockBFix) {
          instrucCode = instrucCode + instruc->BlockBVal;
       } else if (instruc->BlockBSource == "Data") {
-         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, NULL, NULL);
          currParam++;
       } else if (instruc->BlockBSource != "") {
          instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
@@ -1617,7 +1671,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       if (instruc->BlockCFix) {
          instrucCode = instrucCode + instruc->BlockCVal;
       } else if (instruc->BlockCSource == "Data") {
-         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, NULL, NULL);
          currParam++;
       } else if (instruc->BlockCSource != "") {
          instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
@@ -1627,7 +1681,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       if (instruc->BlockDFix) {
          instrucCode = instrucCode + instruc->BlockDVal;
       } else if (instruc->BlockDSource == "Data") {
-         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, errorList, metaASMFile);
+         instrucCode = instrucCode + DataToBin(lineParam[currParam], instruc->DataWidth, LabelList, i, NULL, NULL);
          currParam++;
       } else if (instruc->BlockDSource != "") {
          instrucCode = instrucCode + HexToBin(lineParam[currParam].SubString(2, lineParam[currParam].Length()));
@@ -1704,17 +1758,29 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
    String DataIn, DataOut = "", Addr, lblName;
    int Delta;
 
-   if (pData.SubString(1,2) == "::") {
+   if (pData.SubString(1, 1) == '$') {
+      if (pErrorList != NULL) {
+         pErrorList->Add(ERR_OPCODE_PARAM_TYPE + pData + pMetaASMFile->Strings[pCurrLine]);
+      }
+      for (int i=1; i<=pSize; i++) {
+         DataOut = DataOut + 0;
+      }
+
+   } else if (pData.SubString(1, 2) == ":*") {
    //Absolute Addr (Higer bits)
-      lblName = pData.SubString(3,pData.Length()-3);
+      lblName = pData.SubString(3, pData.Length()-2);
       Addr = pLabelList->Values[lblName];
       if (Addr == "") {
-         pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         if (pErrorList != NULL) {
+            pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         }
          Addr = "0";
       }
 
       if (StrToInt(Addr) >= 65536 ) {
-         pErrorList->Add(ERR_ABS_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
+         if (pErrorList != NULL) {
+            pErrorList->Add(ERR_ABS_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
+         }
          Addr = "0";
       }
       Addr = DecToHex(Addr, 65535);
@@ -1724,20 +1790,24 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
          Addr = "0" + Addr;
       }
       for (int i=1; i<=pSize/4; i++) {
-         DataOut = DataOut + HexToBin(Addr.SubString(i,1));
+         DataOut = DataOut + HexToBin(Addr.SubString(i, 1));
       }
 
-   } else if (pData.SubString(1,2) == ":*") {
+   } else if (pData.SubString(1,2) == ":.") {
    //Absolute Addr (Lower bits)
-      lblName = pData.SubString(3,pData.Length()-3);
+      lblName = pData.SubString(3,pData.Length()-2);
       Addr = pLabelList->Values[lblName];
       if (Addr == "") {
-         pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         if (pErrorList != NULL) {
+            pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         }
          Addr = "0";
       }
 
       if (StrToInt(Addr) >= 65536 ) {
-         pErrorList->Add(ERR_ABS_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
+         if (pErrorList != NULL) {
+            pErrorList->Add(ERR_ABS_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
+         }
          Addr = "0";
       }
       Addr = DecToHex(Addr, 65535);
@@ -1747,15 +1817,17 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
          Addr = "0" + Addr;
       }
       for (int i=4; i>4-(pSize/4); i--) {
-         DataOut = HexToBin(Addr.SubString(i,1)) + DataOut;
+         DataOut = HexToBin(Addr.SubString(i, 1)) + DataOut;
       }
 
-   } else if (pData.SubString(1,1) == ":") {
+   } else if (pData.SubString(1, 1) == ":") {
    //Relative  Addr
       //Lookup
-      lblName = pData.SubString(2,pData.Length()-2);
+      lblName = pData.SubString(2, pData.Length()-1);
       if (pLabelList->Values[lblName] == "") {
-         pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         if (pErrorList != NULL) {
+            pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
+         }
          Delta = 0;
       } else {
          Delta = StrToInt(pLabelList->Values[lblName]) - pCurrLine - 1;
@@ -1773,12 +1845,13 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
             DataIn = "0" + DataIn;
          }
       } else {
-         pErrorList->Add(ERR_REL_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
+         if (pErrorList != NULL) {
+            pErrorList->Add(ERR_REL_ADDR_FAR + lblName + pMetaASMFile->Strings[pCurrLine]);
+         }
          DataIn = "80";
       }
-      DataOut = HexToBin(DataIn.SubString(1,1)) + HexToBin(DataIn.SubString(2,1));
-      
-   } else if (pData.SubString(1,2) == "0X") {
+      DataOut = HexToBin(DataIn.SubString(1, 1)) + HexToBin(DataIn.SubString(2,1));
+   } else if (pData.SubString(1, 2) == "0X") {
    //Hex Value
       DataIn = pData.SubString(3, pData.Length()); //,(pSize/4)-2);
       //Left Padding
@@ -1787,10 +1860,10 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
       }
       DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
       for (int i=1; i<=pSize/4; i++) {
-         DataOut = DataOut + HexToBin(DataIn.SubString(i,1));
+         DataOut = DataOut + HexToBin(DataIn.SubString(i, 1));
       }
 
-   } else if (pData.SubString(1,2) == "0B") {
+   } else if (pData.SubString(1, 2) == "0B") {
    //Binary Value
       DataOut = pData.SubString(3, pData.Length()); //,(pSize)-2);
       //Left Padding
@@ -1800,7 +1873,7 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
 
    } else {
    //Decimal Value
-      DataIn = pData.SubString(1,(pSize/4)+1);
+      DataIn = pData.SubString(1, (pSize/4)+1);
       DataIn = DecToHex(DataIn);
       //Left Padding
       while (DataIn.Length() < pSize/4) {
@@ -1808,7 +1881,7 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
       }
       DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
       for (int i=1; i<=pSize/4; i++) {
-         DataOut = DataOut + HexToBin(DataIn.SubString(i,1));
+         DataOut = DataOut + HexToBin(DataIn.SubString(i, 1));
       }
 
    }
