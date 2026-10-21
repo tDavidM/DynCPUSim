@@ -139,11 +139,14 @@ __published:
    void __fastcall FormShow(TObject *Sender);
    void __fastcall dbg_MemDrawColumnCell(TObject *Sender, const TRect &Rect, int DataCol,
           TColumn *Column, TGridDrawState State);
+    void __fastcall dbg_MemMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
+          TPoint &MousePos, bool &Handled);
 private:
    int LastDataType;
    int LastSelLine;
    int InstrucCmp;
    int ExecCmp;
+   int currentExecLine;
 
    TList* InstrucList;
 

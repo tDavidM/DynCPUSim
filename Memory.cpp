@@ -62,6 +62,7 @@ __fastcall Tf_Memory::Tf_Memory(TComponent* Owner)
     : TForm(Owner)
 {
    this->InstrucList = new TList;
+   this->currentExecLine = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::cb_OpCodeChange(TObject *Sender)
@@ -664,7 +665,6 @@ void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
 {
    (void)DataSet;
 
-   char Instruction[17];
    int Delta = this->cds_Mem->RecNo - this->LastSelLine;
 
    if (Delta < 128 && Delta > -128) {
@@ -679,26 +679,6 @@ void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
       this->l_AddrVal->Caption = "0x____";
    }
    this->LastSelLine = this->cds_Mem->RecNo;
-
-   strncpy(Instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
-   Instruction[16] = '\0';
-
-   f_GraphIO->Pin1->Checked  = Instruction[0]  != '0';
-   f_GraphIO->Pin2->Checked  = Instruction[1]  != '0';
-   f_GraphIO->Pin3->Checked  = Instruction[2]  != '0';
-   f_GraphIO->Pin4->Checked  = Instruction[3]  != '0';
-   f_GraphIO->Pin5->Checked  = Instruction[4]  != '0';
-   f_GraphIO->Pin6->Checked  = Instruction[5]  != '0';
-   f_GraphIO->Pin7->Checked  = Instruction[6]  != '0';
-   f_GraphIO->Pin8->Checked  = Instruction[7]  != '0';
-   f_GraphIO->Pin9->Checked  = Instruction[8]  != '0';
-   f_GraphIO->Pin10->Checked = Instruction[9]  != '0';
-   f_GraphIO->Pin11->Checked = Instruction[10] != '0';
-   f_GraphIO->Pin12->Checked = Instruction[11] != '0';
-   f_GraphIO->Pin13->Checked = Instruction[12] != '0';
-   f_GraphIO->Pin14->Checked = Instruction[13] != '0';
-   f_GraphIO->Pin15->Checked = Instruction[14] != '0';
-   f_GraphIO->Pin16->Checked = Instruction[15] != '0';
 }
 //---------------------------------------------------------------------------
 int Tf_Memory::DeltaToAddr(int Delta)
@@ -725,21 +705,32 @@ int Tf_Memory::DeltaToAddr(int Delta)
 //---------------------------------------------------------------------------
 void Tf_Memory::MoveAddrByDelta(int Delta)
 {
-   int Target = DeltaToAddr(Delta);
    this->cds_Mem->DisableControls();
    this->cds_Mem->First();
 
    if (this->cds_Mem->RecordCount > 1 ) {
+      int Target = this->currentExecLine;
       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target) {
          this->cds_Mem->Next();
       }
+
+      Target = DeltaToAddr(Delta);
+      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target) {
+         this->cds_Mem->Next();
+      }
+      this->currentExecLine = Target;
    }
 
-   TByteDynArray Location = cds_Mem->GetBookmark();
+   /*TByteDynArray Location = cds_Mem->GetBookmark();
    if (cds_Mem->BookmarkValid(Location)) {
       cds_Mem->GotoBookmark(Location);
    }
-   cds_Mem->FreeBookmark(Location);
+   cds_Mem->FreeBookmark(Location);*/
+
+   char instruction[17];
+   strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
+   instruction[16] = '\0';
+   f_GraphIO->SetInstruction(instruction);
 
    this->cds_Mem->EnableControls();
    this->ExecCmp++;
@@ -762,13 +753,19 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
       while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr) {
          this->cds_Mem->Next();
       }
+      this->currentExecLine = Addr;
    }
 
-   TByteDynArray Location = cds_Mem->GetBookmark();
+   /*TByteDynArray Location = cds_Mem->GetBookmark();
    if (cds_Mem->BookmarkValid(Location)) {
       cds_Mem->GotoBookmark(Location);
    }
-   cds_Mem->FreeBookmark(Location);
+   cds_Mem->FreeBookmark(Location);*/
+
+   char instruction[17];
+   strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
+   instruction[16] = '\0';
+   f_GraphIO->SetInstruction(instruction);
 
    this->cds_Mem->EnableControls();
    this->ExecCmp++;
@@ -1252,14 +1249,14 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                      LineLbl = StringReplace(LineLbl, ":" + LocalLabelList->Strings[k] + " ",
                                           ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
                                           TReplaceFlags() << rfReplaceAll );
-                     LineData = StringReplace(LineData, ":" + LocalLabelList->Strings[k] + ":",
-                                          ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                     LineData = StringReplace(LineData, ":" + LocalLabelList->Strings[k] + " ",
+                                          ":" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
                                           TReplaceFlags() << rfReplaceAll );
-                     LineData = StringReplace(LineData, "::" + LocalLabelList->Strings[k] + ":",
-                                          "::" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                     LineData = StringReplace(LineData, "::" + LocalLabelList->Strings[k] + " ",
+                                          "::" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
                                           TReplaceFlags() << rfReplaceAll );
-                     LineData = StringReplace(LineData, ":*" + LocalLabelList->Strings[k] + ":",
-                                          ":*" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + ":",
+                     LineData = StringReplace(LineData, ":*" + LocalLabelList->Strings[k] + " ",
+                                          ":*" + LocalLabelList->Strings[k] + "_MACRO_" + pMacroUsageCmp->Values[MacroName] + " ",
                                           TReplaceFlags() << rfReplaceAll );
                   }
                   //Rewrite them with the / separator instead of the fix 24 char as renaming may have make them longer than 24 char
@@ -1425,7 +1422,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    }
 
    this->b_Clear->Click();
-   this->b_Delete->Click();
+   this->cds_Mem->Delete();
 
    this->b_Add->Enabled    = false;
    this->b_Insert->Enabled = false;
@@ -1967,6 +1964,23 @@ void __fastcall Tf_Memory::FormShow(TObject *Sender)
 
    this->Left = Screen->Width - (this->Width + 5);
    this->Top = Screen->Height - (this->Height + 50);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Memory::dbg_MemMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
+          TPoint &MousePos, bool &Handled)
+{
+   Handled = true;
+
+   if (WheelDelta > 0) {
+      if (!cds_Mem->Bof) {
+         cds_Mem->Prior();
+      }
+   } else {
+      if (!cds_Mem->Eof) {
+         cds_Mem->Next();
+      }
+   }
 }
 //---------------------------------------------------------------------------
 

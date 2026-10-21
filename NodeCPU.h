@@ -178,6 +178,7 @@ __published:
    void __fastcall cb_AnnotationMouseMove(TObject *Sender, TShiftState Shift, int X,
           int Y);
    void __fastcall cb_ActiveDrawClick(TObject *Sender);
+    void __fastcall FormShow(TObject *Sender);
 
 private:
     void __fastcall AppMessage(TMsg& PassedMsg, bool& Handled);

@@ -20,6 +20,7 @@ object f_CPUNode: Tf_CPUNode
   OnMouseMove = FormMouseMove
   OnMouseWheel = FormMouseWheel
   OnPaint = FormPaint
+  OnShow = FormShow
   DesignSize = (
     1693
     937)

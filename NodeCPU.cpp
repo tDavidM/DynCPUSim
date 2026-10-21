@@ -2182,7 +2182,10 @@ void __fastcall Tf_CPUNode::cb_ActiveDrawClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
-
-
+void __fastcall Tf_CPUNode::FormShow(TObject *Sender)
+{
+   this->b_Init->Click();
+   this->b_Start->Click();
+}
+//---------------------------------------------------------------------------
 

@@ -57,4 +57,4 @@
                         GOBCK                      ; Return to the calling code
 
 
-:INTERRUPT_ERROR_DONE    
+:INTERRUPT_ERROR_END    

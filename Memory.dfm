@@ -254,6 +254,7 @@ object f_Memory: Tf_Memory
     Anchors = [akLeft, akTop, akRight, akBottom]
     DataSource = ds_Mem
     Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+    ReadOnly = True
     TabOrder = 11
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
@@ -262,6 +263,7 @@ object f_Memory: Tf_Memory
     TitleFont.Style = []
     OnDrawColumnCell = dbg_MemDrawColumnCell
     OnDblClick = dbg_MemDblClick
+    OnMouseWheel = dbg_MemMouseWheel
   end
   object e_Sort: TEdit
     Left = 161

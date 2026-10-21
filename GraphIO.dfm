@@ -654,7 +654,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '52'
       TabOrder = 17
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin51: TCheckBox
       Left = 19
@@ -663,7 +663,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '51'
       TabOrder = 16
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin53: TCheckBox
       Left = 107
@@ -672,7 +672,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '53'
       TabOrder = 18
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin54: TCheckBox
       Left = 148
@@ -681,7 +681,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '54'
       TabOrder = 19
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin55: TCheckBox
       Left = 195
@@ -690,7 +690,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '55'
       TabOrder = 20
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin56: TCheckBox
       Left = 239
@@ -699,7 +699,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '56'
       TabOrder = 21
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin57: TCheckBox
       Left = 283
@@ -708,7 +708,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '57'
       TabOrder = 22
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin58: TCheckBox
       Left = 324
@@ -717,7 +717,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '58'
       TabOrder = 23
-      OnClick = Line12Click
+      OnClick = Line5Click
     end
     object Pin71: TCheckBox
       Left = 19
@@ -807,7 +807,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '89'
       TabOrder = 33
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin82: TCheckBox
       Left = 63
@@ -816,7 +816,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '82'
       TabOrder = 34
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin90: TCheckBox
       Left = 63
@@ -825,7 +825,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '90'
       TabOrder = 35
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin83: TCheckBox
       Left = 107
@@ -834,7 +834,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '83'
       TabOrder = 36
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin91: TCheckBox
       Left = 107
@@ -843,7 +843,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '91'
       TabOrder = 37
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin84: TCheckBox
       Left = 151
@@ -852,7 +852,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '84'
       TabOrder = 38
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin92: TCheckBox
       Left = 151
@@ -861,7 +861,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '92'
       TabOrder = 39
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin85: TCheckBox
       Left = 195
@@ -870,7 +870,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '85'
       TabOrder = 40
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin93: TCheckBox
       Left = 195
@@ -879,7 +879,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '93'
       TabOrder = 41
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin86: TCheckBox
       Left = 239
@@ -888,7 +888,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '86'
       TabOrder = 42
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin94: TCheckBox
       Left = 239
@@ -897,7 +897,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '94'
       TabOrder = 43
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin87: TCheckBox
       Left = 283
@@ -906,7 +906,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '87'
       TabOrder = 44
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin95: TCheckBox
       Left = 283
@@ -915,7 +915,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '95'
       TabOrder = 45
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin88: TCheckBox
       Left = 327
@@ -924,7 +924,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '88'
       TabOrder = 46
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
     object Pin96: TCheckBox
       Left = 327
@@ -933,7 +933,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '96'
       TabOrder = 47
-      OnClick = Line1Click
+      OnClick = Line8Click
     end
   end
   object p_Misc: TPanel

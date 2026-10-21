@@ -61,7 +61,7 @@
                         SETR  @:%STACK_PNT,  $9           ; Write user value at stack pointer addr
                         SEQ   :%STACK_PNT,   $F           ; Check if stack pointer at limit 0x80
                         JMPA  :STACK_OK_PUSH              ; When ok
-                        %STACK_FULL_ERR                   ; Call the error handling macro
+%STACK_FULL_ERR                                           ; Call the error handling macro
                         JMPA  :STACK_DONE_PUSH            ; Skip the decrement
 :STACK_OK_PUSH          DEC   :%STACK_PNT                 ; Decrement stack pointer
 :STACK_DONE_PUSH        POP   :%RAM_PAGE                  ; Reset RAM page
@@ -77,7 +77,7 @@
                         SETR  :%STACK_PNT,   $9          ; Write user value at stack pointer addr
                         SEQ   :%STACK_PNT,   $C          ; Check if stack pointer at starting value 0xFF
                         JMPA  :STACK_OK_POP              ; When ok
-                        %STACK_EMPTY_ERR                 ; Call the error handling macro
+%STACK_EMPTY_ERR                                         ; Call the error handling macro
                         JMPA  :STACK_DONE_POP            ; Skip the decrement
 :STACK_OK_POP           INC   :%STACK_PNT                ; Increment stack pointer
                         GETR  @:%STACK_PNT,  $9          ; Read value at stack pointer

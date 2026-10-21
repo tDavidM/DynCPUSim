@@ -99,6 +99,10 @@ int Tf_Terminal::HexToInt(String Hex)
    String HexHigh = "";
    int OutVal;
 
+   if (Hex.Length() < 1) {
+      return 0;
+   }
+
    if (Hex.Length() > 1) {
       HexHigh = Hex.SubString(1, 1);
       Hex     = Hex.SubString(2, 1);

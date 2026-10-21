@@ -61,7 +61,7 @@
 ]
 ; ==========================================================
 
-                        %MACRO_TEST                        ; Macro can be called before or after the definition but NOT within it's own definition (no recursion)
+%MACRO_TEST                                                ; Macro can be called before or after the definition but NOT within it's own definition (no recursion)
                         NOP                                ; Calling one takes the same place as an instruction, the code will be inserted inline
                         NOP                                ; Labels and Macros cannot be redefined, names must be unique
 
@@ -71,12 +71,12 @@
 :MACRO_LOOP             DSIZ  $2                           ; Labels inside a macro should not be called from outside as they get renamed at import (for when the same macro is used multiple times)
                         JMPA  :MACRO_LOOP                  ; Every time a macro is used, the labels receive the suffix _MACRO_* where * starts at zero and is incremented each time
                         NOP                                   
-                        %MACRO_EXEMPLE                     ; Calling a different Macro within a definition is valid
+%MACRO_EXEMPLE                                             ; Calling a different Macro within a definition is valid
                         SET   :%CONST, $1                  ; Using a constant requires the :% prefix
 ]
 ; ==========================================================
 
-                        %MACRO_TEST    
+%MACRO_TEST                            
                         SEQ   :%TARGET_REG == $D           ; On that CPU, the 4 last registers are readonly, they always return fixed values 
                         HALT                               ; $C->0x00  $D->0x01  $E->0xFF  $F->0X80 (0x80 is == 0b10000000)
                         JMPA  :PROGRAM_START               ; Unless something is done, at the very last instruction the CPU loops back to the very first                      

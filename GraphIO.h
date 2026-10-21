@@ -213,6 +213,7 @@ private:
 public:
    __fastcall Tf_GraphIO(TComponent* Owner);
    void SetIO(char cmd, char value);
+   void SetInstruction(char* instruction);
 
    bool DebugOutState;
 };
