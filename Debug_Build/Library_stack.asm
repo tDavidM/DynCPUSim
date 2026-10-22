@@ -33,7 +33,7 @@
 ;Initialisation
 ; =============================================================================
                         SET   0xFF, :%STACK_PNT  ; Init the stack pointer
-
+                        JMPA  :STACK_LIB_END     ; Jump over the definition
 
 ; =============================================================================
 ;Stack full error handling routine
@@ -124,3 +124,4 @@
 :POP_JMP_RAM_RETURN
 ]
 
+:STACK_LIB_END

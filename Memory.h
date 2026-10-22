@@ -167,6 +167,7 @@ public:
    void MoveAddrByDelta(int Delta);
    void MoveAddrByAbsolute(int Addr);
    void LoadInstructionSet(_di_IXMLNode pInstructionSet);
+   void ResetState(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Memory *f_Memory;

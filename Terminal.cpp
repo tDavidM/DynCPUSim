@@ -171,7 +171,14 @@ void __fastcall Tf_Terminal::sbBootClick(TObject *Sender)
 {
    (void)Sender;
 
-   f_GraphIO->Pin70->Checked = this->sbBoot->Down;
+   if (this->sbBoot->Down) {
+      f_GraphIO->Pin70->Checked = true;
+      this->sbBoot->Caption = "Reset";
+   } else {
+      f_GraphIO->Pin70->Checked = false;
+      this->sbBoot->Caption = "Boot";
+      f_CPUNode->b_Reset->Click();
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::sbHaltClick(TObject *Sender)
@@ -186,6 +193,7 @@ void __fastcall Tf_Terminal::FormCreate(TObject *Sender)
    (void)Sender;
 
    this->sbBoot->Down = true;
+   this->sbBoot->Caption = "Reset";
    this->sbHalt->Down = false;
 }
 //---------------------------------------------------------------------------

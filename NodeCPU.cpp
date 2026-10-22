@@ -2082,9 +2082,9 @@ void __fastcall Tf_CPUNode::b_ResetClick(TObject *Sender)
    TCheckBox * CurrPin;
 
    f_GraphIO->DebugOutState = false;
-   f_Memory->dbg_Mem->Color = clWindow;
+   f_Memory->ResetState();
+   f_Ram->ResetState();
 
-   f_Memory->cds_Mem->First();
    this->ResetAllNode();
    this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
 

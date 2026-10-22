@@ -793,4 +793,41 @@ void __fastcall Tf_Ram::FormShow(TObject *Sender)
    this->Top = 5;
 }
 //---------------------------------------------------------------------------
+void Tf_Ram::ResetState(void)
+{
+   this->cds_Ram->Filter = "";
+   this->cds_Ram->First();
+   while (!this->cds_Ram->Eof) {
+      this->cds_Ram->Edit();
+      cds_RamField01->AsString = "00";
+      cds_RamField23->AsString = "00";
+      cds_RamField45->AsString = "00";
+      cds_RamField67->AsString = "00";
+      cds_RamField89->AsString = "00";
+      cds_RamFieldAB->AsString = "00";
+      cds_RamFieldCD->AsString = "00";
+      cds_RamFieldEF->AsString = "00";
+      this->cds_Ram->Post();
+      this->cds_Ram->Next();
+   }
+   this->cds_Ram->Filter = "Page='00'";
+
+   this->b_ClearP->Click();
+   this->LastDataType = 2;
+   this->rb_Hex->Checked = true;
+
+   this->LastX = -1;
+   this->LastY = -1;
+
+   this->CurrentPage = "00";
+   this->e_Page->Text = this->CurrentPage;
+   f_Ram->Caption = "RAM page: 0x" + this->CurrentPage;
+
+   for (int i=1; i<=32; i++) {
+      for (int j=1; j<=8; j++) {
+         this->sg_Ram->Cells[j][i] = "00";
+      }
+   }
+}
+//---------------------------------------------------------------------------
 

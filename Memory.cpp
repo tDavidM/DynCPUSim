@@ -424,6 +424,7 @@ void __fastcall Tf_Memory::FormCreate(TObject *Sender)
    //this->b_Add->Click();
 
    this->ExecCmp = 0;
+   this->currentExecLine = 0;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::FormCloseQuery(TObject *Sender, bool &CanClose)
@@ -1933,7 +1934,14 @@ void __fastcall Tf_Memory::dbg_MemDrawColumnCell(TObject *Sender, const TRect &R
 
    if (Column->FieldName == "Address" || Column->FieldName == "AddrHex") {
       if (this->cds_MemBreakPoint->AsBoolean) {
-         dbg_Mem->Canvas->Brush->Color = clRed;
+         if (this->cds_MemAddress->AsInteger == currentExecLine) {
+            dbg_Mem->Canvas->Brush->Color = clYellow;
+         } else {
+            dbg_Mem->Canvas->Brush->Color = clRed;
+         }
+         dbg_Mem->DefaultDrawColumnCell(Rect, DataCol, Column, State);
+      } else if (this->cds_MemAddress->AsInteger == currentExecLine) {
+         dbg_Mem->Canvas->Brush->Color = clLime;
          dbg_Mem->DefaultDrawColumnCell(Rect, DataCol, Column, State);
       }
    }
@@ -1970,7 +1978,7 @@ void __fastcall Tf_Memory::FormShow(TObject *Sender)
 void __fastcall Tf_Memory::dbg_MemMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
           TPoint &MousePos, bool &Handled)
 {
-   Handled = true;
+   /*Handled = true;
 
    if (WheelDelta > 0) {
       if (!cds_Mem->Bof) {
@@ -1980,7 +1988,18 @@ void __fastcall Tf_Memory::dbg_MemMouseWheel(TObject *Sender, TShiftState Shift,
       if (!cds_Mem->Eof) {
          cds_Mem->Next();
       }
-   }
+   } */
 }
+//---------------------------------------------------------------------------
+void Tf_Memory::ResetState(void)
+{
+   this->dbg_Mem->Color = clWindow;
+   this->cds_Mem->First();
+   this->currentExecLine = 0;
+   this->LastDataType = 2;
+   this->LastSelLine = 0;
+   this->ExecCmp = 0;
+}
+
 //---------------------------------------------------------------------------
 

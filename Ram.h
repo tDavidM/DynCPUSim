@@ -73,6 +73,7 @@ private:
 public:
    void Set(String Addr, String Value, String Page = '0');
    void Get(String Addr, char *Value, String Page = '0');
+   void ResetState(void);
    __fastcall Tf_Ram(TComponent* Owner);
 };
 //---------------------------------------------------------------------------
