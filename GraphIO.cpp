@@ -35,6 +35,7 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
    } else {
       f_Ram->ResetState();
       f_Memory->ResetState();
+      f_Terminal->ResetState();
 
       TCheckBox * CurrPin;
 
@@ -47,7 +48,6 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
 
       f_Terminal->sbBoot->Down = false;
       f_Terminal->sbBoot->Caption = "Boot";
-      f_Terminal->RefreshScreen();
       f_CPUNode->b_Reset->Caption = "Boot";
 
       DebugOutState = false;
@@ -440,13 +440,15 @@ void __fastcall Tf_GraphIO::Pin20Click(TObject *Sender)
       c2 = BinToHex(Pin125->Checked, Pin126->Checked, Pin127->Checked, Pin128->Checked);
       String value = c2 + c1;
 
-      f_Terminal->IOOut(cmd, value);
+      f_Terminal->IOProcess(cmd, value);
    }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall Tf_GraphIO::Pin19Click(TObject *Sender)
 {
+   (void)Sender;
+
    this->Pin18->Checked = false;
    f_Terminal->pInterrupt->Color = clGray;
    //f_Terminal->lValue->Caption = "0x00 ( )";
@@ -455,11 +457,13 @@ void __fastcall Tf_GraphIO::Pin19Click(TObject *Sender)
 
 void __fastcall Tf_GraphIO::Pin18Click(TObject *Sender)
 {
+   (void)Sender;
+
    f_Terminal->pInterrupt->Color = clYellow;
 }
 //---------------------------------------------------------------------------
 
-void Tf_GraphIO::SetIO(char cmd, char value)
+void Tf_GraphIO::SetIO(char cmd, char value, bool interrupt)
 {
    //97-104
    Pin97->Checked  = cmd & 0x01;
@@ -484,6 +488,20 @@ void Tf_GraphIO::SetIO(char cmd, char value)
    Pin112->Checked = value & 0x80;
 
    l_Line10->Caption = "[0x" + IntToHex(value, 2) + "]";
+
+   if (interrupt) {
+      f_GraphIO->Pin18->Checked = true;
+   }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_GraphIO::Pin80Click(TObject *Sender)
+{
+   (void)Sender;
+
+   if (this->Pin80->Checked) {
+      f_Terminal->ClockTick();
+   }
 }
 //---------------------------------------------------------------------------
 

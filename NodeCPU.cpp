@@ -465,6 +465,7 @@ void __fastcall Tf_CPUNode::b_InitClick(TObject *Sender)
       }
    }
 
+   this->p_DrawCmp->Hint = IntToStr(LinkCount);
    this->pgLoading->Position = 0;
    this->CallDrawArea(REFRESH_BUFFER);
 }
@@ -835,7 +836,6 @@ void Tf_CPUNode::CallDrawArea(int pMode)
    //t_DrawMulti1Timer(this);
    //t_DrawMulti2Timer(this);
    //t_DrawMulti3Timer(this);
-   //this->DrawArea(0);
    this->p_DrawCmp->Caption = "Draw: " + IntToStr(DrawCmpItem) + " - " + IntToStr(DrawCmpLine);
 
    if (pMode == 1) {
@@ -860,6 +860,8 @@ void Tf_CPUNode::CallDrawArea(int pMode)
 
 void Tf_CPUNode::DrawBuffer(int NbDraw)
 {
+   (void)NbDraw;
+
    TNode* NodeCurr;
    TNode* NodeUp;
    TNode* NodeDown;
@@ -1131,12 +1133,6 @@ void Tf_CPUNode::DoDrawAllAnnotation(void)
    }
 
 }
-
-//---------------------------------------------------------------------------
-void Tf_CPUNode::DrawArea(int NbDraw)
-{
-
-}
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::b_StepClick(TObject *Sender)
 {
@@ -1156,7 +1152,7 @@ void Tf_CPUNode::UpdateNode(void)
    NodeSelect->Name = f_GraphEdit->e_Name->Text;
    NodeSelect->X = StrToInt(f_GraphEdit->e_PosX->Text);
    NodeSelect->Y = StrToInt(f_GraphEdit->e_PosY->Text);
-   NodeSelect->SetType(f_GraphEdit->cb_Type->ItemIndex);
+   NodeSelect->SetType(static_cast<NodeTypes>(f_GraphEdit->cb_Type->ItemIndex));
    NodeSelect->NameOutUp   = f_GraphEdit->e_NameOutUp->Text;
    NodeSelect->NameOutDown = f_GraphEdit->e_NameOutDown->Text;
 
@@ -1266,7 +1262,7 @@ void __fastcall Tf_CPUNode::b_OrClick(TObject *Sender)
    this->b_XOr->Font->Style  = this->b_XOr->Font->Style  >> fsBold;
    this->b_Not->Font->Style  = this->b_Not->Font->Style  >> fsBold;
 
-   this->NodeType = SelType->Tag;
+   this->NodeType = static_cast<NodeTypes>(SelType->Tag);
    SelType->Font->Style = SelType->Font->Style << fsBold;
 }
 //---------------------------------------------------------------------------
@@ -2173,6 +2169,8 @@ void __fastcall Tf_CPUNode::cb_ActiveDrawClick(TObject *Sender)
 
 void __fastcall Tf_CPUNode::FormShow(TObject *Sender)
 {
+   (void)Sender;
+
    this->b_Init->Click();
    this->b_Start->Click();
 }

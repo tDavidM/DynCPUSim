@@ -1028,6 +1028,7 @@ object f_GraphIO: Tf_GraphIO
       Height = 17
       Caption = '80 (Clock Out)'
       TabOrder = 7
+      OnClick = Pin80Click
     end
     object Pin19: TCheckBox
       Left = 154

@@ -24,22 +24,28 @@ __published:
    TPanel *pBuzy;
    TPanel *pInterrupt;
    TLabel *lValue;
+    TPanel *pDebug;
+    TLabel *lTimer;
    void __fastcall FormPaint(TObject *Sender);
    void __fastcall tRefreshTimer(TObject *Sender);
    void __fastcall sbBootClick(TObject *Sender);
    void __fastcall FormCreate(TObject *Sender);
    void __fastcall sbHaltClick(TObject *Sender);
    void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
+    void __fastcall pDebugClick(TObject *Sender);
 private:
-
-
+   int timerValue;
+   int timerCmp;
+   int clockCmp;
    int screenArray[51][20];
    int HexToInt(String Hex);
 public:
    __fastcall Tf_Terminal(TComponent* Owner);
 
-   void IOOut(String cmdHex, String valueHex);
+   void IOProcess(String cmdHex, String valueHex);
+   void ClockTick(void);
    void RefreshScreen(void);
+   void ResetState(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Terminal *f_Terminal;

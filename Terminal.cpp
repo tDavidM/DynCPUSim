@@ -20,6 +20,19 @@ __fastcall Tf_Terminal::Tf_Terminal(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_Terminal::FormCreate(TObject *Sender)
+{
+   (void)Sender;
+
+   this->sbBoot->Down = true;
+   this->sbBoot->Caption = "Reset";
+   this->sbHalt->Down = false;
+
+   this->timerValue = 0;
+   this->timerCmp = 0;
+   this->clockCmp = 0;
+}
+//---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::FormPaint(TObject *Sender)
 {
    (void)Sender;
@@ -41,7 +54,6 @@ void __fastcall Tf_Terminal::FormPaint(TObject *Sender)
                                static_cast<char>(this->screenArray[x][y]));
       }
    }
-
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::tRefreshTimer(TObject *Sender)
@@ -153,18 +165,65 @@ int Tf_Terminal::HexToInt(String Hex)
    return OutVal;
 }
 //---------------------------------------------------------------------------
-void Tf_Terminal::IOOut(String cmdHex, String valueHex)
+void Tf_Terminal::IOProcess(String cmdHex, String valueHex)
 {
    int cmd   = HexToInt(cmdHex);
    int value = HexToInt(valueHex);
 
-   if (cmd == 0x01) {
-      switch (value) {
-         case 0x00 : this->RefreshScreen(); break;
-         case 0x01 : this->pBuzy->Color = clLime; break;
-         case 0x02 : this->pBuzy->Color = clRed; break;
+   switch (cmd) {
+      case 0x01 : // Output/User Display
+         switch (value) {
+            case 0x00 : this->RefreshScreen(); // Screen Buffer Ready
+               break;
+            case 0x01 : this->pBuzy->Color = clLime; // Set Busy Indicator
+               break;
+            case 0x02 : this->pBuzy->Color = clRed;  // Clear Busy Indicator
+               break;
+         } break;
+      case 0x02 : // Request Input
+         switch (value) {
+            case 0x01 : f_GraphIO->SetIO(0x01, HexToInt(this->lValue->Caption.SubString(3, 2)), true); // Get Last Key
+               break;
+            case 0x02 : f_GraphIO->SetIO(0x02, this->clockCmp/256, true); // Get Clock Coarse Value
+               break;
+         } break;
+      case 0x03 : this->pDebug->Caption = "0x" + valueHex; // Display Debug Value
+                  this->pDebug->Color = clYellow;
+         break;
+      case 0x04 : this->timerValue = value * 256; // Set Timer
+                  this->timerCmp = this->timerValue;
+         break;
+   }
+}
+//---------------------------------------------------------------------------
+void Tf_Terminal::ClockTick(void)
+{
+   if (this->clockCmp == 65536) {
+      this->clockCmp = 0;
+   } else {
+      this->clockCmp++;
+   }
+
+   if (this->timerValue != 0) {
+      if (this->timerCmp == 0) {
+         this->timerCmp = timerValue;
+         f_GraphIO->SetIO(0x00, this->clockCmp/256, true);
+      } else {
+         this->timerCmp--;
       }
    }
+
+   this->Caption = "Terminal ( " + IntToStr(this->clockCmp) + " )";
+   this->lTimer->Caption = "(" + IntToStr(this->timerCmp/256) + ")";
+}
+//---------------------------------------------------------------------------
+void Tf_Terminal::ResetState(void)
+{
+   this->timerValue = 0;
+   this->timerCmp = 0;
+   this->clockCmp = 0;
+
+   f_Terminal->RefreshScreen();
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::sbBootClick(TObject *Sender)
@@ -185,16 +244,6 @@ void __fastcall Tf_Terminal::sbHaltClick(TObject *Sender)
    f_GraphIO->Pin39->Checked = this->sbHalt->Down;
 }
 //---------------------------------------------------------------------------
-void __fastcall Tf_Terminal::FormCreate(TObject *Sender)
-{
-   (void)Sender;
-
-   this->sbBoot->Down = true;
-   this->sbBoot->Caption = "Reset";
-   this->sbHalt->Down = false;
-}
-//---------------------------------------------------------------------------
-
 void __fastcall Tf_Terminal::FormKeyPress(TObject *Sender, System::WideChar &Key)
 {
    (void)Sender;
@@ -205,11 +254,19 @@ void __fastcall Tf_Terminal::FormKeyPress(TObject *Sender, System::WideChar &Key
 
       char value = Key;
 
-      f_GraphIO->SetIO(0x01, value);
-      f_GraphIO->Pin18->Checked = true;
+      f_GraphIO->SetIO(0x01, value, true);
 
       Key = 0;
    }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Terminal::pDebugClick(TObject *Sender)
+{
+   (void)Sender;
+
+   this->pDebug->Color = clGray;
+   this->pDebug->Caption = "Debug";
 }
 //---------------------------------------------------------------------------
 

@@ -214,7 +214,6 @@ private:
     void ReadInput(void);
     void WriteOutput(void);
     void DrawBuffer(int NbDraw);
-    void DrawArea(int NbDraw);
     void DoDrawAllAnnotation(void);
     void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
     void LoadAnnotation(_di_IXMLNode pAnnotation);

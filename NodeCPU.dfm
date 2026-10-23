@@ -194,6 +194,7 @@ object f_CPUNode: Tf_CPUNode
     Width = 145
     Height = 18
     Caption = 'Draw: 0 - 0'
+    Enabled = False
     ParentBackground = False
     TabOrder = 13
     Visible = False

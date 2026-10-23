@@ -263,7 +263,6 @@ object f_Memory: Tf_Memory
     TitleFont.Style = []
     OnDrawColumnCell = dbg_MemDrawColumnCell
     OnDblClick = dbg_MemDblClick
-    OnMouseWheel = dbg_MemMouseWheel
   end
   object e_Sort: TEdit
     Left = 161

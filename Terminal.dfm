@@ -42,11 +42,24 @@ object f_Terminal: Tf_Terminal
     OnClick = sbHaltClick
   end
   object lValue: TLabel
-    Left = 372
+    Left = 170
     Top = 413
     Width = 44
     Height = 13
     Caption = '0x00 ( )'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object lTimer: TLabel
+    Left = 305
+    Top = 413
+    Width = 23
+    Height = 13
+    Caption = '( 0 )'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -83,7 +96,7 @@ object f_Terminal: Tf_Terminal
     TabOrder = 1
   end
   object pInterrupt: TPanel
-    Left = 432
+    Left = 353
     Top = 407
     Width = 75
     Height = 25
@@ -94,7 +107,21 @@ object f_Terminal: Tf_Terminal
     ParentDoubleBuffered = False
     TabOrder = 2
   end
+  object pDebug: TPanel
+    Left = 436
+    Top = 407
+    Width = 75
+    Height = 25
+    Caption = 'Debug'
+    Color = clGray
+    DoubleBuffered = False
+    ParentBackground = False
+    ParentDoubleBuffered = False
+    TabOrder = 3
+    OnClick = pDebugClick
+  end
   object tRefresh: TTimer
+    Enabled = False
     OnTimer = tRefreshTimer
     Left = 24
     Top = 24

@@ -1983,22 +1983,6 @@ void __fastcall Tf_Memory::FormShow(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall Tf_Memory::dbg_MemMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
-          TPoint &MousePos, bool &Handled)
-{
-   /*Handled = true;
-
-   if (WheelDelta > 0) {
-      if (!cds_Mem->Bof) {
-         cds_Mem->Prior();
-      }
-   } else {
-      if (!cds_Mem->Eof) {
-         cds_Mem->Next();
-      }
-   } */
-}
-//---------------------------------------------------------------------------
 void Tf_Memory::ResetState(void)
 {
    this->dbg_Mem->Color = clWindow;

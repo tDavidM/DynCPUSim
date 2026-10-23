@@ -206,12 +206,13 @@ __published:
     void __fastcall Pin20Click(TObject *Sender);
     void __fastcall Pin19Click(TObject *Sender);
     void __fastcall Pin18Click(TObject *Sender);
+    void __fastcall Pin80Click(TObject *Sender);
 private:
    char BinToHex(bool p1, bool p2, bool p3, bool p4 );
 
 public:
    __fastcall Tf_GraphIO(TComponent* Owner);
-   void SetIO(char cmd, char value);
+   void SetIO(char cmd, char value, bool interrupt=false);
    void SetInstruction(char* instruction);
 
    bool DebugOutState;
