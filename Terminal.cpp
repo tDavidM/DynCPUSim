@@ -173,11 +173,8 @@ void __fastcall Tf_Terminal::sbBootClick(TObject *Sender)
 
    if (this->sbBoot->Down) {
       f_GraphIO->Pin70->Checked = true;
-      this->sbBoot->Caption = "Reset";
    } else {
       f_GraphIO->Pin70->Checked = false;
-      this->sbBoot->Caption = "Boot";
-      f_CPUNode->b_Reset->Click();
    }
 }
 //---------------------------------------------------------------------------

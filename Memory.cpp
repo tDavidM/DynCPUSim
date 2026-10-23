@@ -1962,7 +1962,14 @@ void __fastcall Tf_Memory::b_bootClick(TObject *Sender)
 {
    (void)Sender;
 
-   f_GraphIO->Pin70->Checked = true;
+   if (f_GraphIO->Pin70->Checked) {
+      f_GraphIO->Pin70->Checked = false;
+      this->b_boot->Caption = "Boot";
+      f_CPUNode->b_Reset->Click();
+   } else {
+      f_GraphIO->Pin70->Checked = true;
+      this->b_boot->Caption = "Reset";
+   }
 }
 //---------------------------------------------------------------------------
 
@@ -1972,6 +1979,7 @@ void __fastcall Tf_Memory::FormShow(TObject *Sender)
 
    this->Left = Screen->Width - (this->Width + 5);
    this->Top = Screen->Height - (this->Height + 50);
+   this->b_boot->Caption = "Reset";
 }
 //---------------------------------------------------------------------------
 
@@ -1999,6 +2007,7 @@ void Tf_Memory::ResetState(void)
    this->LastDataType = 2;
    this->LastSelLine = 0;
    this->ExecCmp = 0;
+   this->b_boot->Caption = "Boot";
 }
 
 //---------------------------------------------------------------------------

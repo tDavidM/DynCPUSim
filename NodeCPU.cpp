@@ -2079,23 +2079,12 @@ void __fastcall Tf_CPUNode::b_ResetClick(TObject *Sender)
 {
    (void)Sender;
 
-   TCheckBox * CurrPin;
+   f_GraphIO->Pin70->Checked = !f_GraphIO->Pin70->Checked;
 
-   f_GraphIO->DebugOutState = false;
-   f_Memory->ResetState();
-   f_Ram->ResetState();
-
-   this->ResetAllNode();
-   this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
-
-   for (int i=0; i<=128; i++) {
-      CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(i));
-      if (CurrPin != NULL) {
-         CurrPin->Checked = false;
-      }
+   if (!f_GraphIO->Pin70->Checked) {
+      //this->ResetAllNode();
    }
-
-   f_GraphIO->Pin70->Checked = false;
+   this->sb_Main->SimpleText = "Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
 }
 //---------------------------------------------------------------------------
 

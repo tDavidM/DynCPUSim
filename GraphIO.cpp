@@ -18,32 +18,39 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
 {
    (void)Sender;
 
-   char Instruction[17];
+    this->Pin70->Checked;
 
-   f_Memory->cds_Mem->First();
-   f_Terminal->sbBoot->Down = this->Pin70->Checked;
+   if (this->Pin70->Checked) {
+      //CPU boot, load first instruction
+      if (this->Pin70->Checked) {
+         char instruction[17];
+         strncpy(instruction, AnsiString(f_Memory->cds_MemCode->AsString).c_str(), 17);
+         instruction[16] = '\0';
+         SetInstruction(instruction);
+      }
+      f_Memory->b_boot->Caption = "Reset";
+      f_Terminal->sbBoot->Down = true;
+      f_Terminal->sbBoot->Caption = "Reset";
+      f_CPUNode->b_Reset->Caption = "Reset";
+   } else {
+      f_Ram->ResetState();
+      f_Memory->ResetState();
 
-   //CPU boot, load first instruction
-   if (this->Pin49->Checked) {
-      strncpy(Instruction, AnsiString(f_Memory->cds_MemCode->AsString).c_str(),17);
-      Instruction[16] = '\0';
+      TCheckBox * CurrPin;
 
-      this->Pin1->Checked  = Instruction[0]  != '0';
-      this->Pin2->Checked  = Instruction[1]  != '0';
-      this->Pin3->Checked  = Instruction[2]  != '0';
-      this->Pin4->Checked  = Instruction[3]  != '0';
-      this->Pin5->Checked  = Instruction[4]  != '0';
-      this->Pin6->Checked  = Instruction[5]  != '0';
-      this->Pin7->Checked  = Instruction[6]  != '0';
-      this->Pin8->Checked  = Instruction[7]  != '0';
-      this->Pin9->Checked  = Instruction[8]  != '0';
-      this->Pin10->Checked = Instruction[9]  != '0';
-      this->Pin11->Checked = Instruction[10] != '0';
-      this->Pin12->Checked = Instruction[11] != '0';
-      this->Pin13->Checked = Instruction[12] != '0';
-      this->Pin14->Checked = Instruction[13] != '0';
-      this->Pin15->Checked = Instruction[14] != '0';
-      this->Pin16->Checked = Instruction[15] != '0';
+      for (int i=0; i<=128; i++) {
+         CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(i));
+         if (CurrPin != NULL) {
+            CurrPin->Checked = false;
+         }
+      }
+
+      f_Terminal->sbBoot->Down = false;
+      f_Terminal->sbBoot->Caption = "Boot";
+      f_Terminal->RefreshScreen();
+      f_CPUNode->b_Reset->Caption = "Boot";
+
+      DebugOutState = false;
    }
 }
 //---------------------------------------------------------------------------
@@ -192,27 +199,6 @@ void __fastcall Tf_GraphIO::FormCloseQuery(TObject *Sender, bool &CanClose)
    (void)Sender;
 
    CanClose = false;
-}
-//---------------------------------------------------------------------------
-void __fastcall Tf_GraphIO::b_ResetClick(TObject *Sender)
-{
-   (void)Sender;
-
-   TCheckBox * CurrPin;
-
-   DebugOutState = false;
-   f_Memory->dbg_Mem->Color = clWindow;
-
-   f_Memory->cds_Mem->First();
-   f_CPUNode->ResetAllNode();
-   f_CPUNode->sb_Main->SimpleText =	"Mouse: Left=Select, Right=Move, Middle=Create, Shift+Left=Link(1), Ctrl+Left=Link(2), Alt+Left=Unlink          Drag & drop: Left=Scroll, Shift+Left=Select, Ctrl+Left=Move";
-
-   for (int i=0; i<=60; i++) {
-      CurrPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(i));
-      if (CurrPin != NULL) {
-         CurrPin->Checked = false;
-      }
-   }
 }
 //---------------------------------------------------------------------------
 char Tf_GraphIO::BinToHex(bool p1, bool p2, bool p3, bool p4 )

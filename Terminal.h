@@ -22,16 +22,16 @@ __published:
    TSpeedButton *sbBoot;
    TSpeedButton *sbHalt;
    TPanel *pBuzy;
-    TPanel *pInterrupt;
-    TLabel *lValue;
+   TPanel *pInterrupt;
+   TLabel *lValue;
    void __fastcall FormPaint(TObject *Sender);
    void __fastcall tRefreshTimer(TObject *Sender);
    void __fastcall sbBootClick(TObject *Sender);
    void __fastcall FormCreate(TObject *Sender);
    void __fastcall sbHaltClick(TObject *Sender);
-    void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
+   void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 private:
-   void RefreshScreen(void);
+
 
    int screenArray[51][20];
    int HexToInt(String Hex);
@@ -39,6 +39,7 @@ public:
    __fastcall Tf_Terminal(TComponent* Owner);
 
    void IOOut(String cmdHex, String valueHex);
+   void RefreshScreen(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Terminal *f_Terminal;

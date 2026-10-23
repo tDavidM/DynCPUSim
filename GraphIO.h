@@ -181,7 +181,6 @@ __published:
    TCheckBox *Pin69;
    TCheckBox *Pin79;
    void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
-   void __fastcall b_ResetClick(TObject *Sender);
    void __fastcall Line1Click(TObject *Sender);
    void __fastcall Line10Click(TObject *Sender);
    void __fastcall Line2Click(TObject *Sender);
