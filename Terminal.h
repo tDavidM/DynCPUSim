@@ -45,6 +45,7 @@ public:
    void IOProcess(String cmdHex, String valueHex);
    void ClockTick(void);
    void RefreshScreen(void);
+   void SetState(void);
    void ResetState(void);
 };
 //---------------------------------------------------------------------------

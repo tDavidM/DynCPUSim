@@ -71,24 +71,24 @@ void Tf_Terminal::RefreshScreen(void)
       }
    }
 
-   String filter = f_Ram->cds_Ram->Filter;
-   f_Ram->cds_Ram->Filter = "Page>'FB'";
-   f_Ram->cds_Ram->First();
+   String filter = f_Ram-> cds_Ram->Filter;
+   f_Ram-> cds_Ram->Filter = "Page>'FB'";
+   f_Ram-> cds_Ram->First();
 
-   while (!f_Ram->cds_Ram->Eof) {
-      int page = HexToInt(f_Ram->cds_RamPage->AsString) - 252;
+   while (!f_Ram-> cds_Ram->Eof) {
+      int page = HexToInt(f_Ram-> cds_RamPage->AsString) - 252;
       if (page >= 0) {
-         int line = f_Ram->cds_RamLine->AsInteger - 1;
+         int line = f_Ram-> cds_RamLine->AsInteger - 1;
          String valueHex[8];
 
-         valueHex[0] = f_Ram->cds_RamField01->AsString;
-         valueHex[1] = f_Ram->cds_RamField23->AsString;
-         valueHex[2] = f_Ram->cds_RamField45->AsString;
-         valueHex[3] = f_Ram->cds_RamField67->AsString;
-         valueHex[4] = f_Ram->cds_RamField89->AsString;
-         valueHex[5] = f_Ram->cds_RamFieldAB->AsString;
-         valueHex[6] = f_Ram->cds_RamFieldCD->AsString;
-         valueHex[7] = f_Ram->cds_RamFieldEF->AsString;
+         valueHex[0] = f_Ram-> cds_RamField01->AsString;
+         valueHex[1] = f_Ram-> cds_RamField23->AsString;
+         valueHex[2] = f_Ram-> cds_RamField45->AsString;
+         valueHex[3] = f_Ram-> cds_RamField67->AsString;
+         valueHex[4] = f_Ram-> cds_RamField89->AsString;
+         valueHex[5] = f_Ram-> cds_RamFieldAB->AsString;
+         valueHex[6] = f_Ram-> cds_RamFieldCD->AsString;
+         valueHex[7] = f_Ram-> cds_RamFieldEF->AsString;
 
          for (int i = 0; i < 8; i++) {
             int value = HexToInt(valueHex[i]);
@@ -99,16 +99,17 @@ void Tf_Terminal::RefreshScreen(void)
             }
          }
       }
-      f_Ram->cds_Ram->Next();
+      f_Ram-> cds_Ram->Next();
    }
-   f_Ram->cds_Ram->Filter = filter;
+   f_Ram-> cds_Ram->Filter = filter;
 
    this->Invalidate();
 }
 //---------------------------------------------------------------------------
 int Tf_Terminal::HexToInt(String Hex)
 {
-   String HexHigh = "";
+   char hexHigh = 0x00;
+   char hexLow;
    int OutVal;
 
    if (Hex.Length() < 1) {
@@ -116,12 +117,13 @@ int Tf_Terminal::HexToInt(String Hex)
    }
 
    if (Hex.Length() > 1) {
-      HexHigh = Hex.SubString(1, 1);
-      Hex     = Hex.SubString(2, 1);
+      hexHigh = Hex[1];
+      hexLow = Hex[2];
+   } else {
+      hexLow = Hex[1];
    }
 
-
-   switch (Hex[1]) {
+   switch (hexLow) {
       case '0': OutVal = 0;  break;
       case '1': OutVal = 1;  break;
       case '2': OutVal = 2;  break;
@@ -141,8 +143,8 @@ int Tf_Terminal::HexToInt(String Hex)
       default:  OutVal = 0;
    }
 
-   if (HexHigh != "") {
-      switch (HexHigh[1]) {
+   if (hexHigh != 0x00) {
+      switch (hexHigh) {
          case '0': break;
          case '1': OutVal += 16;  break;
          case '2': OutVal += 32;  break;
@@ -217,31 +219,36 @@ void Tf_Terminal::ClockTick(void)
    this->lTimer->Caption = "(" + IntToStr(this->timerCmp/256) + ")";
 }
 //---------------------------------------------------------------------------
+void Tf_Terminal::SetState(void)
+{
+   this->sbBoot->Caption = "Reset";
+   this->sbBoot->Down = true;
+}
+//---------------------------------------------------------------------------
 void Tf_Terminal::ResetState(void)
 {
    this->timerValue = 0;
    this->timerCmp = 0;
    this->clockCmp = 0;
 
-   f_Terminal->RefreshScreen();
+   this->sbBoot->Caption = "Boot";
+   this->sbBoot->Down = false;
+
+   this->RefreshScreen();
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::sbBootClick(TObject *Sender)
 {
    (void)Sender;
 
-   if (this->sbBoot->Down) {
-      f_GraphIO->Pin70->Checked = true;
-   } else {
-      f_GraphIO->Pin70->Checked = false;
-   }
+   f_GraphIO->PullPin(70, this->sbBoot->Down);
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::sbHaltClick(TObject *Sender)
 {
    (void)Sender;
 
-   f_GraphIO->Pin39->Checked = this->sbHalt->Down;
+   f_GraphIO->PullPin(39, this->sbHalt->Down);
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::FormKeyPress(TObject *Sender, System::WideChar &Key)

@@ -226,6 +226,8 @@ public:
    void CallDrawArea(int pMode=0);
    bool NodeNameExists(String pName);
    void EmptyFollowList(void);
+   void SetState(void);
+   void ResetState(void);
 };
 
 

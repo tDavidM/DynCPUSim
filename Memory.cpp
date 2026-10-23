@@ -109,44 +109,48 @@ String Tf_Memory::BinToHex(String Bin)
 //---------------------------------------------------------------------------
 String Tf_Memory::HexToDec(String Hex)
 {
-         if (Hex == "0") { return "0"; }
-    else if (Hex == "1") { return "1"; }
-    else if (Hex == "2") { return "2"; }
-    else if (Hex == "3") { return "3"; }
-    else if (Hex == "4") { return "4"; }
-    else if (Hex == "5") { return "5"; }
-    else if (Hex == "6") { return "6"; }
-    else if (Hex == "7") { return "7"; }
-    else if (Hex == "8") { return "8"; }
-    else if (Hex == "9") { return "9"; }
-    else if (Hex == "A") { return "10"; }
-    else if (Hex == "B") { return "11"; }
-    else if (Hex == "C") { return "12"; }
-    else if (Hex == "D") { return "13"; }
-    else if (Hex == "E") { return "14"; }
-    else if (Hex == "F") { return "15"; }
-    else { return "0"; }
+   switch (Hex[1]) {
+      case '0' : return "0";
+      case '1' : return "1";
+      case '2' : return "2";
+      case '3' : return "3";
+      case '4' : return "4";
+      case '5' : return "5";
+      case '6' : return "6";
+      case '7' : return "7";
+      case '8' : return "8";
+      case '9' : return "9";
+      case 'A' : return "10";
+      case 'B' : return "11";
+      case 'C' : return "12";
+      case 'D' : return "13";
+      case 'E' : return "14";
+      case 'F' : return "15";
+      default:  return "0";
+   }
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::HexToBin(String Hex)
 {
-         if (Hex == "0") { return "0000"; }
-    else if (Hex == "1") { return "0001"; }
-    else if (Hex == "2") { return "0010"; }
-    else if (Hex == "3") { return "0011"; }
-    else if (Hex == "4") { return "0100"; }
-    else if (Hex == "5") { return "0101"; }
-    else if (Hex == "6") { return "0110"; }
-    else if (Hex == "7") { return "0111"; }
-    else if (Hex == "8") { return "1000"; }
-    else if (Hex == "9") { return "1001"; }
-    else if (Hex == "A") { return "1010"; }
-    else if (Hex == "B") { return "1011"; }
-    else if (Hex == "C") { return "1100"; }
-    else if (Hex == "D") { return "1101"; }
-    else if (Hex == "E") { return "1110"; }
-    else if (Hex == "F") { return "1111"; }
-    else { return "0"; }
+   switch (Hex[1]) {
+      case '0' : return "0000";
+      case '1' : return "0001";
+      case '2' : return "0010";
+      case '3' : return "0011";
+      case '4' : return "0100";
+      case '5' : return "0101";
+      case '6' : return "0110";
+      case '7' : return "0111";
+      case '8' : return "1000";
+      case '9' : return "1001";
+      case 'A' : return "1010";
+      case 'B' : return "1011";
+      case 'C' : return "1100";
+      case 'D' : return "1101";
+      case 'E' : return "1110";
+      case 'F' : return "1111";
+      default:  return "0000";
+   }
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::DecToHex(String pDec, int pMax)
@@ -735,12 +739,12 @@ void Tf_Memory::MoveAddrByDelta(int Delta)
 
    this->cds_Mem->EnableControls();
    this->ExecCmp++;
-   f_GraphIO->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(this->ExecCmp);
+   f_GraphIO->SetPgrmCmp(this->ExecCmp);
 
    if (this->cds_MemBreakPoint->AsBoolean) {
-     f_GraphIO->Pin29->Checked = true;
-     if (!f_CPUNode->cb_ActiveDraw->Checked) {
-        f_CPUNode->CallDrawArea(1);
+     f_GraphIO->PullPin(29, true);
+     if (!f_CPUNode-> cb_ActiveDraw->Checked) {
+        f_CPUNode-> CallDrawArea(1);
      }
    }
 }
@@ -770,13 +774,13 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
 
    this->cds_Mem->EnableControls();
    this->ExecCmp++;
-   f_GraphIO->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(this->ExecCmp);
+   f_GraphIO->SetPgrmCmp(this->ExecCmp);
 
    if (this->cds_MemBreakPoint->AsBoolean) {
-      f_GraphIO->Pin29->Checked = true;
+      f_GraphIO->PullPin(29, true);
       b_Next->Enabled = true;
-      if (!f_CPUNode->cb_ActiveDraw->Checked) {
-         f_CPUNode->CallDrawArea(1);
+      if (!f_CPUNode-> cb_ActiveDraw->Checked) {
+         f_CPUNode-> CallDrawArea(1);
       }
    }
 }
@@ -1892,7 +1896,7 @@ void __fastcall Tf_Memory::cb_StepByStepClick(TObject *Sender)
    (void)Sender;
 
    b_Next->Enabled = cb_StepByStep->Checked;
-   if (f_GraphIO->Pin39->Checked == true) {
+   if (f_GraphIO->SensePin(39)) {
       b_Next->Click();
    }
 }
@@ -1902,9 +1906,9 @@ void __fastcall Tf_Memory::b_NextClick(TObject *Sender)
 {
    (void)Sender;
 
-   f_GraphIO->Pin39->Checked = false;
-   if (!cb_StepByStep->Checked) {
-      b_Next->Enabled = false;
+   f_GraphIO->PullPin(39, false);
+   if (!this->cb_StepByStep->Checked) {
+      this->b_Next->Enabled = false;
    }
 }
 //---------------------------------------------------------------------------
@@ -1962,13 +1966,10 @@ void __fastcall Tf_Memory::b_bootClick(TObject *Sender)
 {
    (void)Sender;
 
-   if (f_GraphIO->Pin70->Checked) {
-      f_GraphIO->Pin70->Checked = false;
-      this->b_boot->Caption = "Boot";
-      f_CPUNode->b_Reset->Click();
+   if (f_GraphIO->SensePin(70)) {
+      f_GraphIO->PullPin(70, false);
    } else {
-      f_GraphIO->Pin70->Checked = true;
-      this->b_boot->Caption = "Reset";
+      f_GraphIO->PullPin(70, true);
    }
 }
 //---------------------------------------------------------------------------
@@ -1982,7 +1983,11 @@ void __fastcall Tf_Memory::FormShow(TObject *Sender)
    this->b_boot->Caption = "Reset";
 }
 //---------------------------------------------------------------------------
-
+void Tf_Memory::SetState(void)
+{
+   this->b_boot->Caption = "Reset";
+}
+//---------------------------------------------------------------------------
 void Tf_Memory::ResetState(void)
 {
    this->dbg_Mem->Color = clWindow;

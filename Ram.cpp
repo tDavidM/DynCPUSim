@@ -17,13 +17,6 @@ __fastcall Tf_Ram::Tf_Ram(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
-void __fastcall Tf_Ram::FormCloseQuery(TObject *Sender, bool &CanClose)
-{
-   (void)Sender;
-
-   CanClose = false;
-}
-//---------------------------------------------------------------------------
 void __fastcall Tf_Ram::FormCreate(TObject *Sender)
 {
    (void)Sender;
@@ -33,7 +26,7 @@ void __fastcall Tf_Ram::FormCreate(TObject *Sender)
 
    this->CurrentPage = "00";
    this->e_Page->Text = this->CurrentPage;
-   f_Ram->Caption = "RAM page: 0x" + this->CurrentPage;
+   this->Caption = "RAM page: 0x" + this->CurrentPage;
    this->cds_Ram->Filter = "Page='00'";
 
    this->sg_Ram->ColWidths[0] = 16;
@@ -80,8 +73,8 @@ void __fastcall Tf_Ram::FormCreate(TObject *Sender)
    this->sg_Ram->Cells[0][31] = "E";
    this->sg_Ram->Cells[0][32] = "F";
 
-   for (int i=1; i<=32; i++) {
-      for (int j=1; j<=8; j++) {
+   for (int i = 1; i <= 32; i++) {
+      for (int j = 1; j <= 8; j++) {
          this->sg_Ram->Cells[j][i] = "00";
       }
    }
@@ -92,12 +85,27 @@ void __fastcall Tf_Ram::FormCreate(TObject *Sender)
    this->cds_Ram->Open();
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_Ram::FormShow(TObject *Sender)
+{
+   (void)Sender;
+
+   this->Left = 5;
+   this->Top = 5;
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_Ram::FormCloseQuery(TObject *Sender, bool &CanClose)
+{
+   (void)Sender;
+
+   CanClose = false;
+}
+//---------------------------------------------------------------------------
 void __fastcall Tf_Ram::sg_RamKeyPress(TObject *Sender, char &Key)
 {
    if (Key == VK_RETURN) {
       e_PageExit(Sender);
    } else if (Key != VK_TAB && Key != VK_LEFT && Key != VK_RIGHT && Key != VK_BACK && Key != VK_CLEAR &&
-     Key != VK_ESCAPE && Key != VK_DELETE  && Key != VK_HOME && Key != VK_END && Key != VK_INSERT && Key != VK_CANCEL) {
+              Key != VK_ESCAPE && Key != VK_DELETE  && Key != VK_HOME && Key != VK_END && Key != VK_INSERT && Key != VK_CANCEL) {
       if (this->rb_Bin->Checked) {
          if (Key != '0' && Key != '1') {
             Key = 0;
@@ -134,8 +142,8 @@ void __fastcall Tf_Ram::sg_RamExit(TObject *Sender)
 {
    (void)Sender;
 
-   for (int i=1; i<=32; i++) {
-      for (int j=1; j<=8; j++) {
+   for (int i = 1; i <= 32; i++) {
+      for (int j = 1; j <= 8; j++) {
          this->CleanUpData(j, i);
       }
    }
@@ -206,70 +214,74 @@ void Tf_Ram::CleanUpData(int X, int Y)
 //---------------------------------------------------------------------------
 String Tf_Ram::BinToHex(String Hex)
 {
-         if (Hex == "1111") { return "F"; }
-    else if (Hex == "1110") { return "E"; }
-    else if (Hex == "1101") { return "D"; }
-    else if (Hex == "1100") { return "C"; }
-    else if (Hex == "1011") { return "B"; }
-    else if (Hex == "1010") { return "A"; }
-    else if (Hex == "1001") { return "9"; }
-    else if (Hex == "1000") { return "8"; }
-    else if (Hex == "0111") { return "7"; }
-    else if (Hex == "0110") { return "6"; }
-    else if (Hex == "0101") { return "5"; }
-    else if (Hex == "0100") { return "4"; }
-    else if (Hex == "0011") { return "3"; }
-    else if (Hex == "0010") { return "2"; }
-    else if (Hex == "0001") { return "1"; }
-    else if (Hex == "0000") { return "0"; }
-    else { return "0"; } // =^.^= here's a kitty
+        if (Hex == "1111") { return "F"; }
+   else if (Hex == "1110") { return "E"; }
+   else if (Hex == "1101") { return "D"; }
+   else if (Hex == "1100") { return "C"; }
+   else if (Hex == "1011") { return "B"; }
+   else if (Hex == "1010") { return "A"; }
+   else if (Hex == "1001") { return "9"; }
+   else if (Hex == "1000") { return "8"; }
+   else if (Hex == "0111") { return "7"; }
+   else if (Hex == "0110") { return "6"; }
+   else if (Hex == "0101") { return "5"; }
+   else if (Hex == "0100") { return "4"; }
+   else if (Hex == "0011") { return "3"; }
+   else if (Hex == "0010") { return "2"; }
+   else if (Hex == "0001") { return "1"; }
+   else if (Hex == "0000") { return "0"; }
+   else { return "0"; } // =^.^= here's a kitty
 }
 //---------------------------------------------------------------------------
 String Tf_Ram::HexToDec(String Hex)
 {
-           if (Hex == "0") { return "0";  }
-      else if (Hex == "1") { return "1";  }
-      else if (Hex == "2") { return "2";  }
-      else if (Hex == "3") { return "3";  }
-      else if (Hex == "4") { return "4";  }
-      else if (Hex == "5") { return "5";  }
-      else if (Hex == "6") { return "6";  }
-      else if (Hex == "7") { return "7";  }
-      else if (Hex == "8") { return "8";  }
-      else if (Hex == "9") { return "9";  }
-      else if (Hex == "A") { return "10"; }
-      else if (Hex == "B") { return "11"; }
-      else if (Hex == "C") { return "12"; }
-      else if (Hex == "D") { return "13"; }
-      else if (Hex == "E") { return "14"; }
-      else if (Hex == "F") { return "15"; }
-      else { return "0"; }
+   switch (Hex[1]) {
+      case '0' : return "0";
+      case '1' : return "1";
+      case '2' : return "2";
+      case '3' : return "3";
+      case '4' : return "4";
+      case '5' : return "5";
+      case '6' : return "6";
+      case '7' : return "7";
+      case '8' : return "8";
+      case '9' : return "9";
+      case 'A' : return "10";
+      case 'B' : return "11";
+      case 'C' : return "12";
+      case 'D' : return "13";
+      case 'E' : return "14";
+      case 'F' : return "15";
+      default:  return "0";
+   }
 }
 //---------------------------------------------------------------------------
 String Tf_Ram::HexToBin(String Hex)
 {
-           if (Hex == "0") { return "0000"; }
-      else if (Hex == "1") { return "0001"; }
-      else if (Hex == "2") { return "0010"; }
-      else if (Hex == "3") { return "0011"; }
-      else if (Hex == "4") { return "0100"; }
-      else if (Hex == "5") { return "0101"; }
-      else if (Hex == "6") { return "0110"; }
-      else if (Hex == "7") { return "0111"; }
-      else if (Hex == "8") { return "1000"; }
-      else if (Hex == "9") { return "1001"; }
-      else if (Hex == "A") { return "1010"; }
-      else if (Hex == "B") { return "1011"; }
-      else if (Hex == "C") { return "1100"; }
-      else if (Hex == "D") { return "1101"; }
-      else if (Hex == "E") { return "1110"; }
-      else if (Hex == "F") { return "1111"; }
-      else { return "0"; }
+   switch (Hex[1]) {
+      case '0' : return "0000";
+      case '1' : return "0001";
+      case '2' : return "0010";
+      case '3' : return "0011";
+      case '4' : return "0100";
+      case '5' : return "0101";
+      case '6' : return "0110";
+      case '7' : return "0111";
+      case '8' : return "1000";
+      case '9' : return "1001";
+      case 'A' : return "1010";
+      case 'B' : return "1011";
+      case 'C' : return "1100";
+      case 'D' : return "1101";
+      case 'E' : return "1110";
+      case 'F' : return "1111";
+      default:  return "0000";
+   }
 }
 //---------------------------------------------------------------------------
 String Tf_Ram::DecToHex(String Hex)
 {
-   int Dec = StrToInt(Hex);
+   int Dec = StrToIntDef(Hex, 0); // Maybe use HexToDec(Hex[1]) ?
    int Div;
    String Stack = "";
 
@@ -338,8 +350,8 @@ void __fastcall Tf_Ram::rb_BinClick(TObject *Sender)
    this->e_Page->Text = Data;
    this->e_Page->MaxLength = 8;
 
-   for (int i=1; i<=32; i++) {
-      for (int j=1; j<=8; j++) {
+   for (int i = 1; i <= 32; i++) {
+      for (int j = 1; j <= 8; j++) {
          Data = this->sg_Ram->Cells[j][i];
          if (this->LastDataType == 1) {
             Data = Data.UpperCase();
@@ -373,8 +385,8 @@ void __fastcall Tf_Ram::rb_DecClick(TObject *Sender)
    this->e_Page->Text = Data;
    this->e_Page->MaxLength = 3;
 
-   for (int i=1; i<=32; i++) {
-      for (int j=1; j<=8; j++) {
+   for (int i = 1; i <= 32; i++) {
+      for (int j = 1; j <= 8; j++) {
          Data = this->sg_Ram->Cells[j][i];
          if ( this->LastDataType == 0) {
             Data = BinToHex(Data.SubString(1,4)) + BinToHex(Data.SubString(5, 4));
@@ -405,8 +417,8 @@ void __fastcall Tf_Ram::rb_HexClick(TObject *Sender)
    this->e_Page->Text = Data;
    this->e_Page->MaxLength = 2;
 
-   for (int i=1; i<=32; i++) {
-      for(int j=1; j<=8; j++) {
+   for (int i = 1; i <= 32; i++) {
+      for(int j = 1; j <= 8; j++) {
          Data = this->sg_Ram->Cells[j][i];
          if (this->LastDataType == 0) {
             Data = BinToHex(Data.SubString(1, 4)) + BinToHex(Data.SubString(5, 4));
@@ -425,12 +437,12 @@ void __fastcall Tf_Ram::b_SaveClick(TObject *Sender)
 
    String Data;
 
-   for (int i=1; i<=32; i++) {
+   for (int i = 1; i <= 32; i++) {
       this->cds_Ram->Insert();
 
-      cds_RamLine->AsInteger = i;
+      this->cds_RamLine->AsInteger = i;
 
-      for (int j=1; j<=8; j++) {
+      for (int j = 1; j <= 8; j++) {
          Data = this->sg_Ram->Cells[j][i];
 
          if (this->rb_Bin->Checked) {
@@ -440,22 +452,22 @@ void __fastcall Tf_Ram::b_SaveClick(TObject *Sender)
          }
 
          switch(j) {
-            case 1: { cds_RamField01->AsString = Data; break;}
-            case 2: { cds_RamField23->AsString = Data; break;}
-            case 3: { cds_RamField45->AsString = Data; break;}
-            case 4: { cds_RamField67->AsString = Data; break;}
-            case 5: { cds_RamField89->AsString = Data; break;}
-            case 6: { cds_RamFieldAB->AsString = Data; break;}
-            case 7: { cds_RamFieldCD->AsString = Data; break;}
-            case 8: { cds_RamFieldEF->AsString = Data; break;}
+            case 1: { this->cds_RamField01->AsString = Data; break;}
+            case 2: { this->cds_RamField23->AsString = Data; break;}
+            case 3: { this->cds_RamField45->AsString = Data; break;}
+            case 4: { this->cds_RamField67->AsString = Data; break;}
+            case 5: { this->cds_RamField89->AsString = Data; break;}
+            case 6: { this->cds_RamFieldAB->AsString = Data; break;}
+            case 7: { this->cds_RamFieldCD->AsString = Data; break;}
+            case 8: { this->cds_RamFieldEF->AsString = Data; break;}
          }
       }
       this->cds_Ram->Post();
    }
 
-   if (sd_Ram->Execute()) {
-      if (sd_Ram->FileName != "") {
-         cds_Ram->SaveToFile(sd_Ram->FileName, dfXML);
+   if (this->sd_Ram->Execute()) {
+      if (this->sd_Ram->FileName != "") {
+         this->cds_Ram->SaveToFile(this->sd_Ram->FileName, dfXML);
       }
    }
 }
@@ -467,30 +479,30 @@ void __fastcall Tf_Ram::b_LoadClick(TObject *Sender)
    String Data;
    int Line;
 
-   if (od_Ram->Execute()) {
-      if (od_Ram->FileName != "") {
+   if (this->od_Ram->Execute()) {
+      if (this->od_Ram->FileName != "") {
          this->rb_Hex->Checked = true;
          this->CurrentPage = "00";
          this->e_Page->Text = this->CurrentPage;
-         f_Ram->Caption = "RAM page: 0x" + this->CurrentPage;
+         this->Caption = "RAM page: 0x" + this->CurrentPage;
          this->cds_Ram->Filter = "Page='00'";
-         cds_Ram->LoadFromFile(od_Ram->FileName);
+         this->cds_Ram->LoadFromFile(this->od_Ram->FileName);
       }
    }
 
    this->cds_Ram->First();
    while (!this->cds_Ram->Eof) {
-      if (cds_RamPage->AsString == this->CurrentPage) {
-         Line = cds_RamLine->AsInteger;
+      if (this->cds_RamPage->AsString == this->CurrentPage) {
+         Line = this->cds_RamLine->AsInteger;
 
-         this->sg_Ram->Cells[1][Line] = cds_RamField01->AsString;
-         this->sg_Ram->Cells[2][Line] = cds_RamField23->AsString;
-         this->sg_Ram->Cells[3][Line] = cds_RamField45->AsString;
-         this->sg_Ram->Cells[4][Line] = cds_RamField67->AsString;
-         this->sg_Ram->Cells[5][Line] = cds_RamField89->AsString;
-         this->sg_Ram->Cells[6][Line] = cds_RamFieldAB->AsString;
-         this->sg_Ram->Cells[7][Line] = cds_RamFieldCD->AsString;
-         this->sg_Ram->Cells[8][Line] = cds_RamFieldEF->AsString;
+         this->sg_Ram->Cells[1][Line] = this->cds_RamField01->AsString;
+         this->sg_Ram->Cells[2][Line] = this->cds_RamField23->AsString;
+         this->sg_Ram->Cells[3][Line] = this->cds_RamField45->AsString;
+         this->sg_Ram->Cells[4][Line] = this->cds_RamField67->AsString;
+         this->sg_Ram->Cells[5][Line] = this->cds_RamField89->AsString;
+         this->sg_Ram->Cells[6][Line] = this->cds_RamFieldAB->AsString;
+         this->sg_Ram->Cells[7][Line] = this->cds_RamFieldCD->AsString;
+         this->sg_Ram->Cells[8][Line] = this->cds_RamFieldEF->AsString;
       }
       this->cds_Ram->Next();
    }
@@ -617,7 +629,7 @@ void Tf_Ram::SwapPage(String Current, String New)
    int Mode = 2;
    TLocateOptions SrOpt; // ?? loCaseInsensitive
 
-   for (int i=1;i<=32;i++) {
+   for (int i = 1; i <= 32; i++) {
       if (this->cds_Ram->Locate("Line", i, SrOpt)) {
          this->cds_Ram->Edit();
       } else {
@@ -626,7 +638,7 @@ void Tf_Ram::SwapPage(String Current, String New)
          this->cds_RamPage->AsString = this->CurrentPage;
       }
 
-      for (int j=1;j<=8;j++) {
+      for (int j = 1; j <= 8; j++) {
          Data = this->sg_Ram->Cells[j][i];
          this->sg_Ram->Cells[j][i] = "00";
 
@@ -637,21 +649,21 @@ void Tf_Ram::SwapPage(String Current, String New)
          }
 
          switch(j) {
-            case 1: { cds_RamField01->AsString = Data; break;}
-            case 2: { cds_RamField23->AsString = Data; break;}
-            case 3: { cds_RamField45->AsString = Data; break;}
-            case 4: { cds_RamField67->AsString = Data; break;}
-            case 5: { cds_RamField89->AsString = Data; break;}
-            case 6: { cds_RamFieldAB->AsString = Data; break;}
-            case 7: { cds_RamFieldCD->AsString = Data; break;}
-            case 8: { cds_RamFieldEF->AsString = Data; break;}
+            case 1: { this->cds_RamField01->AsString = Data; break;}
+            case 2: { this->cds_RamField23->AsString = Data; break;}
+            case 3: { this->cds_RamField45->AsString = Data; break;}
+            case 4: { this->cds_RamField67->AsString = Data; break;}
+            case 5: { this->cds_RamField89->AsString = Data; break;}
+            case 6: { this->cds_RamFieldAB->AsString = Data; break;}
+            case 7: { this->cds_RamFieldCD->AsString = Data; break;}
+            case 8: { this->cds_RamFieldEF->AsString = Data; break;}
          }
       }
       this->cds_Ram->Post();
    }
 
    this->CurrentPage = New.UpperCase();
-   f_Ram->Caption = "RAM page: 0x" + this->CurrentPage;
+   this->Caption = "RAM page: 0x" + this->CurrentPage;
    this->cds_Ram->Filter = "Page='" + this->CurrentPage + "'";
    //this->cds_Ram->RecordCount
 
@@ -667,14 +679,14 @@ void Tf_Ram::SwapPage(String Current, String New)
       if (this->cds_RamPage->AsString == this->CurrentPage) {
          Line = this->cds_RamLine->AsInteger;
 
-         this->sg_Ram->Cells[1][Line] = cds_RamField01->AsString;
-         this->sg_Ram->Cells[2][Line] = cds_RamField23->AsString;
-         this->sg_Ram->Cells[3][Line] = cds_RamField45->AsString;
-         this->sg_Ram->Cells[4][Line] = cds_RamField67->AsString;
-         this->sg_Ram->Cells[5][Line] = cds_RamField89->AsString;
-         this->sg_Ram->Cells[6][Line] = cds_RamFieldAB->AsString;
-         this->sg_Ram->Cells[7][Line] = cds_RamFieldCD->AsString;
-         this->sg_Ram->Cells[8][Line] = cds_RamFieldEF->AsString;
+         this->sg_Ram->Cells[1][Line] = this->cds_RamField01->AsString;
+         this->sg_Ram->Cells[2][Line] = this->cds_RamField23->AsString;
+         this->sg_Ram->Cells[3][Line] = this->cds_RamField45->AsString;
+         this->sg_Ram->Cells[4][Line] = this->cds_RamField67->AsString;
+         this->sg_Ram->Cells[5][Line] = this->cds_RamField89->AsString;
+         this->sg_Ram->Cells[6][Line] = this->cds_RamFieldAB->AsString;
+         this->sg_Ram->Cells[7][Line] = this->cds_RamFieldCD->AsString;
+         this->sg_Ram->Cells[8][Line] = this->cds_RamFieldEF->AsString;
       }
       this->cds_Ram->Next();
    }
@@ -710,7 +722,7 @@ void __fastcall Tf_Ram::b_ImportClick(TObject *Sender)
          FileId.open(od_Import->FileName.c_str());
          if (!FileId.fail() && !FileId.bad()) {
             this->rb_Hex->Checked = true;
-            while (!FileId.eof() && NbPage<256) {
+            while (!FileId.eof() && NbPage < 256) {
                FileId.getline(fBuffer, 512);
                Buffer = fBuffer;
 
@@ -721,8 +733,8 @@ void __fastcall Tf_Ram::b_ImportClick(TObject *Sender)
                }
 
                FirstI = this->sg_Ram->Row;
-               for (int j=this->sg_Ram->Col; j<=8; j++) {
-                  for (int i=FirstI; i<=32; i++) {
+               for (int j = this->sg_Ram->Col; j <= 8; j++) {
+                  for (int i = FirstI; i <= 32; i++) {
                      if (Buffer.Length() == 1 ) {
                         Buffer = Buffer + "0";
                      }
@@ -760,9 +772,9 @@ void __fastcall Tf_Ram::ud_PageClick(TObject *Sender, TUDBtnType Button)
 
    int  NbPage = (StrToInt(HexToDec(this->CurrentPage.SubString(1, 1))) * 16) + StrToInt(HexToDec(this->CurrentPage.SubString(2, 1)));
    if (Button == btNext && NbPage < 255) {
-      this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage+1) ));
+      this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage + 1)));
    } else if (Button == btPrev && NbPage > 0) {
-      this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage-1) ));
+      this->SwapPage(this->CurrentPage, DecToHex(IntToStr(NbPage - 1)));
    }
 }
 //---------------------------------------------------------------------------
@@ -771,8 +783,8 @@ void __fastcall Tf_Ram::b_ClearPClick(TObject *Sender)
 {
    (void)Sender;
 
-   for (int i=1;i<=32;i++) {
-      for (int j=1;j<=8;j++) {
+   for (int i = 1; i <= 32; i++) {
+      for (int j = 1; j <= 8; j++) {
          if (this->rb_Bin->Checked) {
             this->sg_Ram->Cells[j][i] = "00000000";
          } else if(this->rb_Dec->Checked) {
@@ -785,28 +797,20 @@ void __fastcall Tf_Ram::b_ClearPClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall Tf_Ram::FormShow(TObject *Sender)
-{
-   (void)Sender;
-
-   this->Left = 5;
-   this->Top = 5;
-}
-//---------------------------------------------------------------------------
 void Tf_Ram::ResetState(void)
 {
    this->cds_Ram->Filter = "";
    this->cds_Ram->First();
    while (!this->cds_Ram->Eof) {
       this->cds_Ram->Edit();
-      cds_RamField01->AsString = "00";
-      cds_RamField23->AsString = "00";
-      cds_RamField45->AsString = "00";
-      cds_RamField67->AsString = "00";
-      cds_RamField89->AsString = "00";
-      cds_RamFieldAB->AsString = "00";
-      cds_RamFieldCD->AsString = "00";
-      cds_RamFieldEF->AsString = "00";
+      this->cds_RamField01->AsString = "00";
+      this->cds_RamField23->AsString = "00";
+      this->cds_RamField45->AsString = "00";
+      this->cds_RamField67->AsString = "00";
+      this->cds_RamField89->AsString = "00";
+      this->cds_RamFieldAB->AsString = "00";
+      this->cds_RamFieldCD->AsString = "00";
+      this->cds_RamFieldEF->AsString = "00";
       this->cds_Ram->Post();
       this->cds_Ram->Next();
    }
@@ -821,10 +825,10 @@ void Tf_Ram::ResetState(void)
 
    this->CurrentPage = "00";
    this->e_Page->Text = this->CurrentPage;
-   f_Ram->Caption = "RAM page: 0x" + this->CurrentPage;
+   this->Caption = "RAM page: 0x" + this->CurrentPage;
 
-   for (int i=1; i<=32; i++) {
-      for (int j=1; j<=8; j++) {
+   for (int i = 1; i <= 32; i++) {
+      for (int j = 1; j <= 8; j++) {
          this->sg_Ram->Cells[j][i] = "00";
       }
    }

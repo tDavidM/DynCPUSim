@@ -165,6 +165,7 @@ public:
    void MoveAddrByDelta(int Delta);
    void MoveAddrByAbsolute(int Addr);
    void LoadInstructionSet(_di_IXMLNode pInstructionSet);
+   void SetState(void);
    void ResetState(void);
 };
 //---------------------------------------------------------------------------

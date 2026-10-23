@@ -14,41 +14,54 @@ __fastcall Tf_GraphIO::Tf_GraphIO(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_GraphIO::PullPin(int id, bool state)
+{
+   TCheckBox * currPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(id));
+   if (currPin != NULL) {
+      currPin->Checked = state;
+   }
+}
+//---------------------------------------------------------------------------
+bool __fastcall Tf_GraphIO::SensePin(int id)
+{
+   TCheckBox * currPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(id));
+   if (currPin != NULL) {
+      return currPin->Checked;
+   }
+   return false;
+}
+//---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
 {
    (void)Sender;
 
-    this->Pin70->Checked;
+   this->Pin70->Checked;
 
    if (this->Pin70->Checked) {
       //CPU boot, load first instruction
       if (this->Pin70->Checked) {
          char instruction[17];
-         strncpy(instruction, AnsiString(f_Memory->cds_MemCode->AsString).c_str(), 17);
+         strncpy(instruction, AnsiString(f_Memory-> cds_MemCode->AsString).c_str(), 17);
          instruction[16] = '\0';
          SetInstruction(instruction);
       }
-      f_Memory->b_boot->Caption = "Reset";
-      f_Terminal->sbBoot->Down = true;
-      f_Terminal->sbBoot->Caption = "Reset";
-      f_CPUNode->b_Reset->Caption = "Reset";
+      f_Memory->SetState();
+      f_Terminal->SetState();
+      f_CPUNode->SetState();
    } else {
       f_Ram->ResetState();
       f_Memory->ResetState();
       f_Terminal->ResetState();
+      f_CPUNode->ResetState();
 
       TCheckBox * CurrPin;
 
       for (int i=0; i<=128; i++) {
-         CurrPin = (TCheckBox*)f_GraphIO->FindComponent("Pin" + IntToStr(i));
+         CurrPin = (TCheckBox*)this->FindComponent("Pin" + IntToStr(i));
          if (CurrPin != NULL) {
             CurrPin->Checked = false;
          }
       }
-
-      f_Terminal->sbBoot->Down = false;
-      f_Terminal->sbBoot->Caption = "Boot";
-      f_CPUNode->b_Reset->Caption = "Boot";
 
       DebugOutState = false;
    }
@@ -137,10 +150,10 @@ void __fastcall Tf_GraphIO::Pin50Click(TObject *Sender)
       f_Memory->MoveAddrByDelta(Delta);
    }
 
-   if (f_Memory->cb_StepByStep->Checked) {
+   if (f_Memory-> cb_StepByStep->Checked) {
       Pin29->Checked = true;
-      if (!f_CPUNode->cb_ActiveDraw->Checked) {
-         f_CPUNode->CallDrawArea(1);
+      if (!f_CPUNode-> cb_ActiveDraw->Checked) {
+         f_CPUNode-> CallDrawArea(1);
       }
    }
 }
@@ -166,10 +179,10 @@ void __fastcall Tf_GraphIO::Pin60Click(TObject *Sender)
       f_Memory->MoveAddrByAbsolute(Addr);
    }
 
-   if (f_Memory->cb_StepByStep->Checked) {
+   if (f_Memory-> cb_StepByStep->Checked) {
       Pin29->Checked = true;
-      if (!f_CPUNode->cb_ActiveDraw->Checked) {
-         f_CPUNode->CallDrawArea(1);
+      if (!f_CPUNode-> cb_ActiveDraw->Checked) {
+         f_CPUNode-> CallDrawArea(1);
       }
    }
 }
@@ -290,14 +303,14 @@ void __fastcall Tf_GraphIO::Pin29Click(TObject *Sender)
 {
    (void)Sender;
 
-   if (Pin29->Checked != DebugOutState) {
-      if (Pin29->Checked) {
-         DebugOutState = true;
-         Pin39->Checked = true;
-         f_Memory->dbg_Mem->Color = clRed;
+   if (this->Pin29->Checked != this->DebugOutState) {
+      if (this->Pin29->Checked) {
+         this->DebugOutState = true;
+         this->Pin39->Checked = true;
+         f_Memory-> dbg_Mem->Color = clRed;
       } else {
-         DebugOutState = false;
-         //f_Memory->dbg_Mem->Color = clWindow;
+         this->DebugOutState = false;
+         //f_Memory-> dbg_Mem->Color = clWindow;
       }
    }
 }
@@ -307,7 +320,7 @@ void __fastcall Tf_GraphIO::FormCreate(TObject *Sender)
 {
    (void)Sender;
 
-   DebugOutState = false;
+   this->DebugOutState = false;
 }
 //---------------------------------------------------------------------------
 
@@ -315,8 +328,8 @@ void __fastcall Tf_GraphIO::Pin39Click(TObject *Sender)
 {
    (void)Sender;
 
-   f_Memory->dbg_Mem->Color = clWindow;
-   f_Terminal->sbHalt->Down = this->Pin39->Checked;
+   f_Memory-> dbg_Mem->Color = clWindow;
+   f_Terminal-> sbHalt->Down = this->Pin39->Checked;
 }
 //---------------------------------------------------------------------------
 
@@ -450,8 +463,8 @@ void __fastcall Tf_GraphIO::Pin19Click(TObject *Sender)
    (void)Sender;
 
    this->Pin18->Checked = false;
-   f_Terminal->pInterrupt->Color = clGray;
-   //f_Terminal->lValue->Caption = "0x00 ( )";
+   f_Terminal-> pInterrupt->Color = clGray;
+   //f_Terminal-> lValue->Caption = "0x00 ( )";
 }
 //---------------------------------------------------------------------------
 
@@ -459,7 +472,7 @@ void __fastcall Tf_GraphIO::Pin18Click(TObject *Sender)
 {
    (void)Sender;
 
-   f_Terminal->pInterrupt->Color = clYellow;
+   f_Terminal-> pInterrupt->Color = clYellow;
 }
 //---------------------------------------------------------------------------
 
@@ -490,7 +503,7 @@ void Tf_GraphIO::SetIO(char cmd, char value, bool interrupt)
    l_Line10->Caption = "[0x" + IntToHex(value, 2) + "]";
 
    if (interrupt) {
-      f_GraphIO->Pin18->Checked = true;
+      this->Pin18->Checked = true;
    }
 }
 //---------------------------------------------------------------------------
@@ -502,6 +515,11 @@ void __fastcall Tf_GraphIO::Pin80Click(TObject *Sender)
    if (this->Pin80->Checked) {
       f_Terminal->ClockTick();
    }
+}
+//---------------------------------------------------------------------------
+void Tf_GraphIO::SetPgrmCmp(int cmp)
+{
+   this->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(cmp);
 }
 //---------------------------------------------------------------------------
 

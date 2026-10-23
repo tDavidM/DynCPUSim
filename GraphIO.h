@@ -214,6 +214,9 @@ public:
    __fastcall Tf_GraphIO(TComponent* Owner);
    void SetIO(char cmd, char value, bool interrupt=false);
    void SetInstruction(char* instruction);
+   void __fastcall PullPin(int id, bool state);
+   bool __fastcall SensePin(int id);
+   void SetPgrmCmp(int cmp);
 
    bool DebugOutState;
 };
