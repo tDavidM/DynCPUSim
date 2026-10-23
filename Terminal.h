@@ -47,6 +47,8 @@ public:
    void RefreshScreen(void);
    void SetState(void);
    void ResetState(void);
+   void __fastcall ToggleHalt(bool state);
+   void __fastcall ToggleInterrupt(bool state);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Terminal *f_Terminal;

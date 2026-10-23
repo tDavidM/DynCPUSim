@@ -11,6 +11,8 @@
 //---------------------------------------------------------------------------
 #include "NodeCPU.h"
 //---------------------------------------------------------------------------
+enum NodeTypes : int;
+
 class Tf_GraphEdit : public TForm
 {
 __published:
@@ -50,6 +52,22 @@ __published:
 private:
 public:
    __fastcall Tf_GraphEdit(TComponent* Owner);
+
+   void SetFocusName(void);
+
+   String __fastcall GetName(void);
+   void __fastcall SetName(String name);
+   int __fastcall GetPosX(void);
+   int __fastcall GetPosY(void);
+   void __fastcall SetPos(int X, int Y);
+   void __fastcall SetType(NodeTypes type);
+   NodeTypes __fastcall GetType(void);
+
+
+
+   //void __fastcall Set();
+   //__fastcall Get(void);
+
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_GraphEdit *f_GraphEdit;

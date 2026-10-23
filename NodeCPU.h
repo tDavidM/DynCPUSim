@@ -213,7 +213,7 @@ private:
 
     void ReadInput(void);
     void WriteOutput(void);
-    void DrawBuffer(int NbDraw);
+    void __fastcall DrawBuffer(int NbDraw);
     void DoDrawAllAnnotation(void);
     void TagFollowList(TNode *NodeTag, int Depth, bool Sel);
     void LoadAnnotation(_di_IXMLNode pAnnotation);
@@ -223,8 +223,9 @@ public:
    __fastcall Tf_CPUNode(TComponent* Owner);
    void UpdateNode(void);
    void ResetAllNode(void);
-   void CallDrawArea(int pMode=0);
-   bool NodeNameExists(String pName);
+   bool IsActiveDraw(void);
+   void __fastcall CallDrawArea(int pMode=0);
+   bool __fastcall NodeNameExists(String pName);
    void EmptyFollowList(void);
    void SetState(void);
    void ResetState(void);

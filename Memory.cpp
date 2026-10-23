@@ -55,8 +55,6 @@ TInstruc::TInstruc(int pID, String pName, String pOpCode, int pDisplayOrder)
 //---------------------------------------------------------------------------
 
 
-
-
 //---------------------------------------------------------------------------
 __fastcall Tf_Memory::Tf_Memory(TComponent* Owner)
     : TForm(Owner)
@@ -86,7 +84,7 @@ void __fastcall Tf_Memory::cb_OpCodeChange(TObject *Sender)
    this->cb_D->Enabled = Instruc->FieldDAct;
 }
 //---------------------------------------------------------------------------
-String Tf_Memory::BinToHex(String Bin)
+String __fastcall Tf_Memory::BinToHex(String Bin)
 {
         if (Bin == "1111") { return "F"; }
    else if (Bin == "1110") { return "E"; }
@@ -107,7 +105,7 @@ String Tf_Memory::BinToHex(String Bin)
    else { return "0"; } // =^.^= here's a kitty
 }
 //---------------------------------------------------------------------------
-String Tf_Memory::HexToDec(String Hex)
+String __fastcall Tf_Memory::HexToDec(String Hex)
 {
    switch (Hex[1]) {
       case '0' : return "0";
@@ -130,7 +128,7 @@ String Tf_Memory::HexToDec(String Hex)
    }
 }
 //---------------------------------------------------------------------------
-String Tf_Memory::HexToBin(String Hex)
+String __fastcall Tf_Memory::HexToBin(String Hex)
 {
    switch (Hex[1]) {
       case '0' : return "0000";
@@ -153,7 +151,7 @@ String Tf_Memory::HexToBin(String Hex)
    }
 }
 //---------------------------------------------------------------------------
-String Tf_Memory::DecToHex(String pDec, int pMax)
+String __fastcall Tf_Memory::DecToHex(String pDec, int pMax)
 {
    int Dec = StrToInt(pDec);
    int Div;
@@ -686,7 +684,7 @@ void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
    this->LastSelLine = this->cds_Mem->RecNo;
 }
 //---------------------------------------------------------------------------
-int Tf_Memory::DeltaToAddr(int Delta)
+int __fastcall Tf_Memory::DeltaToAddr(int Delta)
 {
    int Target = 0;
 
@@ -708,7 +706,7 @@ int Tf_Memory::DeltaToAddr(int Delta)
    return Target;
 }
 //---------------------------------------------------------------------------
-void Tf_Memory::MoveAddrByDelta(int Delta)
+void __fastcall Tf_Memory::MoveAddrByDelta(int Delta)
 {
    this->cds_Mem->DisableControls();
    this->cds_Mem->First();
@@ -743,13 +741,13 @@ void Tf_Memory::MoveAddrByDelta(int Delta)
 
    if (this->cds_MemBreakPoint->AsBoolean) {
      f_GraphIO->PullPin(29, true);
-     if (!f_CPUNode-> cb_ActiveDraw->Checked) {
-        f_CPUNode-> CallDrawArea(1);
+     if (!f_CPUNode->IsActiveDraw()) {
+        f_CPUNode->CallDrawArea(REFRESH_BUFFER);
      }
    }
 }
 //---------------------------------------------------------------------------
-void Tf_Memory::MoveAddrByAbsolute(int Addr)
+void __fastcall Tf_Memory::MoveAddrByAbsolute(int Addr)
 {
    this->cds_Mem->DisableControls();
    this->cds_Mem->First();
@@ -779,8 +777,8 @@ void Tf_Memory::MoveAddrByAbsolute(int Addr)
    if (this->cds_MemBreakPoint->AsBoolean) {
       f_GraphIO->PullPin(29, true);
       b_Next->Enabled = true;
-      if (!f_CPUNode-> cb_ActiveDraw->Checked) {
-         f_CPUNode-> CallDrawArea(1);
+      if (!f_CPUNode->IsActiveDraw()) {
+         f_CPUNode->CallDrawArea(REFRESH_BUFFER);
       }
    }
 }
@@ -1998,6 +1996,24 @@ void Tf_Memory::ResetState(void)
    this->ExecCmp = 0;
    this->b_boot->Caption = "Boot";
 }
-
+//---------------------------------------------------------------------------
+void __fastcall Tf_Memory::SetGridColor(bool state)
+{
+   if (state) {
+      this->dbg_Mem->Color = clRed;
+   } else {
+      this->dbg_Mem->Color = clWindow;
+   }
+}
+//---------------------------------------------------------------------------
+bool __fastcall Tf_Memory::IsStepByStep(void)
+{
+   return this->cb_StepByStep->Checked;
+}
+//---------------------------------------------------------------------------
+String __fastcall Tf_Memory::GetCurrentCode(void)
+{
+   return this->cds_MemCode->AsString;
+}
 //---------------------------------------------------------------------------
 

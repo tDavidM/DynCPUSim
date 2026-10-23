@@ -510,26 +510,28 @@ void __fastcall Tf_Ram::b_LoadClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void Tf_Ram::AddrToXY(String Addr, int &X, int &Y)
 {
-   String High = Addr.SubString(1,1);
-   int    Low  = StrToInt( "0x" + Addr.SubString(2,1) );
+   char high = Addr[1];
+   int  Low  = StrToIntDef( "0x" + Addr[2], 0 );
 
    Y = Low + 1;
-        if (High == "0") {X = 1;}
-   else if (High == "1") {X = 1; Y += 16; }
-   else if (High == "2") {X = 2;}
-   else if (High == "3") {X = 2; Y += 16; }
-   else if (High == "4") {X = 3;}
-   else if (High == "5") {X = 3; Y += 16; }
-   else if (High == "6") {X = 4;}
-   else if (High == "7") {X = 4; Y += 16; }
-   else if (High == "8") {X = 5;}
-   else if (High == "9") {X = 5; Y += 16; }
-   else if (High == "A") {X = 6;}
-   else if (High == "B") {X = 6; Y += 16; }
-   else if (High == "C") {X = 7;}
-   else if (High == "D") {X = 7; Y += 16; }
-   else if (High == "E") {X = 8;}
-   else if (High == "F") {X = 8; Y += 16; }
+   switch (high) {
+      case '0' : X = 1;          break;
+      case '1' : X = 1; Y += 16; break;
+      case '2' : X = 2;          break;
+      case '3' : X = 2; Y += 16; break;
+      case '4' : X = 3;          break;
+      case '5' : X = 3; Y += 16; break;
+      case '6' : X = 4;          break;
+      case '7' : X = 4; Y += 16; break;
+      case '8' : X = 5;          break;
+      case '9' : X = 5; Y += 16; break;
+      case 'A' : X = 6;          break;
+      case 'B' : X = 6; Y += 16; break;
+      case 'C' : X = 7;          break;
+      case 'D' : X = 7; Y += 16; break;
+      case 'E' : X = 8;          break;
+      case 'F' : X = 8; Y += 16; break;
+   }
 }
 //---------------------------------------------------------------------------
 void Tf_Ram::Set(String Addr, String Value, String Page)
@@ -578,6 +580,28 @@ void Tf_Ram::Get(String Addr, char *Value, String Page)
    }
 
    strncpy(Value,AnsiString(Data).c_str(),8);
+}
+//---------------------------------------------------------------------------
+TClientDataSet* Tf_Ram::GetDMA(void)
+{
+   return this->cds_Ram;
+}
+//---------------------------------------------------------------------------
+String __fastcall Tf_Ram::GetDMAField(int id)
+{
+   switch (id) {
+      case FIELD_PAGE  : return this->cds_RamPage->AsString;
+      case FIELD_LINE  : return this->cds_RamLine->AsString;
+      case FIELD_00_1F : return this->cds_RamField01->AsString;
+      case FIELD_20_3F : return this->cds_RamField23->AsString;
+      case FIELD_40_5F : return this->cds_RamField45->AsString;
+      case FIELD_60_7F : return this->cds_RamField67->AsString;
+      case FIELD_80_9F : return this->cds_RamField89->AsString;
+      case FIELD_A0_BF : return this->cds_RamFieldAB->AsString;
+      case FIELD_C0_DF : return this->cds_RamFieldCD->AsString;
+      case FIELD_E0_FF : return this->cds_RamFieldEF->AsString;
+      default : return "";
+   }
 }
 //---------------------------------------------------------------------------
 

@@ -77,4 +77,27 @@ void __fastcall Tf_GraphEdit::FormShow(TObject *Sender)
    this->Top = Screen->Height - (this->Height + 50);
 }
 //---------------------------------------------------------------------------
+void Tf_GraphEdit::SetFocusName(void) { this->e_Name->SetFocus(); }
+//---------------------------------------------------------------------------
+String __fastcall Tf_GraphEdit::GetName(void) { return this->e_Name->Text; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetName(String name) { this->e_Name->Text = name; }
+//---------------------------------------------------------------------------
+int __fastcall Tf_GraphEdit::GetPosX(void) { return StrToInt(this->e_PosX->Text); }
+//---------------------------------------------------------------------------
+int __fastcall Tf_GraphEdit::GetPosY(void) { return StrToInt(this->e_PosY->Text); }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetPos(int X, int Y) { this->e_PosX->Text = IntToStr(X); this->e_PosY->Text = IntToStr(Y); }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetType(NodeTypes type) { this->cb_Type->ItemIndex = static_cast<int>(type); }
+//---------------------------------------------------------------------------
+NodeTypes __fastcall Tf_GraphEdit::GetType(void) { return static_cast<NodeTypes>(this->cb_Type->ItemIndex); }
+//---------------------------------------------------------------------------
+
+
+
+//void __fastcall Tf_GraphEdit::Set( val) { this-> = val; }
+//---------------------------------------------------------------------------
+//__fastcall Tf_GraphEdit::Get(void) { return this->; }
+//---------------------------------------------------------------------------
 

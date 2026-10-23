@@ -13,6 +13,17 @@
 #include <DBClient.hpp>
 #include <ComCtrls.hpp>
 //---------------------------------------------------------------------------
+#define FIELD_PAGE 0
+#define FIELD_LINE 1
+#define FIELD_00_1F 2
+#define FIELD_20_3F 3
+#define FIELD_40_5F 4
+#define FIELD_60_7F 5
+#define FIELD_80_9F 6
+#define FIELD_A0_BF 7
+#define FIELD_C0_DF 8
+#define FIELD_E0_FF 9
+//---------------------------------------------------------------------------
 class Tf_Ram : public TForm
 {
 __published:
@@ -73,6 +84,8 @@ private:
 public:
    void Set(String Addr, String Value, String Page = '0');
    void Get(String Addr, char *Value, String Page = '0');
+   TClientDataSet* GetDMA(void);
+   String __fastcall GetDMAField(int id);
    void ResetState(void);
    __fastcall Tf_Ram(TComponent* Owner);
 };

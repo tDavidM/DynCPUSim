@@ -71,24 +71,24 @@ void Tf_Terminal::RefreshScreen(void)
       }
    }
 
-   String filter = f_Ram-> cds_Ram->Filter;
-   f_Ram-> cds_Ram->Filter = "Page>'FB'";
-   f_Ram-> cds_Ram->First();
+   String filter = f_Ram->GetDMA()->Filter;
+   f_Ram->GetDMA()->Filter = "Page>'FB'";
+   f_Ram->GetDMA()->First();
 
-   while (!f_Ram-> cds_Ram->Eof) {
-      int page = HexToInt(f_Ram-> cds_RamPage->AsString) - 252;
+   while (!f_Ram->GetDMA()->Eof) {
+      int page = HexToInt(f_Ram->GetDMAField(FIELD_PAGE)) - 252;
       if (page >= 0) {
-         int line = f_Ram-> cds_RamLine->AsInteger - 1;
+         int line = StrToIntDef(f_Ram->GetDMAField(FIELD_LINE), 0) - 1;
          String valueHex[8];
 
-         valueHex[0] = f_Ram-> cds_RamField01->AsString;
-         valueHex[1] = f_Ram-> cds_RamField23->AsString;
-         valueHex[2] = f_Ram-> cds_RamField45->AsString;
-         valueHex[3] = f_Ram-> cds_RamField67->AsString;
-         valueHex[4] = f_Ram-> cds_RamField89->AsString;
-         valueHex[5] = f_Ram-> cds_RamFieldAB->AsString;
-         valueHex[6] = f_Ram-> cds_RamFieldCD->AsString;
-         valueHex[7] = f_Ram-> cds_RamFieldEF->AsString;
+         valueHex[0] = f_Ram->GetDMAField(FIELD_00_1F);
+         valueHex[1] = f_Ram->GetDMAField(FIELD_20_3F);
+         valueHex[2] = f_Ram->GetDMAField(FIELD_40_5F);
+         valueHex[3] = f_Ram->GetDMAField(FIELD_60_7F);
+         valueHex[4] = f_Ram->GetDMAField(FIELD_80_9F);
+         valueHex[5] = f_Ram->GetDMAField(FIELD_A0_BF);
+         valueHex[6] = f_Ram->GetDMAField(FIELD_C0_DF);
+         valueHex[7] = f_Ram->GetDMAField(FIELD_E0_FF);
 
          for (int i = 0; i < 8; i++) {
             int value = HexToInt(valueHex[i]);
@@ -99,9 +99,9 @@ void Tf_Terminal::RefreshScreen(void)
             }
          }
       }
-      f_Ram-> cds_Ram->Next();
+      f_Ram->GetDMA()->Next();
    }
-   f_Ram-> cds_Ram->Filter = filter;
+   f_Ram->GetDMA()->Filter = filter;
 
    this->Invalidate();
 }
@@ -249,6 +249,21 @@ void __fastcall Tf_Terminal::sbHaltClick(TObject *Sender)
    (void)Sender;
 
    f_GraphIO->PullPin(39, this->sbHalt->Down);
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_Terminal::ToggleHalt(bool state)
+{
+   this->sbHalt->Down = state;
+}
+//---------------------------------------------------------------------------
+void __fastcall Tf_Terminal::ToggleInterrupt(bool state)
+{
+   if (state) {
+      this->pInterrupt->Color = clYellow;
+   } else {
+      this->pInterrupt->Color = clGray;
+      //this->lValue->Caption = "0x00 ( )";
+   }
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::FormKeyPress(TObject *Sender, System::WideChar &Key)

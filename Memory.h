@@ -149,24 +149,29 @@ private:
    TList* InstrucList;
 
    void CreateLine(void);
-   int DeltaToAddr(int Delta);
-   String BinToHex(String Bin);
-   String HexToDec(String Hex);
-   String HexToBin(String Hex);
-   String DecToHex(String pDec, int pMax=4095);
-   String DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile);
+   int __fastcall DeltaToAddr(int Delta);
+   String __fastcall BinToHex(String Bin);
+   String __fastcall HexToDec(String Hex);
+   String __fastcall HexToBin(String Hex);
+   String __fastcall DecToHex(String pDec, int pMax=4095);
 
+   String  DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile);
    void Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList *pConstList, TStringList* pErrorList, TStringList* pMetaASMFile);
    void Parse4MacroDefineAndInclude(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, String* pIncludes, TStringList* pErrorList, TStringList* pMetaASMFile);
    void Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStringList *pMacroUsageCmp, TList* pMacroLabelList, TStringList* pErrorList, TStringList* pMetaASMFile);
 
 public:
    __fastcall Tf_Memory(TComponent* Owner);
-   void MoveAddrByDelta(int Delta);
-   void MoveAddrByAbsolute(int Addr);
+   void __fastcall MoveAddrByDelta(int Delta);
+   void __fastcall MoveAddrByAbsolute(int Addr);
    void LoadInstructionSet(_di_IXMLNode pInstructionSet);
    void SetState(void);
    void ResetState(void);
+   void __fastcall HighlightMemGrid(bool state);
+   bool __fastcall IsStepByStep(void);
+   String __fastcall GetCurrentCode(void);
+   void __fastcall SetGridColor(bool state);
+
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Memory *f_Memory;

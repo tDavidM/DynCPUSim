@@ -41,7 +41,7 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
       //CPU boot, load first instruction
       if (this->Pin70->Checked) {
          char instruction[17];
-         strncpy(instruction, AnsiString(f_Memory-> cds_MemCode->AsString).c_str(), 17);
+         strncpy(instruction, AnsiString(f_Memory->GetCurrentCode()).c_str(), 17);
          instruction[16] = '\0';
          SetInstruction(instruction);
       }
@@ -150,10 +150,10 @@ void __fastcall Tf_GraphIO::Pin50Click(TObject *Sender)
       f_Memory->MoveAddrByDelta(Delta);
    }
 
-   if (f_Memory-> cb_StepByStep->Checked) {
+   if (f_Memory->IsStepByStep()) {
       Pin29->Checked = true;
-      if (!f_CPUNode-> cb_ActiveDraw->Checked) {
-         f_CPUNode-> CallDrawArea(1);
+      if (!f_CPUNode->IsActiveDraw()) {
+         f_CPUNode->CallDrawArea(REFRESH_BUFFER);
       }
    }
 }
@@ -179,10 +179,10 @@ void __fastcall Tf_GraphIO::Pin60Click(TObject *Sender)
       f_Memory->MoveAddrByAbsolute(Addr);
    }
 
-   if (f_Memory-> cb_StepByStep->Checked) {
+   if (f_Memory->IsStepByStep()) {
       Pin29->Checked = true;
-      if (!f_CPUNode-> cb_ActiveDraw->Checked) {
-         f_CPUNode-> CallDrawArea(1);
+      if (!f_CPUNode->IsActiveDraw()) {
+         f_CPUNode->CallDrawArea(REFRESH_BUFFER);
       }
    }
 }
@@ -307,10 +307,10 @@ void __fastcall Tf_GraphIO::Pin29Click(TObject *Sender)
       if (this->Pin29->Checked) {
          this->DebugOutState = true;
          this->Pin39->Checked = true;
-         f_Memory-> dbg_Mem->Color = clRed;
+         f_Memory->SetGridColor(true);
       } else {
          this->DebugOutState = false;
-         //f_Memory-> dbg_Mem->Color = clWindow;
+         //f_Memory->SetGridColor(false);
       }
    }
 }
@@ -328,8 +328,8 @@ void __fastcall Tf_GraphIO::Pin39Click(TObject *Sender)
 {
    (void)Sender;
 
-   f_Memory-> dbg_Mem->Color = clWindow;
-   f_Terminal-> sbHalt->Down = this->Pin39->Checked;
+   f_Memory->SetGridColor(false);
+   f_Terminal->ToggleHalt(this->Pin39->Checked);
 }
 //---------------------------------------------------------------------------
 
@@ -463,8 +463,7 @@ void __fastcall Tf_GraphIO::Pin19Click(TObject *Sender)
    (void)Sender;
 
    this->Pin18->Checked = false;
-   f_Terminal-> pInterrupt->Color = clGray;
-   //f_Terminal-> lValue->Caption = "0x00 ( )";
+   f_Terminal->ToggleInterrupt(false);
 }
 //---------------------------------------------------------------------------
 
@@ -472,7 +471,7 @@ void __fastcall Tf_GraphIO::Pin18Click(TObject *Sender)
 {
    (void)Sender;
 
-   f_Terminal-> pInterrupt->Color = clYellow;
+   f_Terminal->ToggleInterrupt(true);
 }
 //---------------------------------------------------------------------------
 
