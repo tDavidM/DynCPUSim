@@ -1135,16 +1135,16 @@ void Tf_CPUNode::UpdateNode(void)
 
    //Read data from Edit Window and Update the selected Node
    NodeSelect->Name = f_GraphEdit->GetName();
-   NodeSelect->X = StrToInt(f_GraphEdit->GetPosX());
-   NodeSelect->Y = StrToInt(f_GraphEdit->GetPosX());
+   NodeSelect->X = f_GraphEdit->GetPosX();
+   NodeSelect->Y = f_GraphEdit->GetPosX();
    NodeSelect->SetType(f_GraphEdit->GetType());
-   NodeSelect->NameOutUp   = f_GraphEdit-> e_NameOutUp->Text;
-   NodeSelect->NameOutDown = f_GraphEdit-> e_NameOutDown->Text;
+   NodeSelect->NameOutUp   = f_GraphEdit->GetNameOutputUp();
+   NodeSelect->NameOutDown = f_GraphEdit->GetNameOutputDown();
 
-   NodeSelect->SetInUp(StrToInt(f_GraphEdit-> e_PinIDInUp->Text));
-   NodeSelect->SetInDown(StrToInt(f_GraphEdit-> e_PinIDInDown->Text));
+   NodeSelect->SetInUp(f_GraphEdit->GetPinIDInputUp());
+   NodeSelect->SetInDown(f_GraphEdit->GetPinIDInputDown());
 
-   NodeSelect->DeleteFlag = f_GraphEdit-> cb_Delete->Checked;
+   NodeSelect->DeleteFlag = f_GraphEdit->GetIsDelete();
 
    if (NodeSelect->DeleteFlag) {
       NodeSelect->SetInUp(0);
@@ -1155,25 +1155,25 @@ void Tf_CPUNode::UpdateNode(void)
    //If Node Name changed or deleted, update Nodes conneted to it "Upstream"
    for (int i = 0; i<NodeCmp; i++) {
       NodeCible = (TNode*)this->NodeList->Items[i];
-      if (f_GraphEdit-> l_SaveName->Caption == NodeCible->NameOutUp) {
+      if (f_GraphEdit->GetSaveName() == NodeCible->NameOutUp) {
          if (NodeSelect->DeleteFlag) {
             NodeCible->NameOutUp = "";
             NodeCible->SetOutUp(0, NULL);
-         } else if (f_GraphEdit-> l_SaveName->Caption != f_GraphEdit->GetName()) {
+         } else if (f_GraphEdit->GetSaveName() != f_GraphEdit->GetName()) {
             NodeCible->NameOutUp = f_GraphEdit->GetName();
          }
       }
-      if (f_GraphEdit-> l_SaveName->Caption == NodeCible->NameOutDown) {
+      if (f_GraphEdit->GetSaveName() == NodeCible->NameOutDown) {
          if (NodeSelect->DeleteFlag) {
             NodeCible->NameOutDown = "";
             NodeCible->SetOutDown(0, NULL);
-         } else if (f_GraphEdit-> l_SaveName->Caption != f_GraphEdit->GetName()) {
+         } else if (f_GraphEdit->GetSaveName() != f_GraphEdit->GetName()) {
             NodeCible->NameOutDown = f_GraphEdit->GetName();
          }
       }
    }
    //If Output Node Up Changed / Removed
-   if (f_GraphEdit-> e_NameOutUp->Text != f_GraphEdit-> l_NameOutUp->Caption || NodeSelect->DeleteFlag) {
+   if (f_GraphEdit->GetNameOutputUp() != f_GraphEdit->GetNameLabelOutputUp() || NodeSelect->DeleteFlag) {
       if (NodeSelect->NameOutUp != "") {
          int i = 0;
          while (i<NodeCmp) {
@@ -1189,7 +1189,7 @@ void Tf_CPUNode::UpdateNode(void)
       }
    }
    //If Output Node Down Changed / Removed
-   if (f_GraphEdit-> e_NameOutDown->Text != f_GraphEdit-> l_NameOutDown->Caption || NodeSelect->DeleteFlag) {
+   if (f_GraphEdit->GetNameOutputDown() != f_GraphEdit->GetNameLabelOutputDown() || NodeSelect->DeleteFlag) {
       if (NodeSelect->NameOutDown != "") {
          int i = 0;
          while (i<NodeCmp) {
@@ -1206,12 +1206,12 @@ void Tf_CPUNode::UpdateNode(void)
    }
 
    //Update Output if Removed
-   if (f_GraphEdit-> e_NameOutUp->Text == "") {
-      NodeSelect->SetOutUp(StrToInt(f_GraphEdit-> e_PinIDOutUp->Text), NULL);
+   if (f_GraphEdit->GetNameOutputUp() == "") {
+      NodeSelect->SetOutUp(f_GraphEdit->GetPinIDOutputUp(), NULL);
    }
 
-   if (f_GraphEdit-> e_NameOutDown->Text == "") {
-      NodeSelect->SetOutDown(StrToInt(f_GraphEdit-> e_PinIDOutDown->Text), NULL);
+   if (f_GraphEdit->GetNameOutputDown() == "") {
+      NodeSelect->SetOutDown(f_GraphEdit->GetPinIDOutputDown(), NULL);
    }
 
    if (NodeSelect->DeleteFlag) {
@@ -1226,9 +1226,9 @@ void Tf_CPUNode::UpdateNode(void)
    }
 
    //Reset Stored "Previous" names
-   f_GraphEdit-> l_SaveName->Caption    = NodeSelect->Name;
-   f_GraphEdit-> l_NameOutUp->Caption   = NodeSelect->NameOutUp;
-   f_GraphEdit-> l_NameOutDown->Caption = NodeSelect->NameOutDown;
+   f_GraphEdit->SetSaveName( NodeSelect->Name);
+   f_GraphEdit->SetNameLabelOutputUp(  NodeSelect->NameOutUp);
+   f_GraphEdit->SetNameLabelOutputDown(NodeSelect->NameOutDown);
 
    //Draw
    this->Invalidate();
@@ -1307,22 +1307,22 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                }
                this->CallDrawArea(REFRESH_BUFFER);
 
-               f_GraphEdit-> l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
+               f_GraphEdit->SetInternalID(NodeCurr->InternalID);
                f_GraphEdit->SetName(NodeCurr->Name);
-               f_GraphEdit-> cb_Delete->Checked = NodeCurr->DeleteFlag;
-               f_GraphEdit-> l_SaveName->Caption = NodeCurr->Name;
+               f_GraphEdit->SetIsDelete(NodeCurr->DeleteFlag);
+               f_GraphEdit->SetSaveName(NodeCurr->Name);
                f_GraphEdit->SetPos(NodeCurr->X, NodeCurr->Y);
                f_GraphEdit->SetType(NodeCurr->GetType());
 
-               f_GraphEdit-> e_NameOutUp->Text = NodeCurr->NameOutUp;
-               f_GraphEdit-> e_NameOutDown->Text = NodeCurr->NameOutDown;
-               f_GraphEdit-> l_NameOutUp->Caption = NodeCurr->NameOutUp;
-               f_GraphEdit-> l_NameOutDown->Caption = NodeCurr->NameOutDown;
+               f_GraphEdit->SetNameOutputUp(  NodeCurr->NameOutUp);
+               f_GraphEdit->SetNameOutputDown(NodeCurr->NameOutDown);
+               f_GraphEdit->SetNameLabelOutputUp(NodeCurr->NameOutUp);
+               f_GraphEdit->SetNameLabelOutputDown(NodeCurr->NameOutDown);
 
-               f_GraphEdit-> e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
-               f_GraphEdit-> e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
-               f_GraphEdit-> e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
-               f_GraphEdit-> e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
+               f_GraphEdit->SetPinIDInputUp(   NodeCurr->GetPin_InUp());
+               f_GraphEdit->SetPinIDInputDown( NodeCurr->GetPin_InDown());
+               f_GraphEdit->SetPinIDOutputUp(  NodeCurr->GetPin_OutUp());
+               f_GraphEdit->SetPinIDOutputDown(NodeCurr->GetPin_OutDown());
 
                f_GraphEdit->Visible = true;
                i = NodeCmp;
@@ -1387,9 +1387,9 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                    && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY) + this->p_Area->Top){
                   //this->NodeSelect = NodeCurr;
                   if (Shift.Contains(ssShift)) {
-                      f_GraphEdit-> e_NameOutUp->Text = NodeCurr->Name;
+                      f_GraphEdit->GetNameOutputUp() = NodeCurr->Name;
                   } else if (Shift.Contains(ssCtrl)) {
-                      f_GraphEdit-> e_NameOutDown->Text = NodeCurr->Name;
+                      f_GraphEdit->GetNameOutputDown() = NodeCurr->Name;
                   }
                   f_GraphEdit->Visible = true;
                   Found = true;
@@ -1402,9 +1402,9 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
 
             UpdateNode();
             if (Shift.Contains(ssShift)) {
-                f_GraphEdit-> l_NameOutUp->Caption = NodeCurr->Name;
+                f_GraphEdit->SetNameLabelOutputUp(NodeCurr->Name);
             } else if (Shift.Contains(ssCtrl)) {
-                f_GraphEdit-> l_NameOutDown->Caption = NodeCurr->Name;
+                f_GraphEdit->SetNameLabelOutputDown(NodeCurr->Name);
             }
             //Draw
             this->CallDrawArea(REFRESH_BUFFER);
@@ -1435,22 +1435,22 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                this->Invalidate();
                this->CallDrawArea(REFRESH_BUFFER);
 
-               f_GraphEdit-> l_InternalID->Caption = IntToStr(NodeCurr->InternalID);
+               f_GraphEdit->SetInternalID(NodeCurr->InternalID);
                f_GraphEdit->SetName(NodeCurr->Name);
-               f_GraphEdit-> cb_Delete->Checked = NodeCurr->DeleteFlag;
-               f_GraphEdit-> l_SaveName->Caption = NodeCurr->Name;
+               f_GraphEdit->SetIsDelete(NodeCurr->DeleteFlag);
+               f_GraphEdit->SetSaveName(NodeCurr->Name);
                f_GraphEdit->SetPos(NodeCurr->X, NodeCurr->Y);
                f_GraphEdit->SetType(NodeCurr->GetType());
 
-               f_GraphEdit-> e_NameOutUp->Text = NodeCurr->NameOutUp;
-               f_GraphEdit-> e_NameOutDown->Text = NodeCurr->NameOutDown;
-               f_GraphEdit-> l_NameOutUp->Caption = NodeCurr->NameOutUp;
-               f_GraphEdit-> l_NameOutDown->Caption = NodeCurr->NameOutDown;
+               f_GraphEdit->SetNameOutputUp(  NodeCurr->NameOutUp);
+               f_GraphEdit->SetNameOutputDown(NodeCurr->NameOutDown);
+               f_GraphEdit->SetNameLabelOutputUp(  NodeCurr->NameOutUp);
+               f_GraphEdit->SetNameLabelOutputDown(NodeCurr->NameOutDown);
 
-               f_GraphEdit-> e_PinIDInUp->Text = IntToStr(NodeCurr->GetPin_InUp());
-               f_GraphEdit-> e_PinIDInDown->Text = IntToStr(NodeCurr->GetPin_InDown());
-               f_GraphEdit-> e_PinIDOutUp->Text = IntToStr(NodeCurr->GetPin_OutUp());
-               f_GraphEdit-> e_PinIDOutDown->Text = IntToStr(NodeCurr->GetPin_OutDown());
+               f_GraphEdit->SetPinIDInputUp(   NodeCurr->GetPin_InUp());
+               f_GraphEdit->SetPinIDInputDown( NodeCurr->GetPin_InDown());
+               f_GraphEdit->SetPinIDOutputUp(  NodeCurr->GetPin_OutUp());
+               f_GraphEdit->SetPinIDOutputDown(NodeCurr->GetPin_OutDown());
 
                f_GraphEdit->Visible = true;
                i = NodeCmp;
@@ -1629,7 +1629,7 @@ void __fastcall Tf_CPUNode::FormKeyDown(TObject *Sender, WORD &Key,
 
    if (Key == VK_DELETE && NodeSelect != NULL) {
       if (Application->MessageBox( L"Delete Node ?", L"Delete Node", MB_YESNO) == mrYes) {
-         f_GraphEdit-> cb_Delete->Checked = true;
+         f_GraphEdit->SetIsDelete(true);
          this->UpdateNode();
       }
    } else if (Key == VK_KEY_1 || Key == VK_NUMPAD1) {

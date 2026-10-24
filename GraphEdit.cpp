@@ -93,8 +93,50 @@ void __fastcall Tf_GraphEdit::SetType(NodeTypes type) { this->cb_Type->ItemIndex
 //---------------------------------------------------------------------------
 NodeTypes __fastcall Tf_GraphEdit::GetType(void) { return static_cast<NodeTypes>(this->cb_Type->ItemIndex); }
 //---------------------------------------------------------------------------
-
-
+void __fastcall Tf_GraphEdit::SetNameOutputUp(String name) { this->e_NameOutUp->Text = name; }
+//---------------------------------------------------------------------------
+String __fastcall Tf_GraphEdit::GetNameOutputUp(void) { return this->e_NameOutUp->Text; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetNameOutputDown(String name) { this->e_NameOutDown->Text = name; }
+//---------------------------------------------------------------------------
+String __fastcall Tf_GraphEdit::GetNameOutputDown(void) { return this->e_NameOutDown->Text; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetPinIDInputUp(int id) { this->e_PinIDInUp->Text = IntToStr(id); }
+//---------------------------------------------------------------------------
+int __fastcall Tf_GraphEdit::GetPinIDInputUp(void) { return StrToInt(this->e_PinIDInUp->Text); }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetPinIDInputDown(int id) { this->e_PinIDInDown->Text = IntToStr(id); }
+//---------------------------------------------------------------------------
+int __fastcall Tf_GraphEdit::GetPinIDInputDown(void) { return StrToInt(this->e_PinIDInDown->Text); }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetPinIDOutputUp(int id) { this->e_PinIDOutUp->Text = IntToStr(id); }
+//---------------------------------------------------------------------------
+int __fastcall Tf_GraphEdit::GetPinIDOutputUp(void) { return StrToInt(this->e_PinIDOutUp->Text); }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetPinIDOutputDown(int id) { this->e_PinIDOutDown->Text = IntToStr(id); }
+//---------------------------------------------------------------------------
+int __fastcall Tf_GraphEdit::GetPinIDOutputDown(void) { return StrToInt(this->e_PinIDOutDown->Text); }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetIsDelete(bool val) { this->cb_Delete->Checked = val; }
+//---------------------------------------------------------------------------
+bool __fastcall Tf_GraphEdit::GetIsDelete(void) { return this->cb_Delete->Checked; }
+//---------------------------------------------------------------------------
+String __fastcall Tf_GraphEdit::GetSaveName(void) { return this->l_SaveName->Caption; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetSaveName(String name) { this->l_SaveName->Caption = name; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetInternalID(int id) { this->l_InternalID->Caption = IntToStr(id); }
+//---------------------------------------------------------------------------
+//String __fastcall Tf_GraphEdit::GetInternalID(void) { return this->l_InternalID->Caption; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetNameLabelOutputUp(String name) { this->l_NameOutUp->Caption = name; }
+//---------------------------------------------------------------------------
+String __fastcall Tf_GraphEdit::GetNameLabelOutputUp(void) { return this->l_NameOutUp->Caption; }
+//---------------------------------------------------------------------------
+void __fastcall Tf_GraphEdit::SetNameLabelOutputDown(String name) { this->l_NameOutDown->Caption = name; }
+//---------------------------------------------------------------------------
+String __fastcall Tf_GraphEdit::GetNameLabelOutputDown(void) { return this->l_NameOutDown->Caption; }
+//---------------------------------------------------------------------------
 
 //void __fastcall Tf_GraphEdit::Set( val) { this-> = val; }
 //---------------------------------------------------------------------------

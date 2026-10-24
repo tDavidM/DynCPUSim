@@ -62,8 +62,28 @@ public:
    void __fastcall SetPos(int X, int Y);
    void __fastcall SetType(NodeTypes type);
    NodeTypes __fastcall GetType(void);
-
-
+   void __fastcall SetNameOutputUp(String name);
+   String __fastcall GetNameOutputUp(void);
+   void __fastcall SetNameOutputDown(String name);
+   String __fastcall GetNameOutputDown(void);
+   void __fastcall SetPinIDInputUp(int id);
+   int __fastcall GetPinIDInputUp(void);
+   void __fastcall SetPinIDInputDown(int id);
+   int __fastcall GetPinIDInputDown(void);
+   void __fastcall SetPinIDOutputUp(int id);
+   int __fastcall GetPinIDOutputUp(void);
+   void __fastcall SetPinIDOutputDown(int id);
+   int __fastcall GetPinIDOutputDown(void);
+   void __fastcall SetIsDelete(bool val);
+   bool __fastcall GetIsDelete(void);
+   String __fastcall GetSaveName(void);
+   void __fastcall SetSaveName(String name);
+   void __fastcall SetInternalID(int id);
+   //String __fastcall GetInternalID(void);
+   void __fastcall SetNameLabelOutputUp(String name);
+   String __fastcall GetNameLabelOutputUp(void);
+   void __fastcall SetNameLabelOutputDown(String name);
+   String __fastcall GetNameLabelOutputDown(void);
 
    //void __fastcall Set();
    //__fastcall Get(void);
