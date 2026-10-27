@@ -1136,7 +1136,7 @@ void Tf_CPUNode::UpdateNode(void)
    //Read data from Edit Window and Update the selected Node
    NodeSelect->Name = f_GraphEdit->GetName();
    NodeSelect->X = f_GraphEdit->GetPosX();
-   NodeSelect->Y = f_GraphEdit->GetPosX();
+   NodeSelect->Y = f_GraphEdit->GetPosY();
    NodeSelect->SetType(f_GraphEdit->GetType());
    NodeSelect->NameOutUp   = f_GraphEdit->GetNameOutputUp();
    NodeSelect->NameOutDown = f_GraphEdit->GetNameOutputDown();
@@ -1179,7 +1179,7 @@ void Tf_CPUNode::UpdateNode(void)
          while (i<NodeCmp) {
             NodeCible = (TNode*)this->NodeList->Items[i];
             if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutUp) {
-               NodeSelect->SetOutUp(0,NodeCible);
+               NodeSelect->SetOutUp(0, NodeCible);
                i = NodeCmp;
             }
             i++;
@@ -1195,7 +1195,7 @@ void Tf_CPUNode::UpdateNode(void)
          while (i<NodeCmp) {
             NodeCible = (TNode*)this->NodeList->Items[i];
             if (NodeSelect->DeleteFlag || NodeCible->Name == NodeSelect->NameOutDown) {
-               NodeSelect->SetOutDown(0,NodeCible);
+               NodeSelect->SetOutDown(0, NodeCible);
                i = NodeCmp;
             }
             i++;
@@ -1387,9 +1387,9 @@ void __fastcall Tf_CPUNode::FormMouseDown(TObject *Sender, TMouseButton Button,
                    && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY) + this->p_Area->Top){
                   //this->NodeSelect = NodeCurr;
                   if (Shift.Contains(ssShift)) {
-                      f_GraphEdit->GetNameOutputUp() = NodeCurr->Name;
+                      f_GraphEdit->SetNameOutputUp(NodeCurr->Name);
                   } else if (Shift.Contains(ssCtrl)) {
-                      f_GraphEdit->GetNameOutputDown() = NodeCurr->Name;
+                      f_GraphEdit->SetNameOutputDown(NodeCurr->Name);
                   }
                   f_GraphEdit->Visible = true;
                   Found = true;
