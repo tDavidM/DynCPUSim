@@ -67,9 +67,8 @@ void __fastcall Tf_Memory::cb_OpCodeChange(TObject *Sender)
 {
    (void)Sender;
 
-   TInstruc* Instruc;
+   TInstruc* Instruc = static_cast<TInstruc*>(this->InstrucList->Items[this->cb_OpCode->ItemIndex]);
 
-   Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
    this->cb_OpCode->Hint = Instruc->Comm;
    this->l_Width->Caption = "MaxData: " + IntToStr(Instruc->DataWidth) + " bits";
 
@@ -255,9 +254,9 @@ void Tf_Memory::CreateLine(void)
    String BasePrefix;
    int BaseId, WidthHex;
    String BinData, HexData, InstrucText, InstrucCode;
-   TInstruc* Instruc;
 
-   Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+   TInstruc* Instruc = static_cast<TInstruc*>(this->InstrucList->Items[this->cb_OpCode->ItemIndex]);
+
    WidthHex = Instruc->DataWidth/4;
 
    if (this->rb_Bin->Checked) {
@@ -569,10 +568,9 @@ void __fastcall Tf_Memory::rb_BinClick(TObject *Sender)
 
    int WidthHex;
    String BinData;
-   TInstruc* Instruc;
 
    if (this->cb_OpCode->ItemIndex >= 0) {
-      Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+      TInstruc* Instruc = static_cast<TInstruc*>(this->InstrucList->Items[this->cb_OpCode->ItemIndex]);
       WidthHex = Instruc->DataWidth/4;
   
       if (this->e_Data->Text != "") {
@@ -605,10 +603,9 @@ void __fastcall Tf_Memory::rb_DecClick(TObject *Sender)
 
    int WidthHex, DecData = 0, Muliplier;
    String BinData, HexData;
-   TInstruc* Instruc;
 
    if (this->cb_OpCode->ItemIndex >= 0) {
-      Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+      TInstruc* Instruc = static_cast<TInstruc*>(this->InstrucList->Items[this->cb_OpCode->ItemIndex]);
       WidthHex = Instruc->DataWidth/4;
 
       if (this->e_Data->Text != "") {
@@ -641,10 +638,9 @@ void __fastcall Tf_Memory::rb_HexClick(TObject *Sender)
    (void)Sender;
 
    String HexData;
-   TInstruc* Instruc;
 
    if (this->cb_OpCode->ItemIndex >= 0) {
-      Instruc  = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+      TInstruc* Instruc = static_cast<TInstruc*>(this->InstrucList->Items[this->cb_OpCode->ItemIndex]);
 
       if (this->e_Data->Text != "") {
          if (this->LastDataType == 0) {
@@ -843,10 +839,9 @@ void __fastcall Tf_Memory::e_DataExit(TObject *Sender)
    (void)Sender;
 
    int WidthHex, MaxDecimal;
-   TInstruc* Instruc;
    String Data = this->e_Data->Text;
 
-   Instruc = (TInstruc*)this->InstrucList->Items[this->cb_OpCode->ItemIndex];
+   TInstruc* Instruc = static_cast<TInstruc*>(this->InstrucList->Items[this->cb_OpCode->ItemIndex]);
    WidthHex   = Instruc->DataWidth/4;
    MaxDecimal = (2<<(Instruc->DataWidth-1))-1;
       if (this->rb_Bin->Checked) {

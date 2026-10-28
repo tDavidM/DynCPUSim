@@ -240,6 +240,29 @@ void TNode::Work(void)
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+//Constructor for an Annotation
+TAnnotation::TAnnotation(int pId, String pName, String pType, bool pIndDraw)
+{
+   this->id      = pId;
+   this->name    = pName;
+   this->type    = pType;
+   this->indDraw = pIndDraw;
+
+   this->hueR = 0;
+   this->hueG = 0;
+   this->hueB = 0;
+
+   this->upX   = 0;
+   this->upY   = 0;
+   this->downX = 0;
+   this->downY = 0;
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 __fastcall Tf_CPUNode::Tf_CPUNode(TComponent* Owner)
@@ -636,46 +659,29 @@ void __fastcall Tf_CPUNode::b_SaveClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void Tf_CPUNode::LoadAnnotation(_di_IXMLNode pAnnotation)
 {
-   String ID, Name, Type, R, G, B;
-   TPoint PointA, PointB;
-   TStringList *AnnotationData;
+   _di_IXMLNodeList allAnnot = pAnnotation->ChildNodes;
 
-   _di_IXMLNodeList AllAnnotation = pAnnotation->ChildNodes;
+   for (int i = 0; i < allAnnot->Count; i++) {
 
-   for (int i = 0; i < AllAnnotation->Count; i++) {
-      ID           = AllAnnotation->Get(i)->GetAttribute("ID");
-      Name         = AllAnnotation->Get(i)->GetAttribute("Name");
-      Type         = AllAnnotation->Get(i)->GetAttribute("Type");
+      TAnnotation *data = new TAnnotation(0, allAnnot->Get(i)->GetAttribute("Name"),
+                                          allAnnot->Get(i)->GetAttribute("Type"), false);
+      this->AnnotationList->Add(data);
 
-      AnnotationData = new TStringList;
-      //AnnotationData->NameValueSeparator = '=';
-      this->AnnotationList->Add(AnnotationData);
+      _di_IXMLNode info = allAnnot->Get(i)->ChildNodes->Nodes[0];
+      data->hueR = StrToInt(info->GetAttribute("R"));
+      data->hueG = StrToInt(info->GetAttribute("G"));
+      data->hueB = StrToInt(info->GetAttribute("B"));
 
-      AnnotationData->Add(Name); // 0
-      AnnotationData->Add(Type); // 1
+      if (data->type == "Rect") {
+         _di_IXMLNode point = allAnnot->Get(i)->ChildNodes->Nodes[1];
+         data->upX = StrToInt(point->GetAttribute("X"));
+         data->upY = StrToInt(point->GetAttribute("Y"));
 
-      _di_IXMLNode AnnotationInfo = AllAnnotation->Get(i)->ChildNodes->Nodes[0];
-      R = AnnotationInfo->GetAttribute("R");
-      G = AnnotationInfo->GetAttribute("G");
-      B = AnnotationInfo->GetAttribute("B");
-      AnnotationData->Add("Hue:R=" + R + ",G=" + G + ".B=" + B); // 2
-
-      _di_IXMLNode AnnotationPoint;
-      if (Type == "Rect") {
-         AnnotationPoint = AllAnnotation->Get(i)->ChildNodes->Nodes[1];
-         PointA.X = AnnotationPoint->GetAttribute("X");
-         PointA.Y = AnnotationPoint->GetAttribute("Y");
-
-         AnnotationPoint = AllAnnotation->Get(i)->ChildNodes->Nodes[2];
-         PointB.X = AnnotationPoint->GetAttribute("X");
-         PointB.Y = AnnotationPoint->GetAttribute("Y");
-
-         AnnotationData->Add("X=" + IntToStr((int)PointA.X) + ",Y=" + IntToStr((int)PointA.Y)); // 3
-         AnnotationData->Add("X=" + IntToStr((int)PointB.X) + ",Y=" + IntToStr((int)PointB.Y)); // 4
-
-         AnnotationData->Add("Draw=False"); // 5
+         point = allAnnot->Get(i)->ChildNodes->Nodes[2];
+         data->downX = StrToInt(point->GetAttribute("X"));
+         data->downY = StrToInt(point->GetAttribute("Y"));
       }
-
+      data->indDraw = false;
    }
 }
 //---------------------------------------------------------------------------
@@ -813,33 +819,112 @@ bool Tf_CPUNode::IsActiveDraw(void)
 //---------------------------------------------------------------------------
 void __fastcall Tf_CPUNode::CallDrawArea(int pMode)
 {
-   TBitmap* Buffer = new TBitmap;
-   TRect  SrcRect, DestRect;
-
-   DrawCmpItem = 0;
-   DrawCmpLine = 0;
+   this->DrawCmpItem = 0;
+   this->DrawCmpLine = 0;
    //t_DrawMulti1Timer(this);
    //t_DrawMulti2Timer(this);
    //t_DrawMulti3Timer(this);
-   this->p_DrawCmp->Caption = "Draw: " + IntToStr(DrawCmpItem) + " - " + IntToStr(DrawCmpLine);
+   this->p_DrawCmp->Caption = "Draw: " + IntToStr(this->DrawCmpItem) + " - " + IntToStr(this->DrawCmpLine);
 
-   if (pMode == 1) {
+   if (pMode == REFRESH_BUFFER) {
       this->DrawBuffer(0);
    }
 
-   SrcRect.init(OffSetX, OffSetY, OffSetX + this->p_Area->Width, OffSetY + this->p_Area->Height);
-   DestRect.init(0, 0, this->p_Area->Width, this->p_Area->Height);
+   TRect srcBufferRect, destBufferRect;
+   srcBufferRect.init(this->OffSetX, this->OffSetY,
+                      this->OffSetX + this->p_Area->Width, this->OffSetY + this->p_Area->Height);
+   destBufferRect.init(0, 0, this->p_Area->Width, this->p_Area->Height);
 
-   Buffer->Height = this->p_Area->Height;
-   Buffer->Width  = this->p_Area->Width ;
-   Buffer->HandleType = bmDIB; // allows use of ScanLine
-   Buffer->PixelFormat = pf24bit;
+   TBitmap* buffer = new TBitmap;
+   buffer->Height = this->p_Area->Height;
+   buffer->Width  = this->p_Area->Width;
+   buffer->HandleType = bmDIB; // allows use of ScanLine
+   buffer->PixelFormat = pf24bit;
 
-   Buffer->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+   if (this->DrawAllAnnotation && pMode == REFRESH_BUFFER) {
+      DoDrawAllAnnotation();
+   }
 
-   this->Canvas->Draw(this->p_Area->Left, this->p_Area->Top, Buffer);
+   buffer->Canvas->CopyRect(destBufferRect, this->MainCanvas->Canvas, srcBufferRect);
 
-   Buffer->Free();
+   if (this->cb_Annotation->Checked && !this->DrawAllAnnotation) {
+      for (int i = 0; i < this->AnnotationList->Count; i++) {
+         TAnnotation* annotationSelect = static_cast<TAnnotation*>(this->AnnotationList->Items[i]);
+
+         //When Annotation is set, check if cursor is still inside the shape, if so, draw annotation
+         if (annotationSelect->indDraw) {
+            int upLX   = annotationSelect->upX;
+            int upLY   = annotationSelect->upY;
+            int downRX = annotationSelect->downX;
+            int downRY = annotationSelect->downY;
+
+            upLX   = ((( upLX  * this->GridSize )                ) - this->OffSetX) + this->p_Area->Left;
+            upLY   = ((( upLY  * this->GridSize )                ) - this->OffSetY) + this->p_Area->Top;
+            downRX = (((downRX * this->GridSize ) + this->ObjSize) - this->OffSetX) + this->p_Area->Left;
+            downRY = (((downRY * this->GridSize ) + this->ObjSize) - this->OffSetY) + this->p_Area->Top;
+
+            TBitmap* annotationCanvas = new TBitmap;
+
+            upLX   = upLX   - this->p_Area->Left;
+            upLY   = upLY   - this->p_Area->Top;
+            downRX = downRX - this->p_Area->Left;
+            downRY = downRY - this->p_Area->Top;
+
+            int height = downRY - upLY;
+            int width  = downRX - upLX;
+            TRect srcAnnotRect, destAnnotRect;
+            srcAnnotRect.init(upLX   + this->OffSetX, upLY   + this->OffSetY,
+                              downRX + this->OffSetX, downRY + this->OffSetY);
+            destAnnotRect.init(0, 0, width, height);
+
+            annotationCanvas->Height = height;
+            annotationCanvas->Width  = width ;
+            annotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+            annotationCanvas->PixelFormat = pf24bit;
+            annotationCanvas->Canvas->CopyRect(destAnnotRect, this->MainCanvas->Canvas, srcAnnotRect);
+
+            float colorR = 1.0 - (annotationSelect->hueR / 200.0);
+            float colorG = 1.0 - (annotationSelect->hueG / 200.0);
+            float colorB = 1.0 - (annotationSelect->hueB / 200.0);
+
+            for (int y = 0; y < height; y++) {
+               Byte *pyx = static_cast<Byte *>(annotationCanvas->ScanLine[y]);
+               for (int x = 0; x < width; x++) {
+                  int colorInt = (pyx[x*3] * colorG) * colorR ; // Blue
+                  if (colorInt > 255) {
+                     pyx[x*3] = 255;
+                  } else {
+                     pyx[x*3] = colorInt;
+                  }
+
+                  colorInt = (pyx[x*3 + 1] * colorR) * colorB ; //Green
+                  if (colorInt > 255) {
+                     pyx[x*3 + 1] = 255;
+                  } else {
+                     pyx[x*3 + 1] = colorInt;
+                  }
+
+                  colorInt = (pyx[x*3 + 2] * colorB) * colorG ; //Red
+                  if (colorInt > 255) {
+                     pyx[x*3 + 2] = 255;
+                  } else {
+                     pyx[x*3 + 2] = colorInt;
+                  }
+               }
+            }
+
+            annotationCanvas->Canvas->TextOutA(10, 10, annotationSelect->name);
+
+            buffer->Canvas->Draw(upLX, upLY, annotationCanvas);
+            annotationCanvas->Free();
+         }
+      }
+   }
+
+   this->Canvas->Draw(this->p_Area->Left, this->p_Area->Top, buffer);
+
+   buffer->Free();
+
 }
 //---------------------------------------------------------------------------
 
@@ -855,27 +940,27 @@ void __fastcall Tf_CPUNode::DrawBuffer(int NbDraw)
 
    this->MainCanvas->Canvas->Brush->Color  = clWhite;
    this->MainCanvas->Canvas->Pen->Color    = clBlue;
-   this->MainCanvas->Canvas->Rectangle(0, 0, (800*this->GridSize)+10, (300*this->GridSize)+10);
+   this->MainCanvas->Canvas->Rectangle(0, 0, (800 * this->GridSize) + 10, (300 * this->GridSize) + 10);
 
    this->MainCanvas->Canvas->Brush->Color = clBtnFace;
    this->MainCanvas->Canvas->Pen->Color   = clBlack;
    //this->MainCanvas->Canvas->FillRect(ClientRect);
 
-   for (int i = 0; i<NodeCmp; i++) {
+   for (int i = 0; i < this->NodeCmp; i++) {
       //if (i%4 == NbDraw) {
       //Node, Black Inactive, Red Active
-      NodeCurr = (TNode*)this->NodeList->Items[i];
+      NodeCurr = static_cast<TNode*>(this->NodeList->Items[i]);
 
       if (NodeCurr->TagFlag) {
          this->MainCanvas->Canvas->Brush->Color = clGray;
       } else {
          this->MainCanvas->Canvas->Brush->Color = clBlack;
       }
-      this->MainCanvas->Canvas->Pen->Color   = clBlack;
+      this->MainCanvas->Canvas->Pen->Color = clBlack;
 
       if (! NodeCurr->DeleteFlag) {
 
-         if (NodeCurr == NodeSelect) {
+         if (NodeCurr == this->NodeSelect) {
             this->MainCanvas->Canvas->Brush->Color = clWhite;
          } else if (NodeCurr->GetInOutType() == N_NORMAL && NodeCurr->GetActive()) {
             if (NodeCurr->TagFlag) {
@@ -901,77 +986,77 @@ void __fastcall Tf_CPUNode::DrawBuffer(int NbDraw)
 
          switch(NodeCurr->GetType()) {
             case N_OR: { //OR Circle
-               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
-                                                  NodeCurr->Y * GridSize,
-                                                 (NodeCurr->X * GridSize) + ObjSize,
-                                                 (NodeCurr->Y * GridSize) + ObjSize);
+               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * this->GridSize,
+                                                  NodeCurr->Y * this->GridSize,
+                                                 (NodeCurr->X * this->GridSize) + this->ObjSize,
+                                                 (NodeCurr->Y * this->GridSize) + this->ObjSize);
                break;
             }
             case N_AND: { //AND Square
-               this->MainCanvas->Canvas->Rectangle( NodeCurr->X * GridSize,
-                                                    NodeCurr->Y * GridSize,
-                                                   (NodeCurr->X * GridSize) + ObjSize,
-                                                   (NodeCurr->Y * GridSize) + ObjSize);
+               this->MainCanvas->Canvas->Rectangle( NodeCurr->X * this->GridSize,
+                                                    NodeCurr->Y * this->GridSize,
+                                                   (NodeCurr->X * this->GridSize) + this->ObjSize,
+                                                   (NodeCurr->Y * this->GridSize) + this->ObjSize);
                break;
             }
             case N_NOR: { //NOR Circle with a Point
-               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
-                                                  NodeCurr->Y * GridSize,
-                                                 (NodeCurr->X * GridSize) + ObjSize,
-                                                 (NodeCurr->Y * GridSize) + ObjSize);
+               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * this->GridSize,
+                                                  NodeCurr->Y * this->GridSize,
+                                                 (NodeCurr->X * this->GridSize) + this->ObjSize,
+                                                 (NodeCurr->Y * this->GridSize) + this->ObjSize);
 
                //this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
-               Triangle[0] = Point((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
-               Triangle[1] = Point((NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) + ObjSize);
-               Triangle[2] = Point((NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               Triangle[0] = Point((NodeCurr->X * this->GridSize) + (this->ObjSize/2), (NodeCurr->Y * this->GridSize));
+               Triangle[1] = Point((NodeCurr->X * this->GridSize) + (this->ObjSize/2), (NodeCurr->Y * this->GridSize) + this->ObjSize);
+               Triangle[2] = Point((NodeCurr->X * this->GridSize) + this->ObjSize + (this->ObjSize/2), (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
                this->MainCanvas->Canvas->Polygon(Triangle, 2);
 
                break;
             }
             case N_NAND: { //NAND Square with a Point
-               this->MainCanvas->Canvas->Rectangle( NodeCurr->X * GridSize,
-                                                    NodeCurr->Y * GridSize,
-                                                   (NodeCurr->X * GridSize) + ObjSize,
-                                                   (NodeCurr->Y * GridSize) + ObjSize);
+               this->MainCanvas->Canvas->Rectangle( NodeCurr->X * this->GridSize,
+                                                    NodeCurr->Y * this->GridSize,
+                                                   (NodeCurr->X * this->GridSize) + this->ObjSize,
+                                                   (NodeCurr->Y * this->GridSize) + this->ObjSize);
 
                //this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize));
-               Triangle[0] = Point((NodeCurr->X * GridSize) + (ObjSize/2),  (NodeCurr->Y * GridSize));
-               Triangle[1] = Point((NodeCurr->X * GridSize) + (ObjSize/2),  (NodeCurr->Y * GridSize) + ObjSize);
-               Triangle[2] = Point((NodeCurr->X * GridSize) + ObjSize + (ObjSize/2), (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               Triangle[0] = Point((NodeCurr->X * this->GridSize) + (this->ObjSize/2),  (NodeCurr->Y * this->GridSize));
+               Triangle[1] = Point((NodeCurr->X * this->GridSize) + (this->ObjSize/2),  (NodeCurr->Y * this->GridSize) + this->ObjSize);
+               Triangle[2] = Point((NodeCurr->X * this->GridSize) + this->ObjSize + (this->ObjSize/2), (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
                this->MainCanvas->Canvas->Polygon(Triangle, 2);
 
                break;
             }
             case N_XOR: { //XOR Circle with a White +
-               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * GridSize,
-                                                  NodeCurr->Y * GridSize,
-                                                 (NodeCurr->X * GridSize) + ObjSize,
-                                                 (NodeCurr->Y * GridSize) + ObjSize);
+               this->MainCanvas->Canvas->Ellipse( NodeCurr->X * this->GridSize,
+                                                  NodeCurr->Y * this->GridSize,
+                                                 (NodeCurr->X * this->GridSize) + this->ObjSize,
+                                                 (NodeCurr->Y * this->GridSize) + this->ObjSize);
 
-               if (NodeCurr == NodeSelect) {
+               if (NodeCurr == this->NodeSelect) {
                   this->MainCanvas->Canvas->Pen->Color = clBlack;
                } else {
                   this->MainCanvas->Canvas->Pen->Color = clWhite;
                }
-               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) );
-               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + (ObjSize/2), (NodeCurr->Y * GridSize) + ObjSize );
-               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize)              , (NodeCurr->Y * GridSize) + (ObjSize/2) );
-               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + ObjSize    , (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * this->GridSize) + (this->ObjSize/2), (NodeCurr->Y * this->GridSize) );
+               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * this->GridSize) + (this->ObjSize/2), (NodeCurr->Y * this->GridSize) + this->ObjSize );
+               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * this->GridSize)                    , (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
+               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * this->GridSize) + this->ObjSize    , (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
                this->MainCanvas->Canvas->Pen->Color = clBlack;
 
                break;
             }
             case N_NOT: { //NOT Triangle
                //this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize),  (NodeCurr->Y * GridSize));
-               Triangle[0] = Point( (NodeCurr->X * GridSize), (NodeCurr->Y * GridSize));
-               Triangle[1] = Point( (NodeCurr->X * GridSize), (NodeCurr->Y * GridSize) + ObjSize);
-               Triangle[2] = Point( (NodeCurr->X * GridSize) + ObjSize, (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               Triangle[0] = Point( (NodeCurr->X * this->GridSize), (NodeCurr->Y * this->GridSize));
+               Triangle[1] = Point( (NodeCurr->X * this->GridSize), (NodeCurr->Y * this->GridSize) + this->ObjSize);
+               Triangle[2] = Point( (NodeCurr->X * this->GridSize) + this->ObjSize, (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
                this->MainCanvas->Canvas->Polygon(Triangle, 2);
 
                break;
             }
             case N_LINK: { //LINK Line
-               if (NodeCurr == NodeSelect) {
+               if (NodeCurr == this->NodeSelect) {
                   this->MainCanvas->Canvas->Pen->Color = clWhite;
                } else if (NodeCurr->GetActive()) {
                   if (NodeCurr->TagFlag) {
@@ -983,8 +1068,8 @@ void __fastcall Tf_CPUNode::DrawBuffer(int NbDraw)
                   this->MainCanvas->Canvas->Pen->Color = clBlack;
                }
 
-               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * GridSize)           , (NodeCurr->Y * GridSize) + (ObjSize/2) );
-               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * GridSize) + ObjSize , (NodeCurr->Y * GridSize) + (ObjSize/2) );
+               this->MainCanvas->Canvas->MoveTo( (NodeCurr->X * this->GridSize)                 , (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
+               this->MainCanvas->Canvas->LineTo( (NodeCurr->X * this->GridSize) + this->ObjSize , (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
                this->MainCanvas->Canvas->Pen->Color = clBlack;
 
                break;
@@ -1009,112 +1094,90 @@ void __fastcall Tf_CPUNode::DrawBuffer(int NbDraw)
          //Line Out Up
          NodeUp = NodeCurr->GetNodeOutUp();
          if (NodeUp != NULL) {
-            this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) +  ObjSize,
-                                             (NodeCurr->Y * GridSize) + (ObjSize/2) );
-            this->MainCanvas->Canvas->LineTo((NodeUp->X * GridSize),
-                                          (NodeUp->Y * GridSize) + (ObjSize/2) );
+            this->MainCanvas->Canvas->MoveTo((NodeCurr->X * this->GridSize) +  this->ObjSize,
+                                             (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
+            this->MainCanvas->Canvas->LineTo((NodeUp->X * this->GridSize),
+                                             (NodeUp->Y * this->GridSize) + (this->ObjSize/2) );
          }
 
          //Line Out Down
          NodeDown = NodeCurr->GetNodeOutDown();
          if (NodeDown != NULL) {
-            this->MainCanvas->Canvas->MoveTo((NodeCurr->X * GridSize) +  ObjSize,
-                                             (NodeCurr->Y * GridSize) + (ObjSize/2) );
-            this->MainCanvas->Canvas->LineTo((NodeDown->X * GridSize),
-                                             (NodeDown->Y * GridSize) + (ObjSize/2) );
+            this->MainCanvas->Canvas->MoveTo((NodeCurr->X * this->GridSize) +  this->ObjSize,
+                                             (NodeCurr->Y * this->GridSize) + (this->ObjSize/2) );
+            this->MainCanvas->Canvas->LineTo((NodeDown->X * this->GridSize),
+                                             (NodeDown->Y * this->GridSize) + (this->ObjSize/2) );
          }
       }
       //}//if modulo
-   }
-
-   if ( DrawAllAnnotation ) {
-      DoDrawAllAnnotation();
    }
 }
 //---------------------------------------------------------------------------
 void Tf_CPUNode::DoDrawAllAnnotation(void)
 {
-   TStringList *AnnotationSelect;
-   TRect  SrcRect, DestRect;
-   String PointA, PointB, DrawFlag, Hue;
-   int UpLX, UpLY, DownRX, DownRY;
-   int Height, Width;
-   TBitmap* AnnotationCanvas;
-   TColor SelectPixel;
-   float ColorR, ColorG, ColorB;
-   int ColorInt;
-   String ColR, ColG, ColB;
-   Byte *pyx;
+   for (int i = 0; i < this->AnnotationList->Count ; i++) {
+      TAnnotation* annotationSelect = static_cast<TAnnotation*>(this->AnnotationList->Items[i]);
 
-   for (int i = 0; i<AnnotationList->Count ; i++) {
-      AnnotationSelect = (TStringList*)AnnotationList->Items[i];
-      Hue    = AnnotationSelect->Strings[2];
-      PointA = AnnotationSelect->Strings[3];
-      PointB = AnnotationSelect->Strings[4];
+      int upLX   = annotationSelect->upX;
+      int upLY   = annotationSelect->upY;
+      int downRX = annotationSelect->downX;
+      int downRY = annotationSelect->downY;
 
-      UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
-      UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
-      DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
-      DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
+      upLX   = upLX * this->GridSize;
+      upLY   = upLY * this->GridSize;
+      downRX = downRX * this->GridSize + this->ObjSize;
+      downRY = downRY * this->GridSize + this->ObjSize;
 
-      UpLX   = UpLX * GridSize            ;
-      UpLY   = UpLY * GridSize            ;
-      DownRX = DownRX * GridSize + ObjSize;
-      DownRY = DownRY * GridSize + ObjSize;
+      TBitmap* annotationCanvas = new TBitmap;
 
-      AnnotationCanvas = new TBitmap;
+      int height = downRY - upLY;
+      int width  = downRX - upLX;
+      TRect  srcRect, destRect;
+      srcRect.init(upLX, upLY, downRX, downRY);
+      destRect.init(0, 0, width, height);
 
-      Height = DownRY-UpLY;
-      Width  = DownRX-UpLX;
-      SrcRect.init(UpLX, UpLY, DownRX, DownRY);
-      DestRect.init(0, 0, Width, Height);
+      annotationCanvas->Height = height;
+      annotationCanvas->Width  = width ;
+      annotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+      annotationCanvas->PixelFormat = pf24bit;
+      annotationCanvas->Canvas->CopyRect(destRect, this->MainCanvas->Canvas, srcRect);
 
-      AnnotationCanvas->Height = Height;
-      AnnotationCanvas->Width  = Width ;
-      AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
-      AnnotationCanvas->PixelFormat = pf24bit;
-      AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+      float colorR = 1.0 - (annotationSelect->hueR / 200.0);
+      float colorG = 1.0 - (annotationSelect->hueG / 200.0);
+      float colorB = 1.0 - (annotationSelect->hueB / 200.0);
 
-      ColR = Hue.SubString(7,Hue.Pos(",")-7);
-      ColG = Hue.SubString(Hue.Pos(",")+3,Hue.Pos(".")-Hue.Pos(",")-3);
-      ColB = Hue.SubString(Hue.Pos(".")+3,Hue.Length());
-
-      ColorR = 1.0-(StrToInt(ColR)/200.0);
-      ColorG = 1.0-(StrToInt(ColG)/200.0);
-      ColorB = 1.0-(StrToInt(ColB)/200.0);
-
-      for (int y = 0; y < Height; y++) {
-         pyx=(Byte *)AnnotationCanvas->ScanLine[y];
-         for (int x = 0; x < Width; x++) {
-            ColorInt = (pyx[x*3] * ColorG) * ColorR ; // Blue
-            if (ColorInt > 255) {
+      for (int y = 0; y < height; y++) {
+         Byte *pyx = static_cast<Byte *>(annotationCanvas->ScanLine[y]);
+         for (int x = 0; x < width; x++) {
+            int colorInt = (pyx[x*3] * colorG) * colorR ; // Blue
+            if (colorInt > 255) {
                pyx[x*3] = 255;
             } else {
-               pyx[x*3] = ColorInt;
+               pyx[x*3] = colorInt;
             }
 
-            ColorInt = (pyx[x*3 + 1] * ColorR) * ColorB ; //Green
-            if (ColorInt > 255) {
+            colorInt = (pyx[x*3 + 1] * colorR) * colorB ; //Green
+            if (colorInt > 255) {
                pyx[x*3 + 1] = 255;
             } else {
-               pyx[x*3 + 1] = ColorInt;
+               pyx[x*3 + 1] = colorInt;
             }
 
-            ColorInt = (pyx[x*3 + 2] * ColorB) * ColorG ; //Red
-            if (ColorInt > 255) {
+            colorInt = (pyx[x*3 + 2] * colorB) * colorG ; //Red
+            if (colorInt > 255) {
                pyx[x*3 + 2] = 255;
             } else {
-               pyx[x*3 + 2] = ColorInt;
+               pyx[x*3 + 2] = colorInt;
             }
          }
       }
 
-      this->MainCanvas->Canvas->Draw(UpLX, UpLY, AnnotationCanvas);
+      this->MainCanvas->Canvas->Draw(upLX, upLY, annotationCanvas);
       this->MainCanvas->Canvas->Brush->Color = clBtnFace;
       this->MainCanvas->Canvas->Pen->Color = clBlack;
-      this->MainCanvas->Canvas->TextOutA(UpLX + 10, UpLY + 10, AnnotationSelect->Strings[0]);
+      this->MainCanvas->Canvas->TextOutA(upLX + 10, upLY + 10, annotationSelect->name);
 
-      AnnotationCanvas->Free();
+      annotationCanvas->Free();
    }
 
 }
@@ -1201,7 +1264,7 @@ void Tf_CPUNode::UpdateNode(void)
             i++;
          }
       } else {
-         NodeSelect->SetOutDown(0,NULL);
+         NodeSelect->SetOutDown(0, NULL);
       }
    }
 
@@ -1695,34 +1758,14 @@ void __fastcall Tf_CPUNode::FormCreate(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
-      int X, int Y)
+void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift, int X, int Y)
 {
    (void)Sender;
 
-   TNode* NodeCurr;
-   String Name;
-   NodeTypes type;
-
-   TStringList *AnnotationSelect;
-   TRect  SrcRect, DestRect;
-   String PointA, PointB, DrawFlag, Hue;
-   int UpLX, UpLY, DownRX, DownRY;
-   int Height, Width;
-   bool AnnotationFound = false;
-   TBitmap* AnnotationCanvas;
-   TColor SelectPixel;
-   float ColorR, ColorG, ColorB;
-   int ColorInt;
-   String ColR, ColG, ColB;
-   Byte *pyx;
-
-   int UpdateOffSetX;
-   int UpdateOffSetY;
-
    //Catch cursor mouvment when "drag & drop" of the Canvas
    if (   Shift.Contains(ssLeft) && !(Shift.Contains(ssCtrl) || Shift.Contains(ssShift) || Shift.Contains(ssAlt))
-       && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize) )
+       && (X <= this->MouseDownX - this->GridSize || X >= this->MouseDownX + this->GridSize ||
+           Y <= this->MouseDownY - this->GridSize || Y >= this->MouseDownY + this->GridSize) )
    {
    //Move view
       this->OffSetX -= X - this->MouseDownX;
@@ -1740,22 +1783,22 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
    } else if (Shift.Contains(ssLeft) && Shift.Contains(ssShift) && !Shift.Contains(ssCtrl)) {
    //Select (Shift)
       this->SelectList->Clear();
-      for (int i = 0; i<NodeCmp; i++) {
-         NodeCurr = (TNode*)this->NodeList->Items[i];
-         if (! NodeCurr->DeleteFlag) {
+      for (int i = 0; i < NodeCmp; i++) {
+         TNode* nodeCurr = static_cast<TNode*>(this->NodeList->Items[i]);
+         if (! nodeCurr->DeleteFlag) {
             if (  (  (   this->MouseDownX < X
-                      && ((NodeCurr->X*GridSize)-OffSetX)+this->p_Area->Left >= this->MouseDownX
-                      && ((NodeCurr->X*GridSize)-OffSetX)+this->p_Area->Left <= X)
+                      && ((nodeCurr->X * this->GridSize) - this->OffSetX) + this->p_Area->Left >= this->MouseDownX
+                      && ((nodeCurr->X * this->GridSize) - this->OffSetX) + this->p_Area->Left <= X)
                    ||(   this->MouseDownX > X
-                      && ((NodeCurr->X*GridSize)-OffSetX)+this->p_Area->Left <= this->MouseDownX
-                      && ((NodeCurr->X*GridSize)-OffSetX)+this->p_Area->Left >= X) )
+                      && ((nodeCurr->X * this->GridSize) - this->OffSetX) + this->p_Area->Left <= this->MouseDownX
+                      && ((nodeCurr->X * this->GridSize) - this->OffSetX) + this->p_Area->Left >= X) )
                 &&(  (   this->MouseDownY < Y
-                      && ((NodeCurr->Y*GridSize)-OffSetY)+this->p_Area->Top  >= this->MouseDownY
-                      && ((NodeCurr->Y*GridSize)-OffSetY)+this->p_Area->Top <= Y)
+                      && ((nodeCurr->Y * this->GridSize) - this->OffSetY) + this->p_Area->Top >= this->MouseDownY
+                      && ((nodeCurr->Y * this->GridSize) - this->OffSetY) + this->p_Area->Top <= Y)
                    ||(   this->MouseDownY > Y
-                      && ((NodeCurr->Y*GridSize)-OffSetY)+this->p_Area->Top  <= this->MouseDownY
-                      && ((NodeCurr->Y*GridSize)-OffSetY)+this->p_Area->Top >= Y) ) ) {
-               this->SelectList->Add(NodeCurr);
+                      && ((nodeCurr->Y * this->GridSize) - this->OffSetY) + this->p_Area->Top <= this->MouseDownY
+                      && ((nodeCurr->Y * this->GridSize) - this->OffSetY) + this->p_Area->Top >= Y) ) ) {
+               this->SelectList->Add(nodeCurr);
             }
          }
       }
@@ -1781,30 +1824,31 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->Canvas->Pen->Color = clGreen;
       this->Canvas->Pen->Width = 2;
       this->Canvas->MoveTo(this->MouseDownX, this->MouseDownY);
-      this->Canvas->LineTo(X,this->MouseDownY);
+      this->Canvas->LineTo(X, this->MouseDownY);
       this->Canvas->LineTo(X, Y);
       this->Canvas->LineTo(this->MouseDownX, Y);
       this->Canvas->LineTo(this->MouseDownX, this->MouseDownY);
       this->Canvas->Pen->Width = 1;
-      this->Canvas->TextOutA(this->MouseDownX+5, this->MouseDownY+5,
-                             "X:"  + IntToStr((((this->MouseDownX-this->p_Area->Left)+this->OffSetX)+(ObjSize/2)) / GridSize) +
-                             ",Y:" + IntToStr((((this->MouseDownY-this->p_Area->Top)+this->OffSetY)+(ObjSize)) / GridSize));
-      this->Canvas->TextOutA(X-25, Y-15,
-                             "X:"  + IntToStr((((X)+this->OffSetX-this->p_Area->Left)-ObjSize) / GridSize) +
-                             ",Y:" + IntToStr((((Y)+this->OffSetY-this->p_Area->Top) -(ObjSize/2)) / GridSize));
+      this->Canvas->TextOutA(this->MouseDownX + 5, this->MouseDownY + 5,
+                             "X:"  + IntToStr((((this->MouseDownX - this->p_Area->Left) + this->OffSetX) + (this->ObjSize / 2)) / this->GridSize) +
+                             ",Y:" + IntToStr((((this->MouseDownY - this->p_Area->Top)  + this->OffSetY) + (this->ObjSize))     / this->GridSize));
+      this->Canvas->TextOutA(X - 25, Y - 15,
+                             "X:"  + IntToStr((((X) + this->OffSetX - this->p_Area->Left) - this->ObjSize) /       this->GridSize) +
+                             ",Y:" + IntToStr((((Y) + this->OffSetY - this->p_Area->Top)  - (this->ObjSize / 2)) / this->GridSize));
    } else if(   Shift.Contains(ssLeft) && !Shift.Contains(ssShift) && Shift.Contains(ssCtrl)
-             && (X <= this->MouseDownX-GridSize || X >= this->MouseDownX+GridSize || Y <= this->MouseDownY-GridSize || Y >= this->MouseDownY+GridSize))
+             && (  X <= this->MouseDownX - this->GridSize || X >= this->MouseDownX + this->GridSize ||
+                   Y <= this->MouseDownY - this->GridSize || Y >= this->MouseDownY + this->GridSize))
    {
    //Move Selection (Ctrl)
-      UpdateOffSetX = (X - this->MouseDownX) / GridSize ;
-      UpdateOffSetY = (Y - this->MouseDownY) / GridSize ;
+      int updateOffSetX = (X - this->MouseDownX) / this->GridSize ;
+      int updateOffSetY = (Y - this->MouseDownY) / this->GridSize ;
       this->MouseDownX = X;
       this->MouseDownY = Y;
 
-      for (int i = 0; i<this->SelectList->Count; i++) {
-         NodeCurr = (TNode*)this->SelectList->Items[i];
-         NodeCurr->X += UpdateOffSetX;
-         NodeCurr->Y += UpdateOffSetY;
+      for (int i = 0; i < this->SelectList->Count; i++) {
+         TNode* nodeCurr = static_cast<TNode*>(this->NodeList->Items[i]);
+         nodeCurr->X += updateOffSetX;
+         nodeCurr->Y += updateOffSetY;
          this->ItsUpdated = true;
       }
       //Draw
@@ -1815,204 +1859,207 @@ void __fastcall Tf_CPUNode::FormMouseMove(TObject *Sender, TShiftState Shift,
       this->CallDrawArea(REFRESH_BUFFER);
    } else {
    //Update status bar Info for Node Name/Type
-      for (int i = 0; i<NodeCmp; i++) {
-         NodeCurr = (TNode*)this->NodeList->Items[i];
-         if (! NodeCurr->DeleteFlag) {
-            if (   X >= ( (NodeCurr->X * GridSize)            - OffSetX)+this->p_Area->Left
-                && X <  (((NodeCurr->X * GridSize) + ObjSize) - OffSetX)+this->p_Area->Left
-                && Y >= ( (NodeCurr->Y * GridSize)            - OffSetY)+this->p_Area->Top
-                && Y <  (((NodeCurr->Y * GridSize) + ObjSize) - OffSetY)+this->p_Area->Top ) {
-               //type = NodeCurr->GetType();
-               Name = NodeCurr->Name;
-               type = NodeCurr->GetType();
+      bool nodeFound = false;
 
-               this->sb_Main->Panels->Items[0]->Text = Name + " [" + f_GraphEdit ->cb_Type->Items->Strings[type] +
-                                                       "] -> X:" + IntToStr(NodeCurr->X) + " Y:" + IntToStr(NodeCurr->Y);
+      for (int i = 0; i < this->NodeCmp; i++) {
+         TNode* nodeCurr = static_cast<TNode*>(this->NodeList->Items[i]);
+         if (! nodeCurr->DeleteFlag) {
+            if (   X >= ( (nodeCurr->X * this->GridSize)                  - this->OffSetX) + this->p_Area->Left
+                && X <  (((nodeCurr->X * this->GridSize) + this->ObjSize) - this->OffSetX) + this->p_Area->Left
+                && Y >= ( (nodeCurr->Y * this->GridSize)                  - this->OffSetY) + this->p_Area->Top
+                && Y <  (((nodeCurr->Y * this->GridSize) + this->ObjSize) - this->OffSetY) + this->p_Area->Top ) {
+               //type = NodeCurr->GetType();
+               String name = nodeCurr->Name;
+               NodeTypes type = nodeCurr->GetType();
+
+               this->sb_Main->Panels->Items[0]->Text = name + " [" + f_GraphEdit ->cb_Type->Items->Strings[type] +
+                                                       "] -> X:" + IntToStr(nodeCurr->X) + " Y:" + IntToStr(nodeCurr->Y);
                //this->Hint = Name + " [" + f_GraphEdit ->cb_Type->Items->Strings[type] + "]";
                //f_CPUNode->Hint
 
-               i = NodeCmp;
+               nodeFound = true;
+               break;
             }
          }
       }
 
-      if (cb_Annotation->Checked && !this->DrawAllAnnotation) {
-         for(int i = 0; i<AnnotationList->Count ; i++) {
-            AnnotationSelect = (TStringList*)AnnotationList->Items[i];
-            PointA = AnnotationSelect->Strings[3];
-            PointB = AnnotationSelect->Strings[4];
-            DrawFlag = AnnotationSelect->Strings[5];
+      if (this->cb_Annotation->Checked && !this->DrawAllAnnotation) {
+         bool annotationFound = false;
 
-            //When Annotation is drawn, check if cursor is still inside the shape, if not, redraw
-            if (DrawFlag == "Draw=True") {
-               UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
-               UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
-               DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
-               DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
+         /*for (int i = 0; i < this->AnnotationList->Count; i++) {
+            TAnnotation* annotationSelect = static_cast<TAnnotation*>(this->AnnotationList->Items[i]);
 
-               UpLX   = ((( UpLX * GridSize)            ) + OffSetX)+this->p_Area->Left;
-               UpLY   = ((( UpLY * GridSize)            ) + OffSetY)+this->p_Area->Top;
-               DownRX = (((DownRX * GridSize ) + ObjSize) + OffSetX)+this->p_Area->Left;
-               DownRY = (((DownRY * GridSize ) + ObjSize) + OffSetY)+this->p_Area->Top;
+            //When Annotation is drawn, check if cursor is still inside the shape, if not, redraw area from buffer
+            if (annotationSelect->indDraw) {
+               int upLX   = annotationSelect->upX;
+               int upLY   = annotationSelect->upY;
+               int downRX = annotationSelect->downX;
+               int downRY = annotationSelect->downY;
 
-               if (!(   X >= UpLX
-                     && X <  DownRX
-                     && Y >= UpLY
-                     && Y <  DownRY) )
+               upLX   = ((( upLX  * this->GridSize )                ) + this->OffSetX) + this->p_Area->Left;
+               upLY   = ((( upLY  * this->GridSize )                ) + this->OffSetY) + this->p_Area->Top;
+               downRX = (((downRX * this->GridSize ) + this->ObjSize) + this->OffSetX) + this->p_Area->Left;
+               downRY = (((downRY * this->GridSize ) + this->ObjSize) + this->OffSetY) + this->p_Area->Top;
+
+               if (!(   X >= upLX
+                     && X <  downRX
+                     && Y >= upLY
+                     && Y <  downRY) )
                {
-                  AnnotationSelect->Strings[5] = "Draw=False";
+                  annotationSelect->indDraw = false;
 
-                  AnnotationCanvas = new TBitmap;
+                  TBitmap* annotationCanvas = new TBitmap;
 
-                  UpLX   = UpLX   -this->p_Area->Left;
-                  UpLY   = UpLY   -this->p_Area->Top;
-                  DownRX = DownRX -this->p_Area->Left;
-                  DownRY = DownRY -this->p_Area->Top;
+                  upLX   = upLX   - this->p_Area->Left;
+                  upLY   = upLY   - this->p_Area->Top;
+                  downRX = downRX - this->p_Area->Left;
+                  downRY = downRY - this->p_Area->Top;
 
-                  Height=DownRY-UpLY;
-                  Width=DownRX-UpLX;
-                  SrcRect.init(UpLX+OffSetX, UpLY+OffSetY, DownRX+OffSetX, DownRY+OffSetY);
-                  DestRect.init(0, 0, Width, Height);
+                  int height = downRY - upLY;
+                  int width = downRX - upLX;
+                  TRect  srcRect, destRect;
 
-                  AnnotationCanvas->Height = Height;
-                  AnnotationCanvas->Width  = Width ;
-                  AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
-                  AnnotationCanvas->PixelFormat = pf24bit;
-                  AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+                  srcRect.init(upLX   + this->OffSetX, upLY   + this->OffSetY,
+                               downRX + this->OffSetX, downRY + this->OffSetY);
+                  destRect.init(0, 0, width, height);
 
-                  this->Canvas->Draw(UpLX+this->p_Area->Left, UpLY+this->p_Area->Top, AnnotationCanvas);
-                  AnnotationCanvas->Free();
+                  annotationCanvas->Height = height;
+                  annotationCanvas->Width  = width ;
+                  annotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+                  annotationCanvas->PixelFormat = pf24bit;
+                  annotationCanvas->Canvas->CopyRect(destRect, this->MainCanvas->Canvas, srcRect);
+
+                  this->Canvas->Draw(upLX + this->p_Area->Left, upLY + this->p_Area->Top, annotationCanvas);
+                  annotationCanvas->Free();
+
                }
             }
-         }
-         for (int i = 0; i<AnnotationList->Count ; i++) {
-            AnnotationSelect = (TStringList*)AnnotationList->Items[i];
-            Hue    = AnnotationSelect->Strings[2];
-            PointA = AnnotationSelect->Strings[3];
-            PointB = AnnotationSelect->Strings[4];
+         }*/
+         for (int i = 0; i < this->AnnotationList->Count; i++) {
+            TAnnotation* annotationSelect = static_cast<TAnnotation*>(this->AnnotationList->Items[i]);
 
-            DrawFlag = AnnotationSelect->Strings[5];
+            int upLX   = annotationSelect->upX;
+            int upLY   = annotationSelect->upY;
+            int downRX = annotationSelect->downX;
+            int downRY = annotationSelect->downY;
 
-            UpLX   = StrToInt( PointA.SubString(3, PointA.Pos(",")-3) )              ;
-            UpLY   = StrToInt( PointA.SubString(PointA.Pos(",")+3, PointA.Length()) );
-            DownRX = StrToInt( PointB.SubString(3, PointB.Pos(",")-3) )              ;
-            DownRY = StrToInt( PointB.SubString(PointB.Pos(",")+3, PointB.Length()) );
+            upLX   = ((( upLX  * this->GridSize)                ) - this->OffSetX) + this->p_Area->Left;
+            upLY   = ((( upLY  * this->GridSize)                ) - this->OffSetY) + this->p_Area->Top;
+            downRX = (((downRX * this->GridSize) + this->ObjSize) - this->OffSetX) + this->p_Area->Left;
+            downRY = (((downRY * this->GridSize) + this->ObjSize) - this->OffSetY) + this->p_Area->Top;
 
-            UpLX   = ((( UpLX * GridSize)           ) - OffSetX)+this->p_Area->Left;
-            UpLY   = ((( UpLY * GridSize)           ) - OffSetY)+this->p_Area->Top;
-            DownRX = (((DownRX * GridSize) + ObjSize) - OffSetX)+this->p_Area->Left;
-            DownRY = (((DownRY * GridSize) + ObjSize) - OffSetY)+this->p_Area->Top;
+            if (   X >= upLX
+                && X <  downRX
+                && Y >= upLY
+                && Y <  downRY) {
 
-            if (   X >= UpLX
-                && X <  DownRX
-                && Y >= UpLY
-                && Y <  DownRY ) {
-
-               AnnotationFound = true;
+               annotationFound = true;
                this->AnnotationDrawn = true;
-               if (DrawFlag == "Draw=False") {
-                  AnnotationSelect->Strings[5] = "Draw=True";
+               if (!annotationSelect->indDraw ) {
+                  annotationSelect->indDraw = true;
 
-                  AnnotationCanvas = new TBitmap;
+                  TBitmap* annotationCanvas = new TBitmap;
 
-                  UpLX   = UpLX   -this->p_Area->Left;
-                  UpLY   = UpLY   -this->p_Area->Top;
-                  DownRX = DownRX -this->p_Area->Left;
-                  DownRY = DownRY -this->p_Area->Top;
+                  upLX   = upLX   - this->p_Area->Left;
+                  upLY   = upLY   - this->p_Area->Top;
+                  downRX = downRX - this->p_Area->Left;
+                  downRY = downRY - this->p_Area->Top;
 
-                  Height=DownRY-UpLY;
-                  Width=DownRX-UpLX;
-                  SrcRect.init(UpLX+OffSetX, UpLY+OffSetY, DownRX+OffSetX, DownRY+OffSetY);
-                  DestRect.init(0, 0, Width, Height);
+                  int height = downRY - upLY;
+                  int width  = downRX - upLX;
+                  TRect  srcRect, destRect;
 
-                  AnnotationCanvas->Height = Height;
-                  AnnotationCanvas->Width  = Width ;
-                  AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
-                  AnnotationCanvas->PixelFormat = pf24bit;
-                  AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+                  srcRect.init(upLX   + this->OffSetX, upLY   + this->OffSetY,
+                               downRX + this->OffSetX, downRY + this->OffSetY);
+                  destRect.init(0, 0, width, height);
 
-                  //"Hue:R=" + R + ",V=" + V + ".B=" + B
-                  //int R=StrToInt(e_R->Text),V=StrToInt(e_V->Text),B=StrToInt(e_B->Text);
+                  annotationCanvas->Height = height;
+                  annotationCanvas->Width  = width ;
+                  annotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+                  annotationCanvas->PixelFormat = pf24bit;
+                  annotationCanvas->Canvas->CopyRect(destRect, this->MainCanvas->Canvas, srcRect);
 
-                  ColR = Hue.SubString(7,Hue.Pos(",")-7);
-                  ColG = Hue.SubString(Hue.Pos(",")+3,Hue.Pos(".")-Hue.Pos(",")-3);
-                  ColB = Hue.SubString(Hue.Pos(".")+3,Hue.Length());
+                  float colorR = 1.0 - (annotationSelect->hueR / 200.0);
+                  float colorG = 1.0 - (annotationSelect->hueG / 200.0);
+                  float colorB = 1.0 - (annotationSelect->hueB / 200.0);
 
-                  ColorR = 1.0-(StrToInt(ColR)/200.0);
-                  ColorG = 1.0-(StrToInt(ColG)/200.0);
-                  ColorB = 1.0-(StrToInt(ColB)/200.0);
-
-                  for (int y = 0; y < Height; y++) {
-                     pyx=(Byte *)AnnotationCanvas->ScanLine[y];
-                     for (int x = 0; x < Width; x++) {
-                        ColorInt = (pyx[x*3] * ColorG) * ColorR ; // Blue
-                        if (ColorInt > 255) {
+                  for (int y = 0; y < height; y++) {
+                     Byte *pyx = static_cast<Byte *>(annotationCanvas->ScanLine[y]);
+                     for (int x = 0; x < width; x++) {
+                        int colorInt = (pyx[x*3] * colorG) * colorR ; // Blue
+                        if (colorInt > 255) {
                            pyx[x*3] = 255;
                         } else {
-                           pyx[x*3] = ColorInt;
+                           pyx[x*3] = colorInt;
                         }
 
-                        ColorInt = (pyx[x*3 + 1] * ColorR) * ColorB ; //Green
-                        if (ColorInt > 255) {
+                        colorInt = (pyx[x*3 + 1] * colorR) * colorB ; //Green
+                        if (colorInt > 255) {
                            pyx[x*3 + 1] = 255;
                         } else {
-                           pyx[x*3 + 1] = ColorInt;
+                           pyx[x*3 + 1] = colorInt;
                         }
 
-                        ColorInt = (pyx[x*3 + 2] * ColorB) * ColorG ; //Red
-                        if (ColorInt > 255) {
+                        colorInt = (pyx[x*3 + 2] * colorB) * colorG ; //Red
+                        if (colorInt > 255) {
                            pyx[x*3 + 2] = 255;
                         } else {
-                           pyx[x*3 + 2] = ColorInt;
+                           pyx[x*3 + 2] = colorInt;
                         }
                      }
                   }
 
-                  AnnotationCanvas->Canvas->TextOutA(10,10, AnnotationSelect->Strings[0]);
+                  annotationCanvas->Canvas->TextOutA(10, 10, annotationSelect->name);
 
-                  this->Canvas->Draw(UpLX+this->p_Area->Left, UpLY+this->p_Area->Top, AnnotationCanvas);
-                  AnnotationCanvas->Free();
+                  this->Canvas->Draw(upLX + this->p_Area->Left, upLY + this->p_Area->Top, annotationCanvas);
+                  annotationCanvas->Free();
 
                   /*
                   this->Canvas->Brush->Color = clBtnFace;
                   this->Canvas->Pen->Color = clBlue;
                   this->Canvas->Pen->Width = 2;
-                  this->Canvas->MoveTo(UpLX, UpLY);
-                  this->Canvas->LineTo(DownRX, UpLY);
-                  this->Canvas->LineTo(DownRX, DownRY);
-                  this->Canvas->LineTo(UpLX, DownRY);
-                  this->Canvas->LineTo(UpLX, UpLY);
+                  this->Canvas->MoveTo(upLX, upLY);
+                  this->Canvas->LineTo(downRX, upLY);
+                  this->Canvas->LineTo(downRX, downRY);
+                  this->Canvas->LineTo(upLX, downRY);
+                  this->Canvas->LineTo(upLX, upLY);
                   this->Canvas->Pen->Width = 1;
                   */
+
                }
-            } else {
-               AnnotationSelect->Strings[5] = "Draw=False";
+               if (nodeFound == false) {
+                  this->sb_Main->Panels->Items[0]->Text = annotationSelect->name;
+               }
+            } else if (annotationSelect->indDraw ) {
+               annotationSelect->indDraw = false;
 
-               AnnotationCanvas = new TBitmap;
+               TBitmap* annotationCanvas = new TBitmap;
 
-               UpLX   = UpLX   -this->p_Area->Left;
-               UpLY   = UpLY   -this->p_Area->Top;
-               DownRX = DownRX -this->p_Area->Left;
-               DownRY = DownRY -this->p_Area->Top;
+               upLX   = upLX   - this->p_Area->Left;
+               upLY   = upLY   - this->p_Area->Top;
+               downRX = downRX - this->p_Area->Left;
+               downRY = downRY - this->p_Area->Top;
 
-               Height=DownRY-UpLY;
-               Width=DownRX-UpLX;
-               SrcRect.init(UpLX+OffSetX, UpLY+OffSetY, DownRX+OffSetX, DownRY+OffSetY);
-               DestRect.init(0, 0, Width, Height);
+               int height = downRY - upLY;
+               int width  = downRX - upLX;
+               TRect  srcRect, destRect;
 
-               AnnotationCanvas->Height = abs(Height);
-               AnnotationCanvas->Width  = abs(Width) ;
-               AnnotationCanvas->HandleType = bmDIB; // allows use of ScanLine
-               AnnotationCanvas->PixelFormat = pf24bit;
-               AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
+               srcRect.init(upLX   + this->OffSetX, upLY   + this->OffSetY,
+                            downRX + this->OffSetX, downRY + this->OffSetY);
+               destRect.init(0, 0, width, height);
+
+               annotationCanvas->Height = abs(height);
+               annotationCanvas->Width  = abs(width) ;
+               annotationCanvas->HandleType = bmDIB; // allows use of ScanLine
+               annotationCanvas->PixelFormat = pf24bit;
 
                //this->CallDrawArea(FROM_BUFFER);
-               AnnotationCanvas->Canvas->CopyRect(DestRect, this->MainCanvas->Canvas, SrcRect);
-               this->Canvas->Draw(UpLX+this->p_Area->Left, UpLY+this->p_Area->Top, AnnotationCanvas);
-               AnnotationCanvas->Free();
+               annotationCanvas->Canvas->CopyRect(destRect, this->MainCanvas->Canvas, srcRect);
+               this->Canvas->Draw(upLX + this->p_Area->Left, upLY + this->p_Area->Top, annotationCanvas);
+               annotationCanvas->Free();
             }
          }
-         if (!AnnotationFound && this->AnnotationDrawn) {
+         if (!annotationFound && this->AnnotationDrawn) {
             this->AnnotationDrawn = false;
             //this->Invalidate();
             //this->CallDrawArea(FROM_BUFFER);
@@ -2028,6 +2075,7 @@ void __fastcall Tf_CPUNode::cb_AnnotationClick(TObject *Sender)
    (void)Sender;
 
    this->DrawAllAnnotation = (GetKeyState(VK_CONTROL) & 0x8000 ) && this->cb_Annotation->Checked;
+   this->AnnotationDrawn = false;
 
    this->Invalidate();
    this->CallDrawArea(REFRESH_BUFFER);

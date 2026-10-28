@@ -111,6 +111,23 @@ public:
    TNode(int pIntID, int pX, int pY, NodeTypes pType, String pName);
 };
 
+//---------------------------------------------------------------------------
+
+class TAnnotation
+{
+public:
+   String name, type;
+   int id;
+   float hueR, hueG, hueB;
+   int upX  , upY;
+   int downX, downY;
+   bool indDraw;
+
+   TAnnotation(int pId, String pName, String pType, bool pIndDraw);
+};
+
+//---------------------------------------------------------------------------
+
 class Tf_CPUNode : public TForm
 {
 __published:

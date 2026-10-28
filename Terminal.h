@@ -33,6 +33,7 @@ __published:
    void __fastcall sbHaltClick(TObject *Sender);
    void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
     void __fastcall pDebugClick(TObject *Sender);
+    void __fastcall FormShow(TObject *Sender);
 private:
    int timerValue;
    int timerCmp;

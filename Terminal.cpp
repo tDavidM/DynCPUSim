@@ -292,3 +292,12 @@ void __fastcall Tf_Terminal::pDebugClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall Tf_Terminal::FormShow(TObject *Sender)
+{
+   (void)Sender;
+
+   this->Left = (Screen->Width / 2) - (this->Width / 2);
+   this->Top = 5;
+}
+//---------------------------------------------------------------------------
+

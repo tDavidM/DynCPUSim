@@ -19,6 +19,7 @@ object f_Terminal: Tf_Terminal
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object sbBoot: TSpeedButton
@@ -42,7 +43,7 @@ object f_Terminal: Tf_Terminal
     OnClick = sbHaltClick
   end
   object lValue: TLabel
-    Left = 170
+    Left = 279
     Top = 413
     Width = 44
     Height = 13
@@ -55,7 +56,7 @@ object f_Terminal: Tf_Terminal
     ParentFont = False
   end
   object lTimer: TLabel
-    Left = 305
+    Left = 175
     Top = 413
     Width = 23
     Height = 13

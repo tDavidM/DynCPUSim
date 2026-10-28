@@ -133,7 +133,7 @@ Interrupts:
 
 ToDo/Idea:
 Test CPU pin 49 RAM buzy
-Remove RSTAR - ResetAllReg() ?
+Remove RSTAR - replace with DoneReadIO pin 17
 Remove CFLG  - CarryFlg() ?
 Annotation editor
 Regroup RAM I/O and Hardware I/O pin togetter
