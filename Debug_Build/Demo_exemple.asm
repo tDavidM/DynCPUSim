@@ -1,3 +1,4 @@
+
 #INCLUDE "Library_init.asm"
 
 ; TEST Demo Loading from ASM File, shows a file that can successfully be parsed
@@ -25,12 +26,11 @@
                         SUB   $0 - $1 =  $3                ; The , may be substitute with the following + - = == & | ^ > -> >> < <- << ? for readablity
                         ADD   $3 + $2 -> $3                ; Those 3 ADD lines are strictly equivalent
                         ADD   $3,  $2,   $3                
-                        ADD   $3,$2,$3                            
-
+                        ADD   $3,$2,$3                     
 ; ######################
 
 :LOOP_START             INC   $3                            
-                        SIF   $3 == "0x09"                 ; In addition to the list of symbols that are replaced by , the following ( ) " # @ ! are discarded entirely 
+                        SIF   $3 == "0xff"                 ; In addition to the list of symbols that are replaced by , the following ( ) " # @ ! are discarded entirely 
                         JMPA  #:LOOP_START                 ; Those characters may be used for readablity, the only reserved chars are $ : / * 
                         SET   "0b00000000"->$3             ; Beside hexadecimal values prefixed with 0x (non significant zeros are optional)
                         SET   (255)->$3                    ; The prefix 0b followed by a binary value may be used, ss well as decimal values
@@ -77,17 +77,14 @@
 ; ==========================================================
 
 %MACRO_TEST                            
-                        SEQ   :%TARGET_REG == $D           ; On that CPU, the 4 last registers are readonly, they always return fixed values 
+                        SEQ   :%TARGET_REG == $D           ; On that CPU, the 4 last registers are readonly, they always return fixed values
                         HALT                               ; $C->0x00  $D->0x01  $E->0xFF  $F->0X80 (0x80 is == 0b10000000)
-                        JMPA  :PROGRAM_START               ; Unless something is done, at the very last instruction the CPU loops back to the very first                      
+                        JMPA  :PROGRAM_START               ; Unless something is done, at the very last instruction the CPU loops back to the very first
+                                                           ; 
                                                            ; Included files are simply concatenated at that location
                                                            ; Making the very first instruction something inside the included files in this exemple
+                                                           ; But this JMPA direct it away from the loopback
                                                            
 ; When a .asm file is imported, the controls at the bottom of the ROM window are disabled
 ; Editing can only be done by pressing Clear then re-importing the .asm file
-
-
-
-;  CHECK ??
-; Labels must also be terminated by a : when used (inside an instruction)
 

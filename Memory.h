@@ -20,6 +20,7 @@
 //---------------------------------------------------------------------------
 #include "GraphIO.h"
 #include "ErrorList.h"
+#include <Vcl.ExtCtrls.hpp>
 
 #define ERR_UNKNOWN_FILE "File not found: "
 #define ERR_REDEFINED_MACRO "Macro redefined: "
@@ -39,6 +40,13 @@
 #define ERR_ABS_ADDR_FAR "Absolute Addr Out of Range : "
 #define ERR_REL_ADDR_FAR "Relative Addr Out of Range : "
 
+//---------------------------------------------------------------------------
+
+class THackDBGrid : public TDBGrid
+{
+public:
+   __property VisibleRowCount;
+};
 
 //---------------------------------------------------------------------------
 class TInstruc
@@ -83,7 +91,7 @@ __published:
    TStringField *cds_MemCode;
    TIntegerField *cds_MemAddress;
    TIntegerField *cds_MemOpCode;
-   TStringField *cds_MemData;
+    TStringField *cds_MemCommand;
    TIntegerField *cds_MemDataType;
    TIntegerField *cds_MemRB;
    TIntegerField *cds_MemRC;
@@ -111,6 +119,8 @@ __published:
    TBooleanField *cds_MemBreakPoint;
    TButton *b_boot;
    TStringField *cds_MemSource;
+    TStringField *cds_MemData;
+    TTimer *tReset;
    void __fastcall cb_OpCodeChange(TObject *Sender);
    void __fastcall b_AddClick(TObject *Sender);
    void __fastcall FormCreate(TObject *Sender);
@@ -139,6 +149,7 @@ __published:
    void __fastcall FormShow(TObject *Sender);
    void __fastcall dbg_MemDrawColumnCell(TObject *Sender, const TRect &Rect, int DataCol,
           TColumn *Column, TGridDrawState State);
+    void __fastcall tResetTimer(TObject *Sender);
 private:
    int LastDataType;
    int LastSelLine;
@@ -149,7 +160,7 @@ private:
    TList* InstrucList;
 
    void CreateLine(void);
-   int __fastcall DeltaToAddr(int Delta);
+   int __fastcall DeltaToAddr(int current, int delta);
    String __fastcall BinToHex(String Bin);
    String __fastcall HexToDec(String Hex);
    String __fastcall HexToBin(String Hex);
@@ -162,8 +173,8 @@ private:
 
 public:
    __fastcall Tf_Memory(TComponent* Owner);
-   void __fastcall MoveAddrByDelta(int Delta);
-   void __fastcall MoveAddrByAbsolute(int Addr);
+   void __fastcall MoveAddrByDelta(int delta);
+   void __fastcall MoveAddrByAbsolute(int addr);
    void LoadInstructionSet(_di_IXMLNode pInstructionSet);
    void SetState(void);
    void ResetState(void);
@@ -171,6 +182,7 @@ public:
    bool __fastcall IsStepByStep(void);
    String __fastcall GetCurrentCode(void);
    void __fastcall SetGridColor(bool state);
+   void __fastcall SetNext(bool state);
 
 };
 //---------------------------------------------------------------------------

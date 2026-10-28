@@ -14,8 +14,8 @@
                         SERRH :*ERROR_HANDLING           ; Init the High bits of the Error handling routine
                         SERTL :.ERROR_HANDLING           ; Init the Low bits of the Error handling routine
 
-                        SET   :*INTERRUPT_ERROR_END, $9  ; Skip over the Interrupt and Error handling code
-                        WJMPV $9, :.INTERRUPT_ERROR_END  ;
+                        SET   :*INTERRUPT_ERROR_END, $9  ; Set Addr for Jmp
+                        WJMPV $9, :.INTERRUPT_ERROR_END  ; Skip over the Interrupt and Error handling code
 
 ; =============================================================================
 ;Interrupt handling routine

@@ -294,6 +294,7 @@ void Tf_Memory::CreateLine(void)
 
    this->cds_MemOpCode->AsInteger   = this->cb_OpCode->ItemIndex;
    this->cds_MemMnemonic->AsString  = Instruc->HeadMnemo;
+   this->cds_MemCommand->AsString   = Instruc->Descr;
    this->cds_MemData->AsString      = this->e_Data->Text;
    this->cds_MemComment->AsString   = this->e_Comment->Text;
    this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
@@ -449,6 +450,9 @@ void __fastcall Tf_Memory::dbg_MemDblClick(TObject *Sender)
 
    this->cds_MemAddress->Visible = ! this->cds_MemAddress->Visible;
    this->cds_MemAddrHex->Visible = ! this->cds_MemAddrHex->Visible;
+
+   this->cds_MemCode->Visible    = ! this->cds_MemCode->Visible;
+   this->cds_MemCodeHex->Visible = ! this->cds_MemCodeHex->Visible;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Memory::b_InsertClick(TObject *Sender)
@@ -680,47 +684,55 @@ void __fastcall Tf_Memory::cds_MemAfterScroll(TDataSet *DataSet)
    this->LastSelLine = this->cds_Mem->RecNo;
 }
 //---------------------------------------------------------------------------
-int __fastcall Tf_Memory::DeltaToAddr(int Delta)
+int __fastcall Tf_Memory::DeltaToAddr(int current, int delta)
 {
-   int Target = 0;
+   int target = 0;
 
-   if (Delta <= 127 && Delta >= 0) {
-      Delta = 128 - Delta;
-      Target = this->cds_MemAddress->AsInteger - Delta;
+   if (delta < 128 && delta >= 0) {
+      delta = 128 - delta;
+      target = current - delta;
 
-      while (Target < 0) {
-         Target = Target + this->cds_Mem->RecordCount;
+      while (target < 0) {
+         target = target + this->cds_Mem->RecordCount;
       }
-   } else if (Delta >= 128 && Delta <= 255) {
-      Delta = (Delta - 128) + 1;
-      Target = this->cds_MemAddress->AsInteger + Delta;
+   } else if (delta >= 128 && delta <= 255) {
+      delta = (delta - 128) + 1;
+      target = current + delta;
 
-      while (Target >= this->cds_Mem->RecordCount) {
-         Target = Target - this->cds_Mem->RecordCount;
+      while (target >= this->cds_Mem->RecordCount) {
+         target = target - this->cds_Mem->RecordCount;
       }
    }
-   return Target;
+   return target;
 }
 //---------------------------------------------------------------------------
-void __fastcall Tf_Memory::MoveAddrByDelta(int Delta)
+void __fastcall Tf_Memory::MoveAddrByDelta(int delta)
 {
    this->cds_Mem->DisableControls();
    this->cds_Mem->First();
 
    if (this->cds_Mem->RecordCount > 1 ) {
-      int Target = this->currentExecLine;
-      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target) {
+      int target = DeltaToAddr(this->currentExecLine, delta);
+      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != target) {
          this->cds_Mem->Next();
       }
-
-      Target = DeltaToAddr(Delta);
-      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Target) {
-         this->cds_Mem->Next();
-      }
-      this->currentExecLine = Target;
+      this->currentExecLine = target;
    }
 
+   TBookmark bookmark = this->cds_Mem->GetBookmark();
+   int halfVisible = static_cast<THackDBGrid*>(this->dbg_Mem)->VisibleRowCount / 2;
+   int stepsMoved = 0;
+   while (!this->cds_Mem->Eof && stepsMoved < halfVisible) {
+      this->cds_Mem->Next();
+      stepsMoved++;
+   }
+
+   this->cds_Mem->GotoBookmark(bookmark);
+   this->cds_Mem->FreeBookmark(bookmark);
+   this->cds_Mem->EnableControls();
+
    /*TByteDynArray Location = cds_Mem->GetBookmark();
+
    if (cds_Mem->BookmarkValid(Location)) {
       cds_Mem->GotoBookmark(Location);
    }
@@ -731,7 +743,6 @@ void __fastcall Tf_Memory::MoveAddrByDelta(int Delta)
    instruction[16] = '\0';
    f_GraphIO->SetInstruction(instruction);
 
-   this->cds_Mem->EnableControls();
    this->ExecCmp++;
    f_GraphIO->SetPgrmCmp(this->ExecCmp);
 
@@ -743,19 +754,32 @@ void __fastcall Tf_Memory::MoveAddrByDelta(int Delta)
    }
 }
 //---------------------------------------------------------------------------
-void __fastcall Tf_Memory::MoveAddrByAbsolute(int Addr)
+void __fastcall Tf_Memory::MoveAddrByAbsolute(int addr)
 {
    this->cds_Mem->DisableControls();
    this->cds_Mem->First();
 
    if (this->cds_Mem->RecordCount > 1 ) {
-      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != Addr) {
+      while (!this->cds_Mem->Eof && this->cds_MemAddress->AsInteger != addr) {
          this->cds_Mem->Next();
       }
-      this->currentExecLine = Addr;
+      this->currentExecLine = addr;
    }
 
+   TBookmark bookmark = this->cds_Mem->GetBookmark();
+   int halfVisible = static_cast<THackDBGrid*>(this->dbg_Mem)->VisibleRowCount / 2;
+   int stepsMoved = 0;
+   while (!this->cds_Mem->Eof && stepsMoved < halfVisible) {
+      this->cds_Mem->Next();
+      stepsMoved++;
+   }
+
+   this->cds_Mem->GotoBookmark(bookmark);
+   this->cds_Mem->FreeBookmark(bookmark);
+   this->cds_Mem->EnableControls();
+
    /*TByteDynArray Location = cds_Mem->GetBookmark();
+
    if (cds_Mem->BookmarkValid(Location)) {
       cds_Mem->GotoBookmark(Location);
    }
@@ -766,7 +790,6 @@ void __fastcall Tf_Memory::MoveAddrByAbsolute(int Addr)
    instruction[16] = '\0';
    f_GraphIO->SetInstruction(instruction);
 
-   this->cds_Mem->EnableControls();
    this->ExecCmp++;
    f_GraphIO->SetPgrmCmp(this->ExecCmp);
 
@@ -1280,8 +1303,6 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
 
 void Tf_Memory::Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabelList, TStringList *pConstList, TStringList* pErrorList, TStringList* pMetaASMFile)
 {
-   int lineCount = 1;
-
    //Main loop
    for (int i = 0; i<pASMFile->Count ; i++) {
       String line = pASMFile->Strings[i];
@@ -1360,7 +1381,7 @@ void Tf_Memory::Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabel
 
          //Test if already defined
          if (pLabelList->IndexOfName(labelName.UpperCase()) < 0) {
-            pLabelList->Add(labelName.UpperCase() + "=" + IntToStr(lineCount));
+            pLabelList->Add(labelName.UpperCase() + "=" + IntToStr(i));
          } else {
             pErrorList->Add(ERR_REDEFINED_LABEL + labelName + pMetaASMFile->Strings[i]);
          }
@@ -1372,7 +1393,7 @@ void Tf_Memory::Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabel
 
             //Test if already defined
             if (pLabelList->IndexOfName(labelName.UpperCase()) < 0) {
-               pLabelList->Add(labelName.UpperCase() + "=" + IntToStr(lineCount));
+               pLabelList->Add(labelName.UpperCase() + "=" + IntToStr(i));
             } else {
                pErrorList->Add(ERR_REDEFINED_LABEL + labelName + pMetaASMFile->Strings[i]);
             }
@@ -1387,12 +1408,9 @@ void Tf_Memory::Parse4LabelConstBlank(TStringList *pASMFile, TStringList *pLabel
          continue;
       }
 
-
       //Output instruction + comment
       line = line + lineComment;
       pASMFile->Strings[i] = line;
-      lineCount++;
-      
    }
 }
 //---------------------------------------------------------------------------
@@ -1442,7 +1460,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    this->cb_D->Enabled = false;
 
    ASMFile->LoadFromFile(this->od_Assembler->FileName);
-   for (int i = 1; i<=ASMFile->Count; i++) {
+   for (int i = 1; i <= ASMFile->Count; i++) {
       metaASMFile->Add("[" + ExtractFileName(this->od_Assembler->FileName) + ":" + IntToStr(i) + "]");
    }
 
@@ -1452,17 +1470,19 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    this->Parse4MacroUsage(ASMFile, MacroList, MacroUsageCmp, MacroLabelList, errorList, metaASMFile);
    //Third pass, remove empty or blank lines, comment lines and list labels
    this->Parse4LabelConstBlank(ASMFile, LabelList, constList, errorList, metaASMFile);
+   //ASMFile->SaveToFile("debug_dmp_2.txt");
+   //LabelList->SaveToFile("debug_lbl.txt");
 
    //Fourth pass, process instruction lines and any comments at the end of a line
-   for (int i = 0; i<ASMFile->Count ; i++) {
+   for (int i = 0; i < ASMFile->Count ; i++) {
       String line = ASMFile->Strings[i];
       String lineComment = "";
       String lineData;
 
       //Extract Comment if at the end of a line
       if (line.Pos(";") > 0) {
-         lineComment = line.SubString(line.Pos(";")+1, line.Length()-line.Pos(";"));
-         lineData    = line.SubString(1, line.Pos(";")-1);
+         lineComment = line.SubString(line.Pos(";") + 1, line.Length() - line.Pos(";"));
+         lineData    = line.SubString(1, line.Pos(";") - 1);
       } else {
          lineData = line;
       }
@@ -1687,7 +1707,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       this->cds_Mem->Append();
       this->cds_MemOpCode->AsInteger   = this->cb_OpCode->Items->IndexOf(instruc->Descr);
       this->cds_MemMnemonic->AsString  = lineOpCode;
-      //this->cds_MemData->AsString      = ;
+      this->cds_MemCommand->AsString   = instruc->Descr;
       this->cds_MemComment->AsString   = lineComment;
       //this->cds_MemRB->AsInteger       = StrToInt(this->cb_B->ItemIndex);
       //this->cds_MemRC->AsInteger       = StrToInt(this->cb_C->ItemIndex);
@@ -1696,8 +1716,8 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
       this->cds_MemBreakPoint->AsBoolean = false;
       this->cds_MemHumData->AsString   = instrucText;
       this->cds_MemCode->AsString      = instrucCode;
-      this->cds_MemCodeHex->AsString   = BinToHex(instrucCode.SubString(1,4)) + BinToHex(instrucCode.SubString(5,4)) +
-                                         BinToHex(instrucCode.SubString(9,4)) + BinToHex(instrucCode.SubString(13,4));
+      this->cds_MemCodeHex->AsString   = BinToHex(instrucCode.SubString(1, 4)) + BinToHex(instrucCode.SubString(5, 4)) +
+                                         BinToHex(instrucCode.SubString(9, 4)) + BinToHex(instrucCode.SubString(13, 4));
       this->cds_MemSource->AsString    = metaASMFile->Strings[i];
 
       this->cds_Mem->Post();
@@ -1744,8 +1764,9 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    MacroList->Free();
    MacroLabelList->Free();
 
-   //First line of code
-   this->cds_Mem->First();
+   //Reset CPU
+   f_GraphIO->PullPin(70, false);
+   this->tReset->Enabled = true;
 }
 //---------------------------------------------------------------------------
 String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, int pCurrLine, TStringList* pErrorList, TStringList* pMetaASMFile)
@@ -1784,11 +1805,11 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
       while (Addr.Length() < 4) {
          Addr = "0" + Addr;
       }
-      for (int i=1; i<=pSize/4; i++) {
+      for (int i = 1; i <= pSize / 4; i++) {
          DataOut = DataOut + HexToBin(Addr.SubString(i, 1));
       }
 
-   } else if (pData.SubString(1,2) == ":.") {
+   } else if (pData.SubString(1, 2) == ":.") {
    //Absolute Addr (Lower bits)
       lblName = pData.SubString(3,pData.Length()-2);
       Addr = pLabelList->Values[lblName];
@@ -1811,26 +1832,26 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
       while (Addr.Length() < 4) {
          Addr = "0" + Addr;
       }
-      for (int i=4; i>4-(pSize/4); i--) {
+      for (int i = 4; i > 4 - (pSize / 4); i--) {
          DataOut = HexToBin(Addr.SubString(i, 1)) + DataOut;
       }
 
    } else if (pData.SubString(1, 1) == ":") {
    //Relative  Addr
       //Lookup
-      lblName = pData.SubString(2, pData.Length()-1);
+      lblName = pData.SubString(2, pData.Length() - 1);
       if (pLabelList->Values[lblName] == "") {
          if (pErrorList != NULL) {
             pErrorList->Add(ERR_UNKNOWN_LABEL + lblName + pMetaASMFile->Strings[pCurrLine]);
          }
          Delta = 0;
       } else {
-         Delta = StrToInt(pLabelList->Values[lblName]) - pCurrLine - 1;
+         Delta = StrToInt(pLabelList->Values[lblName]) - pCurrLine;
       }
 
       if (Delta < 128 && Delta > -128) {
-         if (Delta >=0) {
-            Delta = (Delta-1)+128;
+         if (Delta >= 0) {
+            Delta = 128 + Delta - 1;
          } else {
             Delta = abs(Delta);
             Delta = 128 - Delta;
@@ -1845,22 +1866,22 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
          }
          DataIn = "80";
       }
-      DataOut = HexToBin(DataIn.SubString(1, 1)) + HexToBin(DataIn.SubString(2,1));
+      DataOut = HexToBin(DataIn.SubString(1, 1)) + HexToBin(DataIn.SubString(2, 1));
    } else if (pData.SubString(1, 2) == "0X") {
    //Hex Value
-      DataIn = pData.SubString(3, pData.Length()); //,(pSize/4)-2);
+      DataIn = pData.SubString(3, pData.Length()); //,(pSize / 4 ) - 2);
       //Left Padding
-      while (DataIn.Length() < pSize/4) {
+      while (DataIn.Length() < pSize / 4) {
          DataIn = "0" + DataIn;
       }
-      DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
-      for (int i=1; i<=pSize/4; i++) {
+      DataIn = DataIn.SubString(DataIn.Length() - (pSize / 4) + 1, pSize / 4);
+      for (int i = 1; i <= pSize / 4; i++) {
          DataOut = DataOut + HexToBin(DataIn.SubString(i, 1));
       }
 
    } else if (pData.SubString(1, 2) == "0B") {
    //Binary Value
-      DataOut = pData.SubString(3, pData.Length()); //,(pSize)-2);
+      DataOut = pData.SubString(3, pData.Length()); //,(pSize) - 2);
       //Left Padding
       while (DataOut.Length() < pSize) {
          DataOut = "0" + DataOut;
@@ -1868,14 +1889,14 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
 
    } else {
    //Decimal Value
-      DataIn = pData.SubString(1, (pSize/4)+1);
+      DataIn = pData.SubString(1, (pSize / 4 ) + 1);
       DataIn = DecToHex(DataIn);
       //Left Padding
-      while (DataIn.Length() < pSize/4) {
+      while (DataIn.Length() < pSize / 4) {
          DataIn = "0" + DataIn;
       }
-      DataIn = DataIn.SubString(DataIn.Length()-(pSize/4)+1, pSize/4);
-      for (int i=1; i<=pSize/4; i++) {
+      DataIn = DataIn.SubString(DataIn.Length() - (pSize / 4) + 1, pSize / 4);
+      for (int i = 1; i <= pSize / 4; i++) {
          DataOut = DataOut + HexToBin(DataIn.SubString(i, 1));
       }
 
@@ -1884,14 +1905,16 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
    return DataOut;
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_Memory::SetNext(bool state)
+{
+   this->b_Next->Enabled = state;
+}
+//---------------------------------------------------------------------------
 void __fastcall Tf_Memory::cb_StepByStepClick(TObject *Sender)
 {
    (void)Sender;
 
-   b_Next->Enabled = cb_StepByStep->Checked;
-   if (f_GraphIO->SensePin(39)) {
-      b_Next->Click();
-   }
+   this->b_Next->Enabled = this->cb_StepByStep->Checked;
 }
 //---------------------------------------------------------------------------
 
@@ -2009,6 +2032,13 @@ bool __fastcall Tf_Memory::IsStepByStep(void)
 String __fastcall Tf_Memory::GetCurrentCode(void)
 {
    return this->cds_MemCode->AsString;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Memory::tResetTimer(TObject *Sender)
+{
+   f_GraphIO->PullPin(70, true);
+   this->tReset->Enabled = false;
 }
 //---------------------------------------------------------------------------
 

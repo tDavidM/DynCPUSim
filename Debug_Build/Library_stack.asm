@@ -89,8 +89,8 @@
 ;Jump, ErrCD 0x01
 ; =============================================================================
 :PUSH_JMP_RAM
-                        %POP_INLN_RAM            ;
-                        WJMPR $7, $8             ; Return to caller
+                        %PUSH_INLN_RAM           ;
+                        WJMPR $7, $8             ; Return to caller (Push)
 
 ; =============================================================================
 ;Pop $9 (uses 1 slot of CPU stack) return using $7,$8 (H,L)
@@ -98,7 +98,7 @@
 ; =============================================================================
 :POP_JMP_RAM
                         %POP_INLN_RAM            ;
-                        WJMPR $7, $8             ; Return to caller
+                        WJMPR $7, $8             ; Return to caller (Pop)
 
 ; =============================================================================
 ;Push $9 (uses 1 slot of CPU stack) uses $6,$7,$8

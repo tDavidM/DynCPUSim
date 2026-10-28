@@ -1031,11 +1031,11 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin80Click
     end
     object Pin19: TCheckBox
-      Left = 276
+      Left = 290
       Top = 119
       Width = 130
       Height = 17
-      Caption = '19 (I/O Handled Out)'
+      Caption = '19 (I/O Done Out)'
       TabOrder = 8
       OnClick = Pin19Click
     end
@@ -1067,7 +1067,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin17Click
     end
     object Pin49: TCheckBox
-      Left = 292
+      Left = 290
       Top = 60
       Width = 100
       Height = 17
@@ -1075,7 +1075,7 @@ object f_GraphIO: Tf_GraphIO
       TabOrder = 12
     end
     object Pin59: TCheckBox
-      Left = 292
+      Left = 290
       Top = 31
       Width = 41
       Height = 17
@@ -1083,7 +1083,7 @@ object f_GraphIO: Tf_GraphIO
       TabOrder = 13
     end
     object Pin69: TCheckBox
-      Left = 327
+      Left = 326
       Top = 31
       Width = 35
       Height = 17

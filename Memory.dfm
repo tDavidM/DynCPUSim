@@ -401,11 +401,12 @@ object f_Memory: Tf_Memory
     end
     object cds_MemMnemonic: TStringField
       FieldName = 'Mnemonic'
+      Visible = False
       Size = 5
     end
     object cds_MemHumData: TStringField
       DisplayLabel = 'HumanReadable'
-      DisplayWidth = 32
+      DisplayWidth = 28
       FieldName = 'HumData'
       Size = 64
     end
@@ -413,6 +414,7 @@ object f_Memory: Tf_Memory
       DisplayLabel = 'MachineCode'
       DisplayWidth = 18
       FieldName = 'Code'
+      Visible = False
       Size = 16
     end
     object cds_MemCodeHex: TStringField
@@ -420,9 +422,14 @@ object f_Memory: Tf_Memory
       Size = 4
     end
     object cds_MemComment: TStringField
-      DisplayWidth = 28
+      DisplayWidth = 48
       FieldName = 'Comment'
-      Size = 64
+      Size = 128
+    end
+    object cds_MemCommand: TStringField
+      DisplayWidth = 24
+      FieldName = 'Command'
+      Size = 32
     end
     object cds_MemOpCode: TIntegerField
       FieldName = 'OpCode'
@@ -457,8 +464,9 @@ object f_Memory: Tf_Memory
       FieldName = 'BreakPoint'
     end
     object cds_MemSource: TStringField
+      DisplayWidth = 48
       FieldName = 'Source'
-      Size = 64
+      Size = 92
     end
   end
   object ds_Mem: TDataSource
@@ -491,6 +499,13 @@ object f_Memory: Tf_Memory
     Options = [ofPathMustExist, ofEnableSizing]
     Title = 'Load Program From'
     Left = 304
+    Top = 40
+  end
+  object tReset: TTimer
+    Enabled = False
+    Interval = 2000
+    OnTimer = tResetTimer
+    Left = 368
     Top = 40
   end
 end

@@ -43,7 +43,7 @@ void __fastcall Tf_GraphIO::Pin70Click(TObject *Sender)
          char instruction[17];
          strncpy(instruction, AnsiString(f_Memory->GetCurrentCode()).c_str(), 17);
          instruction[16] = '\0';
-         SetInstruction(instruction);
+         this->SetInstruction(instruction);
       }
       f_Memory->SetState();
       f_Terminal->SetState();
@@ -329,6 +329,7 @@ void __fastcall Tf_GraphIO::Pin39Click(TObject *Sender)
    (void)Sender;
 
    f_Memory->SetGridColor(false);
+   f_Memory->SetNext(this->Pin39->Checked);
    f_Terminal->ToggleHalt(this->Pin39->Checked);
 }
 //---------------------------------------------------------------------------

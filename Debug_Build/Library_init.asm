@@ -1,3 +1,7 @@
+;Library with exemples of code and structure
+
+;Generic first include for a project
+
 #INCLUDE "Library_interrupt_error.asm"
 #INCLUDE "Library_stack.asm"
 
