@@ -57,18 +57,18 @@ RROTC - RightCrRot( $ ) -> $         // Circular Right Shift through Carry (Righ
 ;Internal data handling
 PUSH  - Push( $ )                    // Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped )
 POP   - Pop( $ )                     // Pop the value from the top of the internal stack to a Register  (it is 16 bytes deep, the overflow is dropped )
+FLUSH - FlushStack( )                // Set all values stored in the Stack to 0x00
 CPY   - Copy( $ ) -> $               // * Alias to copy a value between 2 Registers
 RST   - Reset( $ )                   // * Alias to erase a value in 1 Registers
 CFLG  - CarryFlg( ) -> $          *  // Output the value of the Carry Flag to a Register
 CLCR  - ClearCarry( )                // Set the Carry Flag to 0x00
-RSTAR - ResetAllReg( )            *  // Set all Registres to 0x00
-FLUSH - FlushStack( )                // Set all values stored in the Stack to 0x00
 RND   - Random( ) -> $               // Set a Register to a Random value using a 16 bits LFSR
 SRNG  - SetRngSeed( )                // Set RngSeed using the value in a specific register (B)
 RIOA  - ReadIOA( ) -> $              // Read from HW I/O A and stores the value in a Register
 RIOB  - ReadIOB( ) -> $              // Read from HW I/O B and stores the value in a Register
-WIOA  - WriteIOA( D )                // Write to I/O A using the value in a Register
-WIOB  - WriteIOB( D )                // Write to I/O B using the value in a Register
+RIOD  - ReadIODone()                 // Signal that reading from HW I/O A and B is done
+WIOA  - WriteIOA( $ )                // Write to I/O A using the value in a Register (output both A and what B was last written to)
+WIOB  - WriteIOB( $ )                // Write to I/O B using the value in a Register (ketp stored until WriteIOA is called)
 NOINT - NoInterrupt( )               // Disable Interrupts
 OKINT - OkInterrupt( )               // Enable Interrupts
 SINTH - SetInterruptH( #Hx )         // * Alias to set Interrupt Goto absolute address (High) with a fixed value

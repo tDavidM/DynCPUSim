@@ -950,8 +950,8 @@ object f_GraphIO: Tf_GraphIO
       Caption = 'Misc I/O Pins:'
     end
     object Label6: TLabel
-      Left = 342
-      Top = 6
+      Left = 315
+      Top = 12
       Width = 44
       Height = 13
       Caption = '(Unused)'
@@ -984,7 +984,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin30Click
     end
     object Pin39: TCheckBox
-      Left = 154
+      Left = 149
       Top = 148
       Width = 126
       Height = 17
@@ -993,7 +993,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin39Click
     end
     object Pin40: TCheckBox
-      Left = 154
+      Left = 149
       Top = 60
       Width = 116
       Height = 17
@@ -1002,7 +1002,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin40Click
     end
     object Pin70: TCheckBox
-      Left = 154
+      Left = 149
       Top = 5
       Width = 86
       Height = 17
@@ -1013,7 +1013,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin70Click
     end
     object Pin60: TCheckBox
-      Left = 154
+      Left = 149
       Top = 90
       Width = 138
       Height = 17
@@ -1022,7 +1022,7 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin60Click
     end
     object Pin80: TCheckBox
-      Left = 154
+      Left = 149
       Top = 31
       Width = 86
       Height = 17
@@ -1031,11 +1031,11 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin80Click
     end
     object Pin19: TCheckBox
-      Left = 154
+      Left = 276
       Top = 119
-      Width = 126
+      Width = 130
       Height = 17
-      Caption = '19 (Handled Out)'
+      Caption = '19 (I/O Handled Out)'
       TabOrder = 8
       OnClick = Pin19Click
     end
@@ -1049,49 +1049,50 @@ object f_GraphIO: Tf_GraphIO
       OnClick = Pin20Click
     end
     object Pin18: TCheckBox
-      Left = 14
+      Left = 149
       Top = 119
-      Width = 132
+      Width = 121
       Height = 17
-      Caption = '18 (Interrput In)'
+      Caption = '18 (Int. Handled Out)'
       TabOrder = 10
       OnClick = Pin18Click
     end
     object Pin17: TCheckBox
-      Left = 342
-      Top = 31
-      Width = 34
+      Left = 14
+      Top = 119
+      Width = 119
       Height = 17
-      Caption = '17'
+      Caption = '17 (Interrput In)'
       TabOrder = 11
+      OnClick = Pin17Click
     end
     object Pin49: TCheckBox
       Left = 292
       Top = 60
       Width = 100
       Height = 17
-      Caption = '49 (RAM Busy In)'
+      Caption = '49 (Mem Busy In)'
       TabOrder = 12
     end
     object Pin59: TCheckBox
-      Left = 342
-      Top = 90
+      Left = 292
+      Top = 31
       Width = 41
       Height = 17
       Caption = '59'
       TabOrder = 13
     end
     object Pin69: TCheckBox
-      Left = 342
-      Top = 119
+      Left = 327
+      Top = 31
       Width = 35
       Height = 17
       Caption = '69'
       TabOrder = 14
     end
     object Pin79: TCheckBox
-      Left = 342
-      Top = 148
+      Left = 361
+      Top = 31
       Width = 40
       Height = 17
       Caption = '79'
@@ -1133,7 +1134,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object l_Line10: TLabel
       Left = 233
-      Top = 88
+      Top = 80
       Width = 38
       Height = 13
       Caption = '[0x00]'
@@ -1146,14 +1147,14 @@ object f_GraphIO: Tf_GraphIO
     end
     object Label10: TLabel
       Left = 107
-      Top = 88
+      Top = 80
       Width = 75
       Height = 13
       Caption = 'I/O Input B (In)'
     end
     object Label11: TLabel
       Left = 107
-      Top = 136
+      Top = 138
       Width = 92
       Height = 13
       Caption = 'I/O Output A (Out)'
@@ -1167,7 +1168,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object l_Line11: TLabel
       Left = 233
-      Top = 136
+      Top = 138
       Width = 38
       Height = 13
       Caption = '[0x00]'
@@ -1265,7 +1266,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin112: TCheckBox
       Left = 327
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '112'
@@ -1274,7 +1275,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin111: TCheckBox
       Left = 283
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '111'
@@ -1283,7 +1284,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin110: TCheckBox
       Left = 239
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '110'
@@ -1292,7 +1293,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin109: TCheckBox
       Left = 195
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '109'
@@ -1301,7 +1302,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin108: TCheckBox
       Left = 151
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '108'
@@ -1310,7 +1311,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin107: TCheckBox
       Left = 107
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '107'
@@ -1319,7 +1320,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin106: TCheckBox
       Left = 63
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '106'
@@ -1328,7 +1329,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin105: TCheckBox
       Left = 19
-      Top = 107
+      Top = 99
       Width = 34
       Height = 17
       Caption = '105'
@@ -1346,7 +1347,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin113: TCheckBox
       Left = 19
-      Top = 155
+      Top = 157
       Width = 33
       Height = 17
       Caption = '113'
@@ -1366,7 +1367,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin114: TCheckBox
       Left = 63
-      Top = 155
+      Top = 157
       Width = 34
       Height = 17
       Caption = '114'
@@ -1384,7 +1385,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin115: TCheckBox
       Left = 107
-      Top = 155
+      Top = 157
       Width = 38
       Height = 17
       Caption = '115'
@@ -1402,7 +1403,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin116: TCheckBox
       Left = 151
-      Top = 155
+      Top = 157
       Width = 34
       Height = 17
       Caption = '116'
@@ -1429,7 +1430,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin117: TCheckBox
       Left = 195
-      Top = 155
+      Top = 157
       Width = 38
       Height = 17
       Caption = '117'
@@ -1438,7 +1439,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin118: TCheckBox
       Left = 239
-      Top = 155
+      Top = 157
       Width = 33
       Height = 17
       Caption = '118'
@@ -1465,7 +1466,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin120: TCheckBox
       Left = 327
-      Top = 155
+      Top = 157
       Width = 34
       Height = 17
       Caption = '120'
@@ -1474,7 +1475,7 @@ object f_GraphIO: Tf_GraphIO
     end
     object Pin119: TCheckBox
       Left = 283
-      Top = 155
+      Top = 157
       Width = 34
       Height = 17
       Caption = '119'

@@ -462,8 +462,10 @@ void __fastcall Tf_GraphIO::Pin19Click(TObject *Sender)
 {
    (void)Sender;
 
-   this->Pin18->Checked = false;
-   f_Terminal->ToggleInterrupt(false);
+   if (this->Pin19->Checked) {
+      this->Pin17->Checked = false;
+      f_Terminal->ToggleInterrupt(ITR_IDLE);
+   }
 }
 //---------------------------------------------------------------------------
 
@@ -471,10 +473,19 @@ void __fastcall Tf_GraphIO::Pin18Click(TObject *Sender)
 {
    (void)Sender;
 
-   f_Terminal->ToggleInterrupt(true);
+   if (this->Pin18->Checked) {
+      this->Pin17->Checked = false;
+      f_Terminal->ToggleInterrupt(ITR_ACTIVE);
+   }
 }
 //---------------------------------------------------------------------------
+void __fastcall Tf_GraphIO::Pin17Click(TObject *Sender)
+{
+   (void)Sender;
 
+   f_Terminal->ToggleInterrupt(ITR_AWAITING);
+}
+//---------------------------------------------------------------------------
 void Tf_GraphIO::SetIO(char cmd, char value, bool interrupt)
 {
    //97-104
@@ -502,7 +513,7 @@ void Tf_GraphIO::SetIO(char cmd, char value, bool interrupt)
    l_Line10->Caption = "[0x" + IntToHex(value, 2) + "]";
 
    if (interrupt) {
-      this->Pin18->Checked = true;
+      this->Pin17->Checked = true;
    }
 }
 //---------------------------------------------------------------------------
@@ -521,4 +532,5 @@ void Tf_GraphIO::SetPgrmCmp(int cmp)
    this->l_PgrmCmp->Caption = "PgrmCmp: " + IntToStr(cmp);
 }
 //---------------------------------------------------------------------------
+
 

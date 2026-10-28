@@ -207,6 +207,7 @@ __published:
     void __fastcall Pin19Click(TObject *Sender);
     void __fastcall Pin18Click(TObject *Sender);
     void __fastcall Pin80Click(TObject *Sender);
+    void __fastcall Pin17Click(TObject *Sender);
 private:
    char BinToHex(bool p1, bool p2, bool p3, bool p4 );
 

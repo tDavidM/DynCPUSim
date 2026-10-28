@@ -13,6 +13,9 @@
 #include "Ram.h"
 #include "GraphIO.h"
 
+//Idle=Gray, Awaiting=Yellow, Active=Red
+enum InterruptStates: int {ITR_IDLE, ITR_AWAITING, ITR_ACTIVE};
+
 //---------------------------------------------------------------------------
 class Tf_Terminal : public TForm
 {
@@ -49,7 +52,7 @@ public:
    void SetState(void);
    void ResetState(void);
    void __fastcall ToggleHalt(bool state);
-   void __fastcall ToggleInterrupt(bool state);
+   void __fastcall ToggleInterrupt(InterruptStates state);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE Tf_Terminal *f_Terminal;

@@ -256,13 +256,14 @@ void __fastcall Tf_Terminal::ToggleHalt(bool state)
    this->sbHalt->Down = state;
 }
 //---------------------------------------------------------------------------
-void __fastcall Tf_Terminal::ToggleInterrupt(bool state)
+void __fastcall Tf_Terminal::ToggleInterrupt(InterruptStates state)
 {
-   if (state) {
-      this->pInterrupt->Color = clYellow;
-   } else {
-      this->pInterrupt->Color = clGray;
-      //this->lValue->Caption = "0x00 ( )";
+   switch (state) {
+      case ITR_ACTIVE   : this->pInterrupt->Color = clRed;    break;
+      case ITR_AWAITING : this->pInterrupt->Color = clYellow; break;
+      case ITR_IDLE     :
+      default           : this->pInterrupt->Color = clGray;
+                        //this->lValue->Caption = "0x00 ( )";
    }
 }
 //---------------------------------------------------------------------------
