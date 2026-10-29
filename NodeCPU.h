@@ -1,4 +1,4 @@
-﻿//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 #ifndef NodeCPUH
 #define NodeCPUH
@@ -162,12 +162,6 @@ __published:
    TButton *b_XOr;
    TButton *b_Not;
    TCheckBox *cb_Annotation;
-   TTimer *TimerSend1;
-   TTimer *TimerSend2;
-   TTimer *TimerSend3;
-   TTimer *TimerWork1;
-   TTimer *TimerWork2;
-   TTimer *TimerWork3;
    void __fastcall b_InitClick(TObject *Sender);
    void __fastcall b_StartClick(TObject *Sender);
    void __fastcall t_WorkTimer(TObject *Sender);

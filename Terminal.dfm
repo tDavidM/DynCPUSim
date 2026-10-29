@@ -84,12 +84,12 @@ object f_Terminal: Tf_Terminal
     TabOrder = 0
     Visible = False
   end
-  object pBuzy: TPanel
+  object pBusy: TPanel
     Left = 519
     Top = 407
     Width = 75
     Height = 25
-    Caption = 'Buzy'
+    Caption = 'Busy'
     Color = clGray
     DoubleBuffered = False
     ParentBackground = False

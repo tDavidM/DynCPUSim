@@ -19,7 +19,7 @@
                                                            ; Comments not set at the end of an instruction are discarded
 :PROGRAM_BEGIN_HEAD_START_HERE/SET   0x08,  $1             ; Very long labels can exceed 24 char by using the / to mark the end/start of the label/instruction (no space)  
                                                            ; Labels are not case sensitive, up to 2 per line, used for relative adresse with :
-                                                           ; Labels can only use A-Z 0-9 and _
+                                                           ; Labels should only use A-Z 0-9 and _ -
                                                            ; Labels are always defined with a single : (left side)
 
                         SET   0x01,      $2                ; Each parameter is seperated by , and spaces are optional and the number may vary to help align/indent the params

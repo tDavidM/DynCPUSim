@@ -3,7 +3,7 @@ Quick Reference
 ;I/O data handling
 SET   - Set( xx ) -> $               // Write a 8bits value to a Register
 GETA  - ReadAddr( @xx ) ->$          // Fetch a value from RAM at a specific 8 bits address to store in a Register
-GETR  - ReadReg( @$ ) ->$            // Fetch a value from RAM at an address in a Register to store in an other Register
+GETR  - ReadReg( @$ ) ->$            // Fetch a value from RAM at an address in a Register to store in another Register
 SETA  - WriteAddr( @xx ) <- $        // Write to RAM at a specific 8 bits address, a value from a Register
 SETR  - WriteReg( @$ ) <- $          // Write to RAM at an address in a Register, a value from a Register
 SETV  - WriteVal( @$ ) <- xx         // Write to RAM at an address in a Register, a 8bits value
@@ -11,12 +11,12 @@ SETV  - WriteVal( @$ ) <- xx         // Write to RAM at an address in a Register
 ;Conditional jumps (branches)
 IFNZ  - IfNotZero( $ ) goto#xx       // Branches if a Register != 0, Goto a relative 8 bits address
 IFZ   - IfZero( $ ) goto#xx          // Branches if a Register == 0, Goto a relative 8 bits address
-IFZR  - IfZeroReg( $ ) goto#$        // Branches if a Register == 0, Goto a relative address stored in a Register
+IFZR  - IfZeroReg( $ ) goto#$      * // Branches if a Register == 0, Goto a relative address stored in a Register
 SIFNZ - SkipNotZero( $ )             // Skip the following instruction if a Register != 0
 SIFZ  - SkipZero( $ )                // Skip the following instruction if a Register == 0
 SIF   - SkipIf( $ = xx )             // Skip the following instruction if a Register == a 8bits value
-SEQ   - SkipEqual( $ = $ )           // Skip the following instruction if a Register == an other Register
-SGRT  - SkipGreater( $ > $ )         // Skip the following instruction if a Register > an other Register
+SEQ   - SkipEqual( $ = $ )           // Skip the following instruction if a Register == another Register
+SGRT  - SkipGreater( $ > $ )         // Skip the following instruction if a Register > another Register
 SIFC  - SkipCarry( )                 // Skip the following instruction if the Carry Flag is set
 SIFNC - SkipNotCarry( )              // Skip the following instruction if the Carry Flag is not set
 DSIZ  - DecSkipZero( $ )             // Decrement a Register by 1 if != 0, otherwise skip the following instruction if that Register == 0
@@ -24,7 +24,7 @@ DSINZ - DecSkipNotZero( $ )          // Decrement a Register by 1 and then skip 
 
 ;Unconditional jumps
 JMPA  - JumpAddr( ) goto#xx          // Goto a relative 8 bits address
-JMPR  - JumpReg( ) goto#$            // Goto a relative address stored in a Register
+JMPR  - JumpReg( ) goto#$          * // Goto a relative address stored in a Register
 WJMP  - WideJump( ) goto#0000 + xxx  // Goto an absolute 12 bits address xxx (limited range, first 4K of ROM)
 WJMPV - WideJumpVal( ) goto#$H + xx  // Goto an absolute 16 bits address stored in a Register plus a given value xx (full 64K range)
 WJMPR - WideJumpReg( ) goto#$H + $L  // Goto an absolute 16 bits address stored in 2 Registers (full 64K range)
@@ -34,21 +34,21 @@ RAISE - Raise( )                     // Trigger Error Handler
 GOBCK - GoBack( )                    // Return from Error Handler
 
 ;Arithmetics 
-ADD   - Add( $ + $ ) -> $            // Add the value from 2 Registers and stores the result in an other Register
-ADDC  - AddCarry( $ + $ ) -> $       // Add the value from 2 Registers as well as the carry and stores the result in an other Register
-SUB   - Subtract( $ - $) -> $        // Substract the value from 2 Registers and stores the result in an other Register
-INC   - Increment( $ )               // Increment a Register by 1 and stores the result in an other Register
-DEC   - Decrement( $ )               // Decrement a Register by 1 and stores the result in an other Register
+ADD   - Add( $ + $ ) -> $            // Add the value from 2 Registers and stores the result in another Register
+ADDC  - AddCarry( $ + $ ) -> $       // Add the value from 2 Registers as well as the carry and stores the result in another Register
+SUB   - Subtract( $ - $) -> $        // Subtract the value from 2 Registers and stores the result in another Register
+INC   - Increment( $ )               // Increment a Register by 1 and stores the result in another Register
+DEC   - Decrement( $ )               // Decrement a Register by 1 and stores the result in another Register
 CMP   - Compare( $ ? $ ) -> $        // * Alias to compares 2 registers and set the difference in $D (carry flag set if $B<$C)
 
 ;Bitwise operations
-AND   - And( $ & $ ) -> $            // Take the conjunction of 2 Registers in an other Register
-OR    - Or( $ | $ ) -> $             // Take the disjunction of 2 Registers in an other Register
-XOR   - Xor( $ ^ $ ) -> $            // Take the exclusive disjunction of 2 Registers in an other Register
-NOT   - Not( $ ) -> $                // Take the negation of a Register in an other Register
-LSHT  - LeftShift( $ ) -> $          // Left Shift (the droped bit is sent to the carry flag)
-RSHT  - RightShift( $ ) -> $         // Logical Right Shift (insert zero) (the droped bit is sent to the carry flag)
-RSHTA - RightArSht( $ ) -> $         // Arithmetic Right Shift (insert one) (the droped bit is sent to the carry flag)
+AND   - And( $ & $ ) -> $            // Take the conjunction of 2 Registers in another Register
+OR    - Or( $ | $ ) -> $             // Take the disjunction of 2 Registers in another Register
+XOR   - Xor( $ ^ $ ) -> $            // Take the exclusive disjunction of 2 Registers in another Register
+NOT   - Not( $ ) -> $                // Take the negation of a Register in another Register
+LSHT  - LeftShift( $ ) -> $          // Left Shift (the dropped bit is sent to the carry flag)
+RSHT  - RightShift( $ ) -> $         // Logical Right Shift (insert zero) (the dropped bit is sent to the carry flag)
+RSHTA - RightArSht( $ ) -> $         // Arithmetic Right Shift (insert one) (the dropped bit is sent to the carry flag)
 LROT  - LeftRotate( $ ) -> $         // Circular Left Shift (Left Rotate)
 RROT  - RightRotate( $ ) -> $        // Circular Right Shift (Right Rotate)
 LROTC - LeftCrRot( $ ) -> $          // Circular Left Shift through Carry (Left Carry Rotate)
@@ -68,7 +68,7 @@ RIOA  - ReadIOA( ) -> $              // Read from HW I/O A and stores the value 
 RIOB  - ReadIOB( ) -> $              // Read from HW I/O B and stores the value in a Register
 RIOD  - ReadIODone()                 // Signal that reading from HW I/O A and B is done
 WIOA  - WriteIOA( $ )                // Write to I/O A using the value in a Register (output both A and what B was last written to)
-WIOB  - WriteIOB( $ )                // Write to I/O B using the value in a Register (ketp stored until WriteIOA is called)
+WIOB  - WriteIOB( $ )                // Write to I/O B using the value in a Register (kept stored until WriteIOA is called)
 NOINT - NoInterrupt( )               // Disable Interrupts
 OKINT - OkInterrupt( )               // Enable Interrupts
 SINTH - SetInterruptH( #Hx )         // * Alias to set Interrupt Goto absolute address (High) with a fixed value

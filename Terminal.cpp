@@ -177,9 +177,9 @@ void Tf_Terminal::IOProcess(String cmdHex, String valueHex)
          switch (value) {
             case 0x00 : this->RefreshScreen(); // Screen Buffer Ready
                break;
-            case 0x01 : this->pBuzy->Color = clLime; // Set Busy Indicator
+            case 0x01 : this->pBusy->Color = clLime; // Set Busy Indicator
                break;
-            case 0x02 : this->pBuzy->Color = clRed;  // Clear Busy Indicator
+            case 0x02 : this->pBusy->Color = clRed;  // Clear Busy Indicator
                break;
          } break;
       case 0x02 : // Request Input

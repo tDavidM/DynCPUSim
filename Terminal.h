@@ -24,7 +24,7 @@ __published:
    TTimer *tRefresh;
    TSpeedButton *sbBoot;
    TSpeedButton *sbHalt;
-   TPanel *pBuzy;
+    TPanel *pBusy;
    TPanel *pInterrupt;
    TLabel *lValue;
     TPanel *pDebug;

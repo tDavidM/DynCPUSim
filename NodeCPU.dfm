@@ -305,22 +305,22 @@ object f_CPUNode: Tf_CPUNode
   object t_Draw: TTimer
     Enabled = False
     OnTimer = t_DrawTimer
-    Left = 16
-    Top = 88
+    Left = 64
+    Top = 56
   end
   object NodeSaveDialog: TSaveDialog
     DefaultExt = '.ndl'
     Filter = 'CPU Sim File|*.ndl'
     Options = [ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Left = 352
-    Top = 88
+    Left = 384
+    Top = 56
   end
   object NodeOpenDialog: TOpenDialog
     DefaultExt = '.ndl'
     Filter = 'CPU Sim File|*.ndl'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    Left = 272
-    Top = 88
+    Left = 240
+    Top = 56
   end
   object XMLDoc: TXMLDocument
     NodeIndentStr = '   '
@@ -328,41 +328,5 @@ object f_CPUNode: Tf_CPUNode
     Left = 312
     Top = 56
     DOMVendorDesc = 'MSXML'
-  end
-  object TimerSend1: TTimer
-    Enabled = False
-    Interval = 1
-    Left = 40
-    Top = 200
-  end
-  object TimerSend2: TTimer
-    Enabled = False
-    Interval = 1
-    Left = 104
-    Top = 200
-  end
-  object TimerSend3: TTimer
-    Enabled = False
-    Interval = 1
-    Left = 168
-    Top = 200
-  end
-  object TimerWork1: TTimer
-    Enabled = False
-    Interval = 1
-    Left = 40
-    Top = 264
-  end
-  object TimerWork2: TTimer
-    Enabled = False
-    Interval = 1
-    Left = 104
-    Top = 264
-  end
-  object TimerWork3: TTimer
-    Enabled = False
-    Interval = 1
-    Left = 172
-    Top = 264
   end
 end

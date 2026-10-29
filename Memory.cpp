@@ -739,7 +739,7 @@ void __fastcall Tf_Memory::MoveAddrByDelta(int delta)
    cds_Mem->FreeBookmark(Location);*/
 
    char instruction[17];
-   strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
+   strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(), 17);
    instruction[16] = '\0';
    f_GraphIO->SetInstruction(instruction);
 
@@ -786,7 +786,7 @@ void __fastcall Tf_Memory::MoveAddrByAbsolute(int addr)
    cds_Mem->FreeBookmark(Location);*/
 
    char instruction[17];
-   strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(),17);
+   strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(), 17);
    instruction[16] = '\0';
    f_GraphIO->SetInstruction(instruction);
 
@@ -2037,6 +2037,8 @@ String __fastcall Tf_Memory::GetCurrentCode(void)
 
 void __fastcall Tf_Memory::tResetTimer(TObject *Sender)
 {
+   (void)Sender;
+
    f_GraphIO->PullPin(70, true);
    this->tReset->Enabled = false;
 }

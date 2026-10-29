@@ -821,9 +821,6 @@ void __fastcall Tf_CPUNode::CallDrawArea(int pMode)
 {
    this->DrawCmpItem = 0;
    this->DrawCmpLine = 0;
-   //t_DrawMulti1Timer(this);
-   //t_DrawMulti2Timer(this);
-   //t_DrawMulti3Timer(this);
    this->p_DrawCmp->Caption = "Draw: " + IntToStr(this->DrawCmpItem) + " - " + IntToStr(this->DrawCmpLine);
 
    if (pMode == REFRESH_BUFFER) {

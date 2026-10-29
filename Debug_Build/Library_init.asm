@@ -5,10 +5,12 @@
 #INCLUDE "Library_interrupt_error.asm"
 #INCLUDE "Library_stack.asm"
 
+;Define for the register that holds the RAM page
 #DEFINE RAM_PAGE $B
 
                         SET   0x00, :%RAM_PAGE   ; Init the RAM page
-                        
+   
+;Define for the registers outputing a fixed value   
 #DEFINE REG_FIXVAL_00 $C
 #DEFINE REG_FIXVAL_01 $D
 #DEFINE REG_FIXVAL_FF $E

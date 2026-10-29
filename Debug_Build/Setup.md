@@ -7,19 +7,19 @@
 - 44 instructions
 - 1 cycle per instruction
 
-## ROM/Program Memory 
+## ROM/Program Memory
  16 bits/pins instructions (CPU input pins 1-16)  
- Current selected ROM absolute address is made availiable to the CPU on pins 81-96
-### Relative addresss
-  - 8 bits/pins adresses (CPU output pins 51-58)
+ Current selected ROM absolute address is made available to the CPU on pins 81-96
+### Relative addresses
+  - 8 bits/pins addresses (CPU output pins 51-58)
   - 1 pin for Ready Next (CPU output pins 50)
-  - 128 foward and 128 backward (ex.: 10000000 = next, 00000000 = 128 backward, 11111111 = 128 foward, no address for current line )
+  - 128 forward and 128 backward (ex.: 10000000 = next, 00000000 = 128 backward, 11111111 = 128 forward, no address for current line )
   - Circular Memory (wrapped around at begin and end)
-  - Trigered by rising edge of Ready Next Flag, returns value immediately
+  - Triggered by rising edge of Ready Next Flag, returns value immediately
 ### Absolute address
-  - 16 bits/pins adresses (CPU output pins 51-58 (low) + 71-78 (high))
+  - 16 bits/pins addresses (CPU output pins 51-58 (low) + 71-78 (high))
   - 1 pin for Ready Next (CPU output pins 60)
-  - Trigered by rising edge of Ready Next Flag, returns value immediately
+  - Triggered by rising edge of Ready Next Flag, returns value immediately
 
 ## RAM
 - 256 pages of 256 values
@@ -27,7 +27,7 @@
 - 2 pin for Read or Write Flags (CPU output pins 40 and 30 respectively)
 - 8 bits/pins input paired with 8 bits/pins address output (CPU output pins 21-28) (CPU input pins 41-48)
 - 8 bits/pins output paired with 8 bits/pins address output (CPU output pins 21-28) (CPU output pins 31-38)
-- Trigered by Read or Write Flags, returns value immediately
+- Triggered by Read or Write Flags, returns value immediately
 - Current page set using the value in register $B
  
 # Instruction Set
@@ -37,7 +37,7 @@
 - @  -  for RAM location.
 
 ## Op-Codes
- format (A [B [C [D]]]) / Instructions
+ Format (A [B [C [D]]]) / Instructions
 ### 4 bits instructions (3 params)
 
 |OpCode | Mnemonic | Command | Comment |
@@ -49,7 +49,7 @@
 | 0100 | IFZ   | IfZero($B)goto#CD                 | Branches if $B == 0, Goto relative 8 bits address CD |
 | 0101 | SIF   | SkipIf($B=CD)                     | Skip the following instruction if $B == CD |
 | 0110 | ADD   | Add($B+$C)->$D                        | Add $B + $C and stores the result to $D |
-| 0111 | SUB   | Subtract($B-$C)->$D                   | Substract $B - $C and stores the result to $D (using two's complement) |
+| 0111 | SUB   | Subtract($B-$C)->$D                   | Subtract $B - $C and stores the result to $D (using two's complement) |
 | 1000 | AND   | And($B&$C)->$D                    | Conjunction of $B & $C set to $D |
 | 1001 | OR    | Or($B|$C)->$D                     | Disjunction of $B | $C set to $D |
 | 1010 | XOR   | Xor($B^$C)->$D                    | Exclusive disjunction of $B ^ $C set to $D |
@@ -63,26 +63,26 @@
 |OpCode | Mnemonic | Command | Comment |
 |-------|----------|---------|---------|
 | 1111 0000 | NOT   | Not($C)->$D                  | Negation of $C set to $D |
-| 1111 0001 | LSHT  | LeftShift($C)->$D            | Left Shift (the droped bit is sent to the carry flag) |
+| 1111 0001 | LSHT  | LeftShift($C)->$D            | Left Shift (the dropped bit is sent to the carry flag) |
 | 1111 0010 | LROT  | LeftRotate($C)->$D           | Circular Left Shift (Left Rotate) |
-| 1111 0011 | RSHT  | RightShift($C)->$D           | Logical Right Shift (insert zero) (the droped bit is sent to the carry flag) |
+| 1111 0011 | RSHT  | RightShift($C)->$D           | Logical Right Shift (insert zero) (the dropped bit is sent to the carry flag) |
 | 1111 0100 | RROT  | RightRotate($C)->$D          | Circular Right Shift (Right Rotate) |
 | 1111 0101 | SEQ   | SkipEqual($C=$D)             | Skip the following instruction if $C == $D |
 | 1111 0110 | JMPA  | JumpAddr()goto#CD            | Goto relative 8 bits address CD |
 | 1111 0111 | GETR  | ReadReg(@$C)->$D             | Fetch value from RAM at $C to store in $D |
 | 1111 1000 | SETR  | WriteReg(@$C)<-$D            | Write $D to RAM at address $C |
 | 1111 1001 | SGRT  | SkipGreater($C>$D)           | Skip the following instruction if $C > $D |
-| 1111 1010 | IFZR  | IfZeroReg($C)goto#$D         | Branches if $C == 0, Goto relative 8 bits address at $D |
+| 1111 1010 | IFZR  | IfZeroReg($C)goto#$D       * | Branches if $C == 0, Goto relative 8 bits address at $D |
 | 1111 1011 | WJMPR | WideJumpReg()goto#$C+$D      | Goto absolute 16 bits address $C$D (full 64K range) |
 | 1111 1100 | LROTC | LeftCrRot($C)->$D            | Circular Left Shift through Carry (Left Carry Rotate) |
 | 1111 1101 | RROTC | RightCrRot($C)->$D           | Circular Right Shift through Carry (Right Carry Rotate) |
-| 1111 1110 | RSHTA | RightArSht($C)->$D           | Arithmetic Right Shift (insert one) (the droped bit is sent to the carry flag) |
+| 1111 1110 | RSHTA | RightArSht($C)->$D           | Arithmetic Right Shift (insert one) (the dropped bit is sent to the carry flag) |
 
 ### 12 bits instructions (1 param)
 
 |OpCode | Mnemonic | Command | Comment |
 |-------|----------|---------|---------|
-| 1111 1111 0000 | JMPR  | JumpReg()goto#$D        | Goto relative address at $D |
+| 1111 1111 0000 | JMPR  | JumpReg()goto#$D      * | Goto relative address at $D |
 | 1111 1111 0001 | CFLG  | CarryFlg()->$D        * | Output the value of the carry flag to a register |
 | 1111 1111 0010 | RIOA  | ReadIOA()->$D               | Read from HW I/O A and stores the value in $D |
 | 1111 1111 0011 | RIOB  | ReadIOB()->$D               | Read from HW I/O B and stores the value in $D |
@@ -96,7 +96,7 @@
 | 1111 1111 1011 | PUSH  | Push($D)                | Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped ) |
 | 1111 1111 1100 | POP   | Pop($D)                 | Pop the value from the top of the internal stack to $D  (it is 16 bytes deep, the overflow is dropped ) |
 | 1111 1111 1101 | WIOA  | WriteIOA($D)                | Write to I/O A using the value in $D (output both A and what B was last written to) |
-| 1111 1111 1110 | WIOB  | WriteIOB($D)                | Write to I/O B using the value in $D (ketp stored until WriteIOA is called) |
+| 1111 1111 1110 | WIOB  | WriteIOB($D)                | Write to I/O B using the value in $D (kept stored until WriteIOA is called) |
 
 ### 16 bits instructions (no param)
 
@@ -135,7 +135,7 @@
 ## Special Registers:
 - Resisters $0 to $A are general purpose registers
 - Register $B behaves just as others general purpose registers but also controls the current RAM page (and can be used to seed the LFSH random number generator with SetRngSeed() )
-- Registers $C to $F always return the following values when read:
+- Registers $C to $F always returns the following values when read:
   +   $C=0x00 $D=0x01 $E=0xFF $F=0x80
   +   Writing to those register does no change the output value
   +   Goto absolute address used by the Interrupt and Error Handler can be set by writing to:
@@ -155,6 +155,11 @@
 
 
 ## ToDo/Idea:
-- Test CPU pin 49 Mem buzy
+- Do Carry Inversion on subtract
+- Make sure that DecSkipNotZero "and then skip the following instruction" is accurate
+- Check RelAddr 128 limits
+- Test CPU pin 49 Mem busy
+- replace IfZeroReg() with SkipNotEqual (SNEQ)
+- find better use for JumpReg
 - Make CFLG - CarryFlg()->$D an alias for LROTC - LeftCrRot($C)->$D where 
 - Annotation editor
