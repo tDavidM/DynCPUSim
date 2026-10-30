@@ -1262,7 +1262,8 @@ void Tf_Memory::Parse4MacroUsage(TStringList *pASMFile, TList* pMacroList, TStri
                //LineData = LineData.UpperCase();
 
                //Skip Macro call lines
-               if (LineLbl.SubString(1,1) != "%" ) {
+               Line = Line.Trim();
+               if (Line.SubString(1,1) != "%" ) {
                   //Loop to replace all Labels found in the Macro
                   for (int k = 1; k < LocalLabelList->Count; k++) {
                      //Rename by concatenting "_MACRO_[X]" to the name where X goes from 0 to the number of time the Macro is called
@@ -1458,6 +1459,8 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    this->cb_B->Enabled = false;
    this->cb_C->Enabled = false;
    this->cb_D->Enabled = false;
+   f_GraphIO->PullPin(70, false);
+   Application->ProcessMessages();
 
    ASMFile->LoadFromFile(this->od_Assembler->FileName);
    for (int i = 1; i <= ASMFile->Count; i++) {
@@ -1765,7 +1768,6 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    MacroLabelList->Free();
 
    //Reset CPU
-   f_GraphIO->PullPin(70, false);
    this->tReset->Enabled = true;
 }
 //---------------------------------------------------------------------------

@@ -27,7 +27,7 @@
                         NOP
                         POP   $9                 ; Push that value in the CPU stack
                         
-:INTERRUPT_HANDLING_END OKINT                    ; Enable interputs
+:INTERRUPT_HANDLING_END OKINT                    ; Enable interrputs
                         RET                      ; Returns 
 
 ; =============================================================================

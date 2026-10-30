@@ -82,7 +82,7 @@
 
 |OpCode | Mnemonic | Command | Comment |
 |-------|----------|---------|---------|
-| 1111 1111 0000 | JMPR  | JumpReg()goto#$D      * | Goto relative address at $D |
+| 1111 1111 0000 | JMPR  | JumpReg()goto#$D        | Goto relative address at $D |
 | 1111 1111 0001 | CFLG  | CarryFlg()->$D        * | Output the value of the carry flag to a register |
 | 1111 1111 0010 | RIOA  | ReadIOA()->$D               | Read from HW I/O A and stores the value in $D |
 | 1111 1111 0011 | RIOB  | ReadIOB()->$D               | Read from HW I/O B and stores the value in $D |
@@ -92,7 +92,7 @@
 | 1111 1111 0111 | RND   | Random()->$D            | Set $D to a Random value using a 16 bits LFSR |
 | 1111 1111 1000 | SIFNZ | SkipNotZero($D)         | Skip the following instruction if $D != 0 |
 | 1111 1111 1001 | DSIZ  | DecSkipZero($D)         | Decrement $D by 1 if != 0, otherwise skip the following instruction if $D == 0 |
-| 1111 1111 1010 | DSINZ | DecSkipNotZero($D)      | Decrement $D by 1 and then skip the following instruction if != 0 |
+| 1111 1111 1010 | DSINZ | DecSkipNotZero($D)      | Decrement $D by 1 if != 0, then skip the following instruction if $D != 0 |
 | 1111 1111 1011 | PUSH  | Push($D)                | Push $D to the top of the internal stack (it is 16 bytes deep, the overflow is dropped ) |
 | 1111 1111 1100 | POP   | Pop($D)                 | Pop the value from the top of the internal stack to $D  (it is 16 bytes deep, the overflow is dropped ) |
 | 1111 1111 1101 | WIOA  | WriteIOA($D)                | Write to I/O A using the value in $D (output both A and what B was last written to) |
@@ -155,11 +155,9 @@
 
 
 ## ToDo/Idea:
-- Do Carry Inversion on subtract
 - Make sure that DecSkipNotZero "and then skip the following instruction" is accurate
 - Check RelAddr 128 limits
 - Test CPU pin 49 Mem busy
 - replace IfZeroReg() with SkipNotEqual (SNEQ)
-- find better use for JumpReg
 - Make CFLG - CarryFlg()->$D an alias for LROTC - LeftCrRot($C)->$D where 
 - Annotation editor

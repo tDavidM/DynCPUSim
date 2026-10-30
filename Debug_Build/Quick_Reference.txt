@@ -20,7 +20,7 @@ SGRT  - SkipGreater( $ > $ )         // Skip the following instruction if a Regi
 SIFC  - SkipCarry( )                 // Skip the following instruction if the Carry Flag is set
 SIFNC - SkipNotCarry( )              // Skip the following instruction if the Carry Flag is not set
 DSIZ  - DecSkipZero( $ )             // Decrement a Register by 1 if != 0, otherwise skip the following instruction if that Register == 0
-DSINZ - DecSkipNotZero( $ )          // Decrement a Register by 1 and then skip the following instruction if that Register != 0
+DSINZ - DecSkipNotZero( $ )          // Decrement a Register by 1 if != 0, then skip the following instruction if that Register != 0
 
 ;Unconditional jumps
 JMPA  - JumpAddr( ) goto#xx          // Goto a relative 8 bits address

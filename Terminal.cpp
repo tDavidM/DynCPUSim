@@ -169,6 +169,24 @@ int Tf_Terminal::HexToInt(String Hex)
 //---------------------------------------------------------------------------
 void Tf_Terminal::IOProcess(String cmdHex, String valueHex)
 {
+   /*
+      CMD:
+             VALUE:
+
+      0x00 = NULL
+
+      0x01 = Output/User Display
+             0x00 = Screen Buffer Ready
+             0x01 = Set Busy Indicator
+             0x02 = Clear Busy Indicator
+      0x02 = Request Input
+             0x01 = Get Last Key
+             0x02 = Get Clock Coarse Value
+      0x03 = Display Debug Value
+      0x04 = Set Timer
+
+   */
+
    int cmd   = HexToInt(cmdHex);
    int value = HexToInt(valueHex);
 

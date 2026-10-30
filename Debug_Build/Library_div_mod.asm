@@ -47,7 +47,7 @@
                         
                         CPY   $4,     $8              ; Copy current i to loop on
 :RSHT_DIVMOD_INL_U      RSHT  $7,     $7              ; Bring (i)th bit down to (0)bit
-                        DSIN  $8                      ; Loop until zero
+                        DSIZ  $8                      ; Loop until zero
                         JMPA  :RSHT_DIVMOD_INL_U
                         
 ;                       NOT   $D,     $6              ; Idea to reduce usage of Registers by 1, not needing $8
@@ -60,7 +60,7 @@
                         AND   $2,     $5,     $2      ; Set (i)th bit from quotient to 1
                         
                         RSHT  $5,     $5              ; Right Shift BitMask for (i)th bit                              
-:DSIN_DIVMOD_INL_U      DSIN  $4                      ; Loop i until zero
+:DSIN_DIVMOD_INL_U      DSIZ  $4                      ; Loop i until zero
                         JMPA  :LSHT_DIVMOD_INL_U      ;
 ]
 
@@ -80,7 +80,7 @@
                         
                         CPY   $6,     $A              ; Copy current i to loop on
 :RSHT_DIVMOD_JMP_U      RSHT  $9,     $9              ; Bring (i)th bit down to (0)bit
-                        DSIN  $A                      ; Loop until zero
+                        DSIZ  $A                      ; Loop until zero
                         JMPA  :RSHT_DIVMOD_JMP_U
                         
 ;                       NOT   $D,     $8              ; Idea to reduce usage of Registers by 1, not needing $A
@@ -93,7 +93,7 @@
                         AND   $2,     $7,     $2      ; Set (i)th bit from quotient to 1
                         
                         RSHT  $7,     $7              ; Right Shift BitMask for (i)th bit                              
-:DSIN_DIVMOD_JMP_U      DSIN  $6                      ; Loop i until zero
+:DSIN_DIVMOD_JMP_U      DSIZ  $6                      ; Loop i until zero
                         JMPA  :LSHT_DIVMOD_JMP_U      ;
                         WJMPR $4,     $5
 
@@ -113,7 +113,7 @@
                         
                         CPY   $4,     $8              ; Copy current i to loop on
 :RSHT_DIVMOD_STK_U      RSHT  $7,     $7              ; Bring (i)th bit down to (0)bit
-                        DSIN  $8                      ; Loop until zero
+                        DSIZ  $8                      ; Loop until zero
                         JMPA  :RSHT_DIVMOD_STK_U
                         
 ;                       NOT   $D,     $6              ; Idea to reduce usage of Registers by 1, not needing $8
@@ -126,7 +126,7 @@
                         AND   $2,     $5,     $2      ; Set (i)th bit from quotient to 1
                         
                         RSHT  $5,     $5              ; Right Shift BitMask for (i)th bit                              
-:DSIN_DIVMOD_STK_U      DSIN  $4                      ; Loop i until zero
+:DSIN_DIVMOD_STK_U      DSIZ  $4                      ; Loop i until zero
                         JMPA  :LSHT_DIVMOD_STK_U      ;
                         POP   $5
                         POP   $4
