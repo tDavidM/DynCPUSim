@@ -16,6 +16,7 @@ object f_Terminal: Tf_Terminal
   KeyPreview = True
   OldCreateOrder = False
   Visible = True
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint

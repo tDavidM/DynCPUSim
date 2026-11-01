@@ -993,9 +993,9 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
       }
    }
    
-   for (int i = 0; i<this->InstrucCmp; i++) {
-      for (int j = 0; j<TempInstrucList->Count; j++) {
-         TempInstruc = (TInstruc*)TempInstrucList->Items[j];
+   for (int i = 0; i < this->InstrucCmp; i++) {
+      for (int j = 0; j < TempInstrucList->Count; j++) {
+         TempInstruc = static_cast<TInstruc*>(TempInstrucList->Items[j]);
          if (TempInstruc->DisplayOrder==i) {
             //Instruc = new TInstruc(TempInstruc->ID, TempInstruc->Name, TempInstruc->OpCode, TempInstruc->DisplayOrder);
             this->InstrucList->Add(TempInstruc);
@@ -1007,7 +1007,7 @@ void Tf_Memory::LoadInstructionSet(_di_IXMLNode pInstructionSet)
    }
    delete TempInstrucList;
 
-   /*for (int i = 0; i<this->InstrucCmp; i++) {
+   /*for (int i = 0; i < this->InstrucCmp; i++) {
       Instruc = (TInstruc*)this->InstrucList->Items[i];
       this->cb_OpCode->Items->Add(Instruc->Descr);
    }*/
@@ -1460,7 +1460,6 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    this->cb_C->Enabled = false;
    this->cb_D->Enabled = false;
    f_GraphIO->PullPin(70, false);
-   Application->ProcessMessages();
 
    ASMFile->LoadFromFile(this->od_Assembler->FileName);
    for (int i = 1; i <= ASMFile->Count; i++) {
@@ -1725,6 +1724,7 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
 
       this->cds_Mem->Post();
    }
+   this->cds_Mem->First();
    ASMFile->Clear();
 
    //Show Errors
@@ -1750,24 +1750,26 @@ void __fastcall Tf_Memory::b_ImportClick(TObject *Sender)
    //Cleanup
    ASMFile->Free();
    LabelList->Free();
+   constList->Free();
    MacroUsageCmp->Free();
    errorList->Free();
    metaASMFile->Free();
 
-   for (int i = 0; i<MacroList->Count ; i++) {
-      ASMFile = (TStringList*)MacroList->Items[i];
-      ASMFile->Free();
+   for (int i = 0; i < MacroList->Count; i++) {
+      TStringList *macroListData = static_cast<TStringList*>(MacroList->Items[i]);
+      macroListData->Free();
    }
 
-   for (int i = 0; i<MacroLabelList->Count ; i++) {
-      ASMFile = (TStringList*)MacroLabelList->Items[i];
-      ASMFile->Free();
+   for (int i = 0; i < MacroLabelList->Count; i++) {
+      TStringList *macroLabelListData = static_cast<TStringList*>(MacroLabelList->Items[i]);
+      macroLabelListData->Free();
    }
 
    MacroList->Free();
    MacroLabelList->Free();
 
    //Reset CPU
+   this->tReset->Interval = f_CPUNode->GetDrawSpeed() * 30;
    this->tReset->Enabled = true;
 }
 //---------------------------------------------------------------------------
@@ -1780,7 +1782,7 @@ String Tf_Memory::DataToBin(String pData, int pSize, TStringList *pLabelList, in
       if (pErrorList != NULL) {
          pErrorList->Add(ERR_OPCODE_PARAM_TYPE + pData + pMetaASMFile->Strings[pCurrLine]);
       }
-      for (int i=1; i<=pSize; i++) {
+      for (int i = 1; i <= pSize; i++) {
          DataOut = DataOut + 0;
       }
 

@@ -708,12 +708,12 @@ void __fastcall Tf_CPUNode::t_WorkTimer(TObject *Sender)
    TNode* nodeCurr;
    int nbIter = this->RunInBatch ? 128 : 1;
   
-   for (int i=0; i<nbIter; i++) {
+   for (int i = 0; i < nbIter; i++) {
       //Read from Input
       this->ReadInput();
 
       //Communicate internal state
-      for (int i = 0; i<this->NodeCmp; i++) {
+      for (int i = 0; i < this->NodeCmp; i++) {
          nodeCurr = (TNode*)this->NodeList->Items[i];
          if (! nodeCurr->DeleteFlag) {
             nodeCurr->Send();
@@ -730,6 +730,15 @@ void __fastcall Tf_CPUNode::t_WorkTimer(TObject *Sender)
 
       //Write to Output
       this->WriteOutput();
+
+      if (nbIter > 1) {
+         //Application->ProcessMessages();
+         MSG msg;
+         if (PeekMessage (&msg, 0, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+         }
+      }
    }
 }
 
@@ -2169,6 +2178,11 @@ void __fastcall Tf_CPUNode::tb_SpeedChange(TObject *Sender)
 
   this->t_Work->Interval = this->DrawTimerSpeed;
   this->t_Draw->Interval = this->DrawTimerSpeed;
+}
+//---------------------------------------------------------------------------
+int __fastcall Tf_CPUNode::GetDrawSpeed()
+{
+   return this->DrawTimerSpeed;
 }
 //---------------------------------------------------------------------------
 

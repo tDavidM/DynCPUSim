@@ -73,13 +73,13 @@ private:
    int LastX, LastY;
    String CurrentPage;
 
-   String BinToHex(String Hex);
-   String HexToDec(String Hex);
-   String HexToBin(String Hex);
-   String DecToHex(String Hex);
-   void AddrToXY(String Addr, int &X, int &Y);
-   void CleanUpData(int X, int Y);
-   void SwapPage(String Current, String New);
+   String __fastcall BinToHex(String Hex);
+   String __fastcall HexToDec(String Hex);
+   String __fastcall HexToBin(String Hex);
+   String __fastcall DecToHex(String Hex);
+   void __fastcall AddrToXY(String addr, int &X, int &Y);
+   void __fastcall CleanUpData(int X, int Y);
+   void SwapPage(String current, String next);
 
 public:
    void Set(String Addr, String Value, String Page = '0');

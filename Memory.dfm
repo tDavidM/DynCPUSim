@@ -503,7 +503,7 @@ object f_Memory: Tf_Memory
   end
   object tReset: TTimer
     Enabled = False
-    Interval = 2000
+    Interval = 2500
     OnTimer = tResetTimer
     Left = 368
     Top = 40

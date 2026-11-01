@@ -235,6 +235,7 @@ public:
    void UpdateNode(void);
    void ResetAllNode(void);
    bool IsActiveDraw(void);
+   int __fastcall GetDrawSpeed();
    void __fastcall CallDrawArea(int pMode=0);
    bool __fastcall NodeNameExists(String pName);
    void EmptyFollowList(void);

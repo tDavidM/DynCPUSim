@@ -37,6 +37,7 @@ __published:
    void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
     void __fastcall pDebugClick(TObject *Sender);
     void __fastcall FormShow(TObject *Sender);
+    void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
 private:
    int timerValue;
    int timerCmp;

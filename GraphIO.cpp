@@ -78,19 +78,19 @@ void __fastcall Tf_GraphIO::Pin30Click(TObject *Sender)
       //21-28
       String c1 = BinToHex(Pin21->Checked, Pin22->Checked, Pin23->Checked, Pin24->Checked);
       String c2 = BinToHex(Pin25->Checked, Pin26->Checked, Pin27->Checked, Pin28->Checked);
-      String Addr = c2 + c1;
+      String addr = c2 + c1;
 
       //31-38
       c1 = BinToHex(Pin31->Checked, Pin32->Checked, Pin33->Checked, Pin34->Checked);
       c2 = BinToHex(Pin35->Checked, Pin36->Checked, Pin37->Checked, Pin38->Checked);
-      String Value = c2 + c1;
+      String value = c2 + c1;
 
       //61-68
       c1 = BinToHex(Pin61->Checked, Pin62->Checked, Pin63->Checked, Pin64->Checked);
       c2 = BinToHex(Pin65->Checked, Pin66->Checked, Pin67->Checked, Pin68->Checked);
-      String Page = c2 + c1;
+      String page = c2 + c1;
 
-      f_Ram->Set(Addr, Value, Page);
+      f_Ram->Set(addr, value, page);
 
       this->Pin49->Checked = false;
    }

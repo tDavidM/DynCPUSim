@@ -155,9 +155,10 @@
 
 
 ## ToDo/Idea:
-- Make sure that DecSkipNotZero "and then skip the following instruction" is accurate
 - Check RelAddr 128 limits
 - Test CPU pin 49 Mem busy
-- replace IfZeroReg() with SkipNotEqual (SNEQ)
+- Bug with ActiveDraw
+- Assember support for negative value 
+- Replace IfZeroReg() with SkipNotEqual (SNEQ)
 - Make CFLG - CarryFlg()->$D an alias for LROTC - LeftCrRot($C)->$D where 
 - Annotation editor

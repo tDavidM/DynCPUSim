@@ -151,7 +151,7 @@ void __fastcall Tf_Ram::sg_RamExit(TObject *Sender)
    this->LastY = -1;
 }
 //---------------------------------------------------------------------------
-void Tf_Ram::CleanUpData(int X, int Y)
+void __fastcall Tf_Ram::CleanUpData(int X, int Y)
 {
    String Data;
 
@@ -212,7 +212,7 @@ void Tf_Ram::CleanUpData(int X, int Y)
    }
 }
 //---------------------------------------------------------------------------
-String Tf_Ram::BinToHex(String Hex)
+String __fastcall Tf_Ram::BinToHex(String Hex)
 {
         if (Hex == "1111") { return "F"; }
    else if (Hex == "1110") { return "E"; }
@@ -233,7 +233,7 @@ String Tf_Ram::BinToHex(String Hex)
    else { return "0"; } // =^.^= here's a kitty
 }
 //---------------------------------------------------------------------------
-String Tf_Ram::HexToDec(String Hex)
+String __fastcall Tf_Ram::HexToDec(String Hex)
 {
    switch (Hex[1]) {
       case '0' : return "0";
@@ -256,7 +256,7 @@ String Tf_Ram::HexToDec(String Hex)
    }
 }
 //---------------------------------------------------------------------------
-String Tf_Ram::HexToBin(String Hex)
+String __fastcall Tf_Ram::HexToBin(String Hex)
 {
    switch (Hex[1]) {
       case '0' : return "0000";
@@ -279,7 +279,7 @@ String Tf_Ram::HexToBin(String Hex)
    }
 }
 //---------------------------------------------------------------------------
-String Tf_Ram::DecToHex(String Hex)
+String __fastcall Tf_Ram::DecToHex(String Hex)
 {
    int Dec = StrToIntDef(Hex, 0); // Maybe use HexToDec(Hex[1]) ?
    int Div;
@@ -508,12 +508,13 @@ void __fastcall Tf_Ram::b_LoadClick(TObject *Sender)
    }
 }
 //---------------------------------------------------------------------------
-void Tf_Ram::AddrToXY(String Addr, int &X, int &Y)
+void __fastcall Tf_Ram::AddrToXY(String addr, int &X, int &Y)
 {
-   char high = Addr[1];
-   int  Low  = StrToIntDef( "0x" + Addr[2], 0 );
+   char high = addr[1];
+   String test =  "0x0" + addr[2];
+   int  low  = StrToInt(test);
 
-   Y = Low + 1;
+   Y = low + 1;
    switch (high) {
       case '0' : X = 1;          break;
       case '1' : X = 1; Y += 16; break;
@@ -646,7 +647,7 @@ void __fastcall Tf_Ram::e_PageExit(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void Tf_Ram::SwapPage(String Current, String New)
+void Tf_Ram::SwapPage(String current, String next)
 {
    String Data;
    int Line;
@@ -686,7 +687,7 @@ void Tf_Ram::SwapPage(String Current, String New)
       this->cds_Ram->Post();
    }
 
-   this->CurrentPage = New.UpperCase();
+   this->CurrentPage = next.UpperCase();
    this->Caption = "RAM page: 0x" + this->CurrentPage;
    this->cds_Ram->Filter = "Page='" + this->CurrentPage + "'";
    //this->cds_Ram->RecordCount

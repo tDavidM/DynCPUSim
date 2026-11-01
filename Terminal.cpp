@@ -320,3 +320,11 @@ void __fastcall Tf_Terminal::FormShow(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall Tf_Terminal::FormCloseQuery(TObject *Sender, bool &CanClose)
+{
+   (void)Sender;
+
+   CanClose = false;
+}
+//---------------------------------------------------------------------------
+
