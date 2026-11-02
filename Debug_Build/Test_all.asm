@@ -20,7 +20,7 @@
 :START_OVER             NOP
                         NOP
 ;                        WJMP  :.SKIP_FIRST_HALT               ;Make sure WideJump works as it's used a lot for error handling
-                        WJMP   :.TEST_NO_20                   ;Alternatively, bypass to a latter test
+                        WJMP   :.TEST_NO_25B                  ;Alternatively, bypass to a latter test
                         NOP
                         HALT                                  ;If this run, there's an issue
                         NOP
@@ -478,7 +478,7 @@
                         JMPA  :TEST_NO_20A                    ;Go get an other random number
 ;Test 21, All other Registers beyond the main 3 used so far
 :TEST_NO_21             SET   "0x15",         :%DBG_REG
-%PRINT_DBG
+                        %PRINT_DBG
                         CPY   :%REG_VAL_FF,   $3              ;Set $3 to 0xFF, testing writing to it
                         AND   $3,     $3,     $4              ;Test that $3 outputs to Bus A and B and testing writing to $4
                         AND   $4,     $4,     $5              ;Test that $4 outputs to Bus A and B and testing writing to $5
@@ -505,7 +505,7 @@
                         WJMP  :.HALT_ON_ERR
 ;Test 22, All Read and Write to RAM
 :TEST_NO_22             SET   "0x16",         :%DBG_REG
-%PRINT_DBG
+                        %PRINT_DBG
                         SET   0xFF,           $B              ;Change RAM page to [0xFF]
                         SETA  @0x00,          :%REG_VAL_01    ;write 0x01 to RAM @ 0x00[0xFF]
                         SETA  @0x01,          :%REG_VAL_80    ;write 0x80 to RAM @ 0x01[0xFF]
@@ -547,7 +547,7 @@
                         SET   0x00,           $B              ;Change RAM page back to 0x00
 ;Test 23, WideJump Val and Reg
 :TEST_NO_23             SET   "0x17",         :%DBG_REG
-%PRINT_DBG
+                        %PRINT_DBG
                         SET   :*TEST_WIDEJMP3, $1             ;Set $1 with the most significant bits of that Label
                         SET   :.TEST_WIDEJMP3, $2             ;Set $2 with the least significant bits of that Label
                         WJMPR $1,              $2             ;Test WideJumpReg to :TEST_WIDEJMP3
@@ -562,7 +562,7 @@
 
 ;Test 24, Random number, second pass, same seed
 :TEST_NO_24             SET   "0x18",         :%DBG_REG
-%PRINT_DBG
+                        %PRINT_DBG
                         SET   0xFF,           $B              ;Prepare the seed for the RNG
                         SRNG                                  ;Set RngSeed
                         SET   0x00,           $B
@@ -593,7 +593,7 @@
                         JMPA  :TEST_NO_24_CHECK               ;Go fetch an other number
 ;Test 25, Push and Pop
 :TEST_NO_25             SET   "0x19",         :%DBG_REG
-%PRINT_DBG
+                        %PRINT_DBG
                         SET   0xFF,           $0              ;Test value
                         SET   0x10,           $1              ;Set for 16 iterations
 :TEST_NO_25_PUSH        PUSH  $0                              ;Fill CPU stack with 0xFF
@@ -612,10 +612,10 @@
                         SIFZ  $0                              ;Check that $0 is == 0x00
                         WJMP  :.HALT_ON_ERR
                         
-                        PUSH  :%REG_VAL_FF                    ;Place a test value in the stack
+:TEST_NO_25B            PUSH  :%REG_VAL_FF                    ;Place a test value in the stack
                         SET   0x55,           $1              ;Preprare more test values to follow
                         SET   0xAA,           $2              ;
-                        SET   0x08,           $0              ;Set for 7 iterations (decrement on the first iteration)
+                        SET   0x07,           $0              ;Set for 7 iterations
 :TEST_NO_25B_PUSH       DSINZ $0                              ;Decrement $0 until zero
                         JMPA  :TEST_NO_25B_END                ;If End of Loop at Zero
                         PUSH  $1
@@ -626,7 +626,7 @@
                         POP   $0
                         SIF   $0,             0xFF            ;Check that last value is == 0xFF
                         WJMP  :.HALT_ON_ERR
-                        SET   0x07,           $0              ;Set for 7 iterations
+                        SET   0x06,           $0              ;Set for 7 iterations (6+1)
 :TEST_NO_25C_POP        POP   $2
                         POP   $1
                         SIF   $2,             0xAA            ;Check that 0xAA was poped out of the stack

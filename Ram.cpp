@@ -510,11 +510,28 @@ void __fastcall Tf_Ram::b_LoadClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall Tf_Ram::AddrToXY(String addr, int &X, int &Y)
 {
-   char high = addr[1];
-   String test =  "0x0" + addr[2];
-   int  low  = StrToInt(test);
+   char high = addr.c_str()[0];
+   char low  = addr.c_str()[1];
 
-   Y = low + 1;
+   switch (low) {
+      case '0' : Y = 1;  break;
+      case '1' : Y = 2;  break;
+      case '2' : Y = 3;  break;
+      case '3' : Y = 4;  break;
+      case '4' : Y = 5;  break;
+      case '5' : Y = 6;  break;
+      case '6' : Y = 7;  break;
+      case '7' : Y = 8;  break;
+      case '8' : Y = 9;  break;
+      case '9' : Y = 10; break;
+      case 'A' : Y = 11; break;
+      case 'B' : Y = 12; break;
+      case 'C' : Y = 13; break;
+      case 'D' : Y = 14; break;
+      case 'E' : Y = 15; break;
+      case 'F' : Y = 16; break;
+   }
+
    switch (high) {
       case '0' : X = 1;          break;
       case '1' : X = 1; Y += 16; break;
