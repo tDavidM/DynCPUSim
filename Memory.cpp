@@ -743,6 +743,8 @@ void __fastcall Tf_Memory::MoveAddrByDelta(int delta)
    instruction[16] = '\0';
    f_GraphIO->SetInstruction(instruction);
 
+   f_GraphIO->SetAbsoluteAddr(this->cds_MemAddress->AsInteger + 1);
+
    this->ExecCmp++;
    f_GraphIO->SetPgrmCmp(this->ExecCmp);
 
@@ -789,6 +791,8 @@ void __fastcall Tf_Memory::MoveAddrByAbsolute(int addr)
    strncpy(instruction, AnsiString(this->cds_MemCode->AsString).c_str(), 17);
    instruction[16] = '\0';
    f_GraphIO->SetInstruction(instruction);
+
+   f_GraphIO->SetAbsoluteAddr(this->cds_MemAddress->AsInteger + 1);
 
    this->ExecCmp++;
    f_GraphIO->SetPgrmCmp(this->ExecCmp);

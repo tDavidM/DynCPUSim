@@ -38,6 +38,7 @@ __published:
     void __fastcall pDebugClick(TObject *Sender);
     void __fastcall FormShow(TObject *Sender);
     void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
+    void __fastcall pInterruptClick(TObject *Sender);
 private:
    int timerValue;
    int timerCmp;

@@ -108,6 +108,7 @@ object f_Terminal: Tf_Terminal
     ParentBackground = False
     ParentDoubleBuffered = False
     TabOrder = 2
+    OnClick = pInterruptClick
   end
   object pDebug: TPanel
     Left = 436

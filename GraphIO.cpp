@@ -207,6 +207,29 @@ void Tf_GraphIO::SetInstruction(char* instruction)
    this->Pin16->Checked = instruction[15] != '0';
 }
 //---------------------------------------------------------------------------
+void Tf_GraphIO::SetAbsoluteAddr(int addr)
+{
+   //81-96
+   Pin81->Checked = addr & 0x0001;
+   Pin82->Checked = addr & 0x0002;
+   Pin83->Checked = addr & 0x0004;
+   Pin84->Checked = addr & 0x0008;
+   Pin85->Checked = addr & 0x0010;
+   Pin86->Checked = addr & 0x0020;
+   Pin87->Checked = addr & 0x0040;
+   Pin88->Checked = addr & 0x0080;
+   Pin89->Checked = addr & 0x0100;
+   Pin90->Checked = addr & 0x0200;
+   Pin91->Checked = addr & 0x0400;
+   Pin92->Checked = addr & 0x0800;
+   Pin93->Checked = addr & 0x1000;
+   Pin94->Checked = addr & 0x2000;
+   Pin95->Checked = addr & 0x4000;
+   Pin96->Checked = addr & 0x8000;
+
+   l_Line8->Caption = "[0x" + IntToHex(addr, 4) + "]";
+}
+//---------------------------------------------------------------------------
 void __fastcall Tf_GraphIO::FormCloseQuery(TObject *Sender, bool &CanClose)
 {
    (void)Sender;
@@ -513,9 +536,7 @@ void Tf_GraphIO::SetIO(char cmd, char value, bool interrupt)
 
    l_Line10->Caption = "[0x" + IntToHex(value, 2) + "]";
 
-   if (interrupt) {
-      this->Pin17->Checked = true;
-   }
+   this->Pin17->Checked = interrupt;
 }
 //---------------------------------------------------------------------------
 

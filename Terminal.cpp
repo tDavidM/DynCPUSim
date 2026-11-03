@@ -251,6 +251,8 @@ void Tf_Terminal::ResetState(void)
 
    this->sbBoot->Caption = "Boot";
    this->sbBoot->Down = false;
+   this->sbHalt->Down = false;
+   //this->sbHalt->Color = clBtnFace;
 
    this->RefreshScreen();
 }
@@ -267,11 +269,15 @@ void __fastcall Tf_Terminal::sbHaltClick(TObject *Sender)
    (void)Sender;
 
    f_GraphIO->PullPin(39, this->sbHalt->Down);
+
+   //this->sbHalt->Color = this->sbHalt->Down ? clYellow : clBtnFace;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::ToggleHalt(bool state)
 {
    this->sbHalt->Down = state;
+
+   //this->sbHalt->Color = this->sbHalt->Down ? clYellow : clBtnFace;
 }
 //---------------------------------------------------------------------------
 void __fastcall Tf_Terminal::ToggleInterrupt(InterruptStates state)
@@ -325,6 +331,18 @@ void __fastcall Tf_Terminal::FormCloseQuery(TObject *Sender, bool &CanClose)
    (void)Sender;
 
    CanClose = false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall Tf_Terminal::pInterruptClick(TObject *Sender)
+{
+   (void)Sender;
+
+   // ITR_AWAITING
+   if (this->pInterrupt->Color == clYellow) {
+      f_GraphIO->SetIO(0x00, 0x00, false);
+      this->pInterrupt->Color = clGray;
+   }
 }
 //---------------------------------------------------------------------------
 
